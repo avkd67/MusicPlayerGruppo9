@@ -1,12 +1,19 @@
-package org.example.musicplayergruppo9;
+package org.example.musicplayergruppo9.controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import org.example.musicplayergruppo9.model.Brano;
+
 import java.io.IOException;
 
-public class HelloController {
+public class MainController {
+
+    @FXML
+    private BorderPane mainContainer; // Riferimento al layout principale
+
     @FXML
     private StackPane areaContenuti; // Lo StackPane che fa da schermo per le due view Home e Libreria
 
@@ -63,5 +70,18 @@ public class HelloController {
     @FXML
     public void unDo() {
         System.out.println("Pulsante unDo cliccato!");
+    }
+
+    public void apriPlayer(Brano branoSelezionato) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
+            Node playerView = loader.load();
+
+            // Inserisce dinamicamente il player nella parte in basso del BorderPane
+            mainContainer.setBottom(playerView);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
