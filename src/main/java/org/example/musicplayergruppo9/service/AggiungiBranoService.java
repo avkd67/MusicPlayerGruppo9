@@ -17,9 +17,9 @@ public class AggiungiBranoService {
     }
 
     public boolean gestisciSalvataggio(String titolo, String artista, String genere,
-                                       LocalDate dataRilascioInput,
+                                       int annoRilascio,
                                        String percorsoFileAudioSelezionato, String estensioneFileAudio,
-                                       String percorsoCopertinaSelezionata) throws IllegalArgumentException, java.io.IOException {
+                                       String percorsoCopertinaSelezionata, boolean explicit) throws IllegalArgumentException, java.io.IOException {
 
         // Validazione: Gestione degli omonimi nel DataBase
         if (branoDAO.esisteOmonimo(titolo, artista)) {
@@ -63,12 +63,9 @@ public class AggiungiBranoService {
             throw e; // Blocchiamo il salvataggio se la copia fallisce
         }
 
-        // Conversione della data da LocalDate (JavaFX) a java.util.Date
-        // Valerio mi ha ricordato che effettivamente volevamo salvare solo l'anno quindi magari cambio toDo
-        Date dataRilascio = null;
-        if (dataRilascioInput != null) {
-            dataRilascio = Date.from(dataRilascioInput.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        }
+        // Calcolo automatico di newRelease (è nuovo se l'anno inserito è uguale a quello di oggi)
+        int annoCorrente = java.time.LocalDate.now().getYear();
+        boolean newRelease = (annoRilascio > 0) && (annoRilascio == annoCorrente);
 
         // Calcolo/Estrazione della durata
         // non sapevo come farlo, per ora ho fatto 180s toDo
@@ -79,11 +76,13 @@ public class AggiungiBranoService {
                 titolo,
                 artista,
                 genere,
-                dataRilascio,
+                annoRilascio,
                 durataSecondi,
                 percorsoAudioDefinitivo,
                 estensioneFileAudio,
-                percorsoCopertinaDefinitiva
+                percorsoCopertinaDefinitiva,
+                newRelease,
+                explicit
         );
 
         // Salvataggio definitivo nel Database tramite DAO

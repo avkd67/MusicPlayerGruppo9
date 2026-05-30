@@ -43,7 +43,10 @@ public class DatabaseConnection {
                 "durata INTEGER, " +
                 "percorso_file_audio TEXT NOT NULL, " +
                 "estensione TEXT, " +
-                "percorso_copertina TEXT" +
+                "percorso_copertina TEXT, " +
+                "preferito INTEGER DEFAULT 0, " +
+                "new_release INTEGER DEFAULT 0, " +
+                "explicit INTEGER DEFAULT 0" +
                 ");";
 
         try (Connection conn = DriverManager.getConnection(URL);

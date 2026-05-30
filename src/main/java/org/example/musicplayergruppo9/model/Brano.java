@@ -1,7 +1,6 @@
 package org.example.musicplayergruppo9.model;
 
 import java.io.File;
-import java.util.Date;
 import java.util.Objects;
 public class Brano {
 
@@ -10,15 +9,19 @@ public class Brano {
     private String titolo;
     private String artista;
     private String genere;
-    private Date dataRilascio;
+    private int dataRilascio;
     private int durata;
     private String percorsoFileAudio;
     private String estensione;
     private String percorsoCopertina;
 
+    private boolean preferito;
+    private boolean newRelease;
+    private boolean explicit;
+
 
     // costruttore senza id per l'inserimento
-    public Brano(String titolo, String artista, String genere, Date dataRilascio, int durata, String percorsoFileAudio, String estensione, String percorsoCopertina) {
+    public Brano(String titolo, String artista, String genere, int dataRilascio, int durata, String percorsoFileAudio, String estensione, String percorsoCopertina, boolean newRelease, boolean explicit) {
         this.titolo = titolo;
         this.artista = artista;
         this.genere = genere;
@@ -27,10 +30,12 @@ public class Brano {
         this.percorsoFileAudio = percorsoFileAudio;
         this.estensione = estensione;
         this.percorsoCopertina = percorsoCopertina;
+        this.newRelease = newRelease;
+        this.explicit = explicit;
     }
 
     //costruttore con id per il recupero
-    public Brano(int id, String titolo, String artista, String genere, Date dataRilascio, int durata, String percorsoFileAudio, String estensione, String percorsoCopertina) {
+    public Brano(int id, String titolo, String artista, String genere, int dataRilascio, int durata, String percorsoFileAudio, String estensione, String percorsoCopertina, boolean preferito, boolean newRelease, boolean explicit) {
         this.id = id;
         this.titolo = titolo;
         this.artista = artista;
@@ -40,6 +45,9 @@ public class Brano {
         this.percorsoFileAudio = percorsoFileAudio;
         this.estensione = estensione;
         this.percorsoCopertina = percorsoCopertina;
+        this.preferito = preferito;
+        this.newRelease = newRelease;
+        this.explicit = explicit;
     }
 
     //per la creazione di oggetti brano che saranno riempiti successivamente con i dati necessari.
@@ -79,11 +87,11 @@ public class Brano {
         this.genere = genere;
     }
 
-    public Date getDataRilascio() {
+    public int getDataRilascio() {
         return dataRilascio;
     }
 
-    public void setDataRilascio(Date dataRilascio) {
+    public void setDataRilascio(int dataRilascio) {
         this.dataRilascio = dataRilascio;
     }
 
@@ -117,6 +125,30 @@ public class Brano {
 
     public void setPercorsoCopertina(String percorsoCopertina) {
         this.percorsoCopertina = percorsoCopertina;
+    }
+
+    public boolean isPreferito() {
+        return preferito;
+    }
+
+    public void setPreferito(boolean preferito) {
+        this.preferito = preferito;
+    }
+
+    public boolean isNewRelease() {
+        return newRelease;
+    }
+
+    public void setNewRelease(boolean newRelease) {
+        this.newRelease = newRelease;
+    }
+
+    public boolean isExplicit() {
+        return explicit;
+    }
+
+    public void setExplicit(boolean explicit) {
+        this.explicit = explicit;
     }
 
     @Override

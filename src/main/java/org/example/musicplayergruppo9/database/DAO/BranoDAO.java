@@ -9,14 +9,15 @@ import java.util.List;
 
 public class BranoDAO {
 
-     /**
+    /**
      * TASK 1.3: Salva un brano nel database.
      * Riceve un oggetto Brano senza ID, lo inserisce, e imposta l'ID generato automaticamente.
      */
     public boolean salvaBrano(Brano brano) {
+        // Corretto il typo: mancava una virgola e uno spazio tra percorso_copertina e preferito
         String sql = "INSERT INTO brani (titolo, artista, genere, data_rilascio, durata, " +
-                "percorso_file_audio, estensione, percorso_copertina) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "percorso_file_audio, estensione, percorso_copertina, preferito, new_release, explicit) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -25,9 +26,9 @@ public class BranoDAO {
             pstmt.setString(2, brano.getArtista());
             pstmt.setString(3, brano.getGenere());
 
-            // Gestione della data di rilascio
-            if (brano.getDataRilascio() != null) {
-                pstmt.setLong(4, brano.getDataRilascio().getTime());
+            // Gestione della data di rilascio (ora è l'anno)
+            if (brano.getDataRilascio() > 0) {
+                pstmt.setInt(4, brano.getDataRilascio());
             } else {
                 pstmt.setNull(4, Types.INTEGER);
             }
@@ -36,6 +37,9 @@ public class BranoDAO {
             pstmt.setString(6, brano.getPercorsoFileAudio());
             pstmt.setString(7, brano.getEstensione());
             pstmt.setString(8, brano.getPercorsoCopertina());
+            pstmt.setInt(9,  brano.isPreferito()    ? 1 : 0);
+            pstmt.setInt(10, brano.isNewRelease()   ? 1 : 0);
+            pstmt.setInt(11, brano.isExplicit()     ? 1 : 0);
 
             int righeInteressate = pstmt.executeUpdate();
 
@@ -55,7 +59,7 @@ public class BranoDAO {
         return false;
     }
 
-     /**
+    /**
      * TASK 1.2 (Validazione): Verifica se esiste già un brano con lo stesso titolo e artista.
      * Utile per bloccare i duplicati prima del salvataggio nel Controller.
      */
@@ -87,27 +91,35 @@ public class BranoDAO {
     public List<Brano> getTuttiIBrani() {
         List<Brano> listaBrani = new ArrayList<>();
         String sql = "SELECT * FROM brani";
+        int annoCorrente = java.time.LocalDate.now().getYear();
 
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                long timestamp = rs.getLong("data_rilascio");
-                java.util.Date data = (timestamp != 0) ? new java.util.Date(timestamp) : null;
+                // Recupero diretto dell'anno come intero
+                int anno = rs.getInt("data_rilascio");
 
-                // Uso il costruttore completo
+                // Ricalcolo dinamico per sapere se è una nuova uscita
+                boolean isNewRelease = (anno > 0 && anno == annoCorrente);
+
+                // Uso il costruttore completo aggiornato
                 Brano brano = new Brano(
                         rs.getInt("id"),
                         rs.getString("titolo"),
                         rs.getString("artista"),
                         rs.getString("genere"),
-                        data,
+                        anno,
                         rs.getInt("durata"),
                         rs.getString("percorso_file_audio"),
                         rs.getString("estensione"),
-                        rs.getString("percorso_copertina")
+                        rs.getString("percorso_copertina"),
+                        rs.getBoolean("preferito"),
+                        isNewRelease,
+                        rs.getBoolean("explicit")
                 );
+
                 listaBrani.add(brano);
             }
 
@@ -116,6 +128,19 @@ public class BranoDAO {
             e.printStackTrace();
         }
         return listaBrani;
+    }
+
+    public boolean aggiornaPreferito(int id, boolean preferito) {
+        String sql = "UPDATE brani SET preferito = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, preferito ? 1 : 0);
+            pstmt.setInt(2, id);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

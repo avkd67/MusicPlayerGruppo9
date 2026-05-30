@@ -111,6 +111,8 @@ public class LibreriaController {
 
         private HBox hboxContainer = new HBox(15);
         private ImageView imgCopertina = new ImageView();
+        private ImageView imgNew = new ImageView();
+        private ImageView imgExplicit = new ImageView();
         private Label lblTitolo = new Label();
         private Label lblAutore = new Label();
         private VBox vboxTesti = new VBox(5);
@@ -144,6 +146,14 @@ public class LibreriaController {
 
             vboxTesti.getChildren().addAll(lblTitolo, lblAutore);
 
+            Image iconaNew = new Image(getClass().getResourceAsStream("/org/example/musicplayergruppo9/img/new.png"));
+            imgNew.setImage(iconaNew);
+            imgNew.setFitHeight(40); imgNew.setFitWidth(40);
+
+            Image iconaExplicit = new Image(getClass().getResourceAsStream("/org/example/musicplayergruppo9/img/explicit.png"));
+            imgExplicit.setImage(iconaExplicit);
+            imgExplicit.setFitHeight(40); imgExplicit.setFitWidth(40);
+
             // Spinge tutto ciò che viene dopo lo spacer all'estrema destra
             HBox.setHgrow(spacer, Priority.ALWAYS);
 
@@ -153,12 +163,23 @@ public class LibreriaController {
             lblDurata.setStyle("-fx-padding: 0 10 0 0;"); // Margine destro per la durata
 
             // Assembla la riga standard
-            hboxContainer.getChildren().addAll(imgCopertina, vboxTesti, spacer, hboxBottoni);
+            hboxContainer.getChildren().addAll(imgCopertina, vboxTesti, imgNew, imgExplicit, spacer, hboxBottoni);
 
             // Definisce l'azione di eliminazione (per la Task 1.4.3)
             btnElimina.setOnAction(e -> {
                 Brano b = getItem();
                 System.out.println("Cliccato Elimina sul brano: " + b.getTitolo());
+            });
+
+            // Gestione bottone Preferito
+            btnPreferito.setOnAction(e -> {
+                Brano b = getItem();
+                if (b != null && b.getId() != -1) { // Evitiamo crash sulla riga finta "Aggiungi brano"
+                    boolean nuovoStato = !b.isPreferito();
+                    b.setPreferito(nuovoStato);
+                    branoDAO.aggiornaPreferito(b.getId(), nuovoStato);
+                    btnPreferito.setText(nuovoStato ? "★" : "☆");
+                }
             });
 
             // Configurazione "Elemento" Aggiungi
@@ -205,6 +226,12 @@ public class LibreriaController {
                     // imgCopertina.setImage(new Image(getClass().getResource("/org/example/.../default.png").toString())); //devo caricare ancora un png di default
                     imgCopertina.setImage(null);
                 }
+
+                imgNew.setVisible(brano.isNewRelease());
+                imgNew.setManaged(brano.isNewRelease());
+                imgExplicit.setVisible(brano.isExplicit());
+                imgExplicit.setManaged(brano.isExplicit());
+                btnPreferito.setText(brano.isPreferito() ? "★" : "☆");
 
                 setText(null);
                 setGraphic(hboxContainer);

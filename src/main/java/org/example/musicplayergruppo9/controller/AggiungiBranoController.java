@@ -1,10 +1,7 @@
 package org.example.musicplayergruppo9.controller;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
@@ -18,9 +15,11 @@ public class AggiungiBranoController {
     @FXML private TextField txtTitolo;
     @FXML private TextField txtArtista;
     @FXML private TextField txtGenere;
-    @FXML private DatePicker dpDataRilascio;
+    @FXML private TextField txtAnnoRilascio;
     @FXML private ImageView imgCopertina;
     @FXML private Label lblFileAudio;
+    @FXML private CheckBox chkExplicit;
+
 
     private AggiungiBranoService aggiungiBranoService;
 
@@ -95,6 +94,18 @@ public class AggiungiBranoController {
         String artista = txtArtista.getText() != null ? txtArtista.getText().trim() : "";
         String genere = txtGenere.getText() != null ? txtGenere.getText().trim() : "";
 
+        // Lettura e validazione dell'anno
+        int annoRilascio = 0;
+        String annoStr = txtAnnoRilascio.getText() != null ? txtAnnoRilascio.getText().trim() : "";
+        if (!annoStr.isEmpty()) {
+            try {
+                annoRilascio = Integer.parseInt(annoStr);
+            } catch (NumberFormatException e) {
+                mostraAlertErrore("Anno non valido", "Inserisci un anno numerico.", "Es: 2024");
+                return;
+            }
+        }
+
         // Validazione: Blocco se i campi minimi obbligatori sono vuoti
         if (titolo.isEmpty() || artista.isEmpty() || percorsoFileAudioSelezionato == null) {
             mostraAlertErrore("Campi Incompleti", "Impossibile salvare il brano.",
@@ -103,9 +114,10 @@ public class AggiungiBranoController {
         }
 
         try {
+            // Passiamo annoRilascio al service (il check newRelease lo fa il service)
             boolean successo = aggiungiBranoService.gestisciSalvataggio(
-                    titolo, artista, genere, dpDataRilascio.getValue(),
-                    percorsoFileAudioSelezionato, estensioneFileAudio, percorsoCopertinaSelezionata
+                    titolo, artista, genere, annoRilascio,
+                    percorsoFileAudioSelezionato, estensioneFileAudio, percorsoCopertinaSelezionata, chkExplicit.isSelected()
             );
 
             if (successo) {
