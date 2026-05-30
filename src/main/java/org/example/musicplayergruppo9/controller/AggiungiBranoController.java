@@ -9,12 +9,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.example.musicplayergruppo9.database.DAO.BranoDAO;
-import org.example.musicplayergruppo9.model.Brano;
+import org.example.musicplayergruppo9.service.AggiungiBranoService;
 
 import java.io.File;
-import java.time.ZoneId;
-import java.util.Date;
 
 public class AggiungiBranoController {
 
@@ -25,7 +22,7 @@ public class AggiungiBranoController {
     @FXML private ImageView imgCopertina;
     @FXML private Label lblFileAudio;
 
-    private BranoDAO branoDAO;
+    private AggiungiBranoService aggiungiBranoService;
 
     // Variabili di appoggio per memorizzare i percorsi dei file scelti, ovviamente sono inizialmente null
     private String percorsoFileAudioSelezionato = null;
@@ -34,7 +31,7 @@ public class AggiungiBranoController {
 
     @FXML
     public void initialize() {
-        branoDAO = new BranoDAO();
+        aggiungiBranoService = new AggiungiBranoService();
     }
 
     /**
@@ -105,85 +102,25 @@ public class AggiungiBranoController {
             return;
         }
 
-        // Validazione: Gestione degli omonimi nel DataBase
-        if (branoDAO.esisteOmonimo(titolo, artista)) {
+        try {
+            boolean successo = aggiungiBranoService.gestisciSalvataggio(
+                    titolo, artista, genere, dpDataRilascio.getValue(),
+                    percorsoFileAudioSelezionato, estensioneFileAudio, percorsoCopertinaSelezionata
+            );
+
+            if (successo) {
+                mostraAlertSuccesso("Salvataggio Completato", "Il brano '" + titolo + "' è stato aggiunto alla tua libreria.");
+                chiudiFinestra();
+            } else {
+                mostraAlertErrore("Errore del Sistema", "Salvataggio fallito.", "Si è verificato un errore imprevisto scrivendo sul database.");
+            }
+
+        } catch (IllegalArgumentException e) {
+            // Validazione: Gestione degli omonimi nel DataBase
             mostraAlertErrore("Brano Duplicato", "Rilevato omonimo nel sistema.",
                     "Esiste già una canzone intitolata '" + titolo + "con artista: '" + artista + "'.");
-            return;
-        }
-
-        // copia i file nella cartella del progetto
-        String percorsoAudioDefinitivo = percorsoFileAudioSelezionato;
-        String percorsoCopertinaDefinitiva = percorsoCopertinaSelezionata;
-
-        try {
-            // Creazione cartella Audio
-            java.nio.file.Path cartellaAudio = java.nio.file.Paths.get("AltriFile", "Audio");
-            if (!java.nio.file.Files.exists(cartellaAudio)) {
-                java.nio.file.Files.createDirectories(cartellaAudio); // questo l'ho messo perché non dovremmo tutti pushare le canzoni che ascoltiamo, speriamo funzioni
-            }
-
-            // Copia del file Audio
-            File fileAudioOriginale = new File(percorsoFileAudioSelezionato);
-            java.nio.file.Path targetAudio = cartellaAudio.resolve(fileAudioOriginale.getName());
-
-            // StandardCopyOption.REPLACE_EXISTING sovrascrive il file se ne esiste già uno con lo stesso nome, non sapevo come gestirlo sincero
-            java.nio.file.Files.copy(fileAudioOriginale.toPath(), targetAudio, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            percorsoAudioDefinitivo = targetAudio.toString(); // Aggiorno il percorso salvato nel dB
-
-            // Stessa cosa ma per la Copertina praticamente
-            if (percorsoCopertinaSelezionata != null) {
-                java.nio.file.Path cartellaCopertine = java.nio.file.Paths.get("AltriFile", "Copertine");
-                if (!java.nio.file.Files.exists(cartellaCopertine)) {
-                    java.nio.file.Files.createDirectories(cartellaCopertine);
-                }
-
-                File fileCopertinaOriginale = new File(percorsoCopertinaSelezionata);
-                java.nio.file.Path targetCopertina = cartellaCopertine.resolve(fileCopertinaOriginale.getName());
-                java.nio.file.Files.copy(fileCopertinaOriginale.toPath(), targetCopertina, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                percorsoCopertinaDefinitiva = targetCopertina.toString();
-            }
-
         } catch (java.io.IOException e) {
             mostraAlertErrore("Errore File System", "Impossibile copiare i file.", "Controlla i permessi della cartella.");
-            e.printStackTrace();
-            return; // Blocchiamo il salvataggio se la copia fallisce
-        }
-
-
-
-
-        // Conversione della data da LocalDate (JavaFX) a java.util.Date (Vostro Model)
-        // Valerio mi ha ricordato che effettivamente volevamo salvare solo l'anno quindi magari cambio toDo
-        Date dataRilascio = null;
-        if (dpDataRilascio.getValue() != null) {
-            dataRilascio = Date.from(dpDataRilascio.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-        }
-
-        // Calcolo/Estrazione della durata
-        // non sapevo come farlo, per ora ho fatto 180s toDo
-        int durataSecondi = 180;
-
-        // Creazione dell'oggetto Model (uso il costruttore senza ID)
-        Brano nuovoBrano = new Brano(
-                titolo,
-                artista,
-                genere,
-                dataRilascio,
-                durataSecondi,
-                percorsoAudioDefinitivo,
-                estensioneFileAudio,
-                percorsoCopertinaDefinitiva
-        );
-
-        // Salvataggio definitivo nel Database tramite DAO
-        boolean successo = branoDAO.salvaBrano(nuovoBrano);
-
-        if (successo) {
-            mostraAlertSuccesso("Salvataggio Completato", "Il brano '" + titolo + "' è stato aggiunto alla tua libreria.");
-            chiudiFinestra();
-        } else {
-            mostraAlertErrore("Errore del Sistema", "Salvataggio fallito.", "Si è verificato un errore imprevisto scrivendo sul database.");
         }
     }
 
@@ -194,8 +131,6 @@ public class AggiungiBranoController {
     private void onAnnulla() {
         chiudiFinestra();
     }
-
-
 
     private void chiudiFinestra() {
         // Recupera lo stage corrente partendo da uno qualsiasi dei nodi grafici e lo chiude
