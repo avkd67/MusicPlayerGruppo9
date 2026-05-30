@@ -41,3 +41,5 @@ build/
 musicplayer.db
 
 *.db
+musicplayer.db
+pom.xml

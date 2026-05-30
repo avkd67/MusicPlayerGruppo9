@@ -143,4 +143,72 @@ public class BranoDAO {
         }
     }
 
-}
+    /**versione cascata, da testare dopo creazione della tabella di collegamento playlist_brani
+     * TASK 3.2: Elimina un brano dalla lista generale e a cascata dalle playlist.
+     */
+    /*public boolean eliminaBrano(int id) {
+        // Query 1: Rimuove il brano dalle playlist (assumendo che la tabella si chiamerà playlist_brani)
+        String sqlCascataPlaylist = "DELETE FROM playlist_brani WHERE id_brano = ?";
+        // Query 2: Rimuove il brano dalla libreria principale
+        String sqlLibreria = "DELETE FROM brani WHERE id = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            // Disabilitiamo l'autocommit per eseguire entrambe le query in blocco (Transazione)
+            conn.setAutoCommit(false); 
+
+            try (PreparedStatement pstmtPlaylist = conn.prepareStatement(sqlCascataPlaylist);
+                 PreparedStatement pstmtLibreria = conn.prepareStatement(sqlLibreria)) {
+                
+                // 1. Eliminazione a cascata (anche se la tabella non esiste ancora, ci prepariamo)
+                try {
+                    pstmtPlaylist.setInt(1, id);
+                    pstmtPlaylist.executeUpdate();
+                } catch (SQLException ignored) {
+                    // Ignoriamo l'errore per ora se la tabella playlist_brani non è stata ancora creata dai colleghi
+                }
+
+                // 2. Eliminazione dalla libreria
+                pstmtLibreria.setInt(1, id);
+                int righeEliminate = pstmtLibreria.executeUpdate();
+
+                // Confermiamo le modifiche al database
+                conn.commit(); 
+                
+                return righeEliminate > 0;
+
+            } catch (SQLException ex) {
+                conn.rollback(); // Se qualcosa va storto, annulliamo tutte le modifiche
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true); // Ripristiniamo il comportamento di default
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[BranoDAO] Errore durante l'eliminazione del brano con ID: " + id);
+            e.printStackTrace();
+            return false;
+        }
+    }*/
+
+    /**
+     * TASK 1.4.3: Elimina un brano dal database in base al suo ID.
+     */
+    public boolean eliminaBrano(int id) {
+        String sql = "DELETE FROM brani WHERE id = ?";
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            
+            // Se executeUpdate è maggiore di 0, ha eliminato correttamente la riga
+            return pstmt.executeUpdate() > 0; 
+
+        } catch (SQLException e) {
+            System.err.println("[BranoDAO] Errore durante l'eliminazione del brano con ID: " + id);
+            e.printStackTrace();
+            return false;
+        }
+    }    
+
+} 

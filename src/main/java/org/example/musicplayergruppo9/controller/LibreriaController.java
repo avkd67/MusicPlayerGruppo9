@@ -165,10 +165,24 @@ public class LibreriaController {
             // Assembla la riga standard
             hboxContainer.getChildren().addAll(imgCopertina, vboxTesti, imgNew, imgExplicit, spacer, hboxBottoni);
 
+            
             // Definisce l'azione di eliminazione (per la Task 1.4.3)
             btnElimina.setOnAction(e -> {
                 Brano b = getItem();
-                System.out.println("Cliccato Elimina sul brano: " + b.getTitolo());
+                // Assicuriamoci di non provare a eliminare il bottone finto "Aggiungi brano" (id -1)
+                if (b != null && b.getId() != -1) {
+                    
+                    // 1. Diciamo al DAO di cancellarlo dal database
+                    boolean eliminato = branoDAO.eliminaBrano(b.getId());
+                    
+                    if (eliminato) {
+                        // 2. Lo togliamo dalla lista grafica per farlo sparire subito dallo schermo!
+                        braniObservableList.remove(b);
+                        System.out.println("Brano eliminato con successo: " + b.getTitolo());
+                    } else {
+                        System.out.println("Errore: impossibile eliminare il brano dal database.");
+                    }
+                }
             });
 
             // Gestione bottone Preferito
