@@ -9,10 +9,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.ElementoCoda;
 
-import java.io.IOException;
 
 public class MainController {
 
@@ -22,7 +20,8 @@ public class MainController {
     @FXML
     private StackPane areaContenuti; // Lo StackPane che fa da schermo per le due view Home e Libreria
 
-    private final PlayerController playerController = new PlayerController();
+    private PlayerController playerController = new PlayerController();
+    private boolean playerAperto = false;
 
     // Metodo collegato al click del tasto "Home" a sinistra
     @FXML
@@ -69,11 +68,11 @@ public class MainController {
         System.out.println("Pulsante Play cliccato!");
     }
 
+    //task 6.2 lo skip viene delegato a PlayerController
     @FXML
     public void skipSong() {
         //delega al PlayerController
-        playerController.skipBrano();
-        System.out.println("Pulsante skip cliccato!");
+        if (playerController != null) playerController.skipSong();
     }
 
     @FXML
@@ -81,11 +80,11 @@ public class MainController {
         System.out.println("Pulsante skipPlaylist cliccato!");
     }
 
+    //task 7.2 Delega il loop al PlayerController
     @FXML
     public void loopSong() {
         //delega al PlayerController
-        playerController.loopBrano();
-        System.out.println("Pulsante loop cliccato!");
+        if (playerController != null) playerController.loopSong();
     }
 
     @FXML
@@ -93,24 +92,32 @@ public class MainController {
         System.out.println("Pulsante unDo cliccato!");
     }
 
-    //Chiamato quando l'utetne clicca su brano/playlist, 
+    //Chiamato quando l'utentne clicca su brano/playlist, 
     // e aggiunge l'elemento alla coda o apre la player
     public void apriPlayer(ElementoCoda elemento) {
-        playerController.aggiungiInCoda(elemento);
-    public void apriPlayer(Brano branoSelezionato) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass()
-                    .getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
-            Node playerView = loader.load();
+        if(!playerAperto){
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass()
+                        .getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
+                Node playerView = loader.load();
 
-            // PASSA I DATI: Prendi il controller del player e passagli il brano
-            PlayerController playerController = loader.getController();
-            playerController.setBrano(branoSelezionato);
+                // PASSA I DATI: Prendi il controller del player e passagli il brano
+                playerController = (PlayerController) loader.getController();
 
-            // Inserisce dinamicamente il player nella parte in basso del BorderPane
-            mainContainer.setBottom(playerView);
-        } catch (IOException e) {
-            e.printStackTrace();
+                // Inserisce dinamicamente il player nella parte in basso del BorderPane
+                mainContainer.setBottom(playerView);
+                playerAperto = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //aggiunge in coda
+        if (playerController != null) {
+            if (elemento instanceof Brano) {
+                playerController.setBrano((Brano) elemento);
+            } else {
+                playerController.aggiungiInCoda(elemento);
+            }
         }
     }
 
@@ -123,11 +130,27 @@ public class MainController {
         return playerController;
     }
 
+    //per svolgere il task 6.2 
+    //aggiunge un elemnto in coda senza interrompere la riproduzione attuale
+    //tramite il tasto, mette l'elemento in coda senza riprodurre subito
+    public void aggiungiInCoda(ElementoCoda elemento) {
+        // Apre il player la prima volta se non è ancora aperto
+        if (!playerAperto) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass()
+                    .getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
+                Node playerView = loader.load();
+                playerController = (PlayerController) loader.getController();
+                mainContainer.setBottom(playerView);
+                playerAperto = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-    @FXML
-    public void unDo() {
-        System.out.println("Pulsante unDo cliccato!");
+        if (playerController != null) {
+            playerController.aggiungiInCoda(elemento);
+        }
     }
-
 
 }

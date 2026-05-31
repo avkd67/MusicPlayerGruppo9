@@ -141,6 +141,15 @@ public class LibreriaController implements Observer {
         private ImageView imgAggiungi = new ImageView();
         private Label lblAggiungi = new Label("Aggiungi brano");
 
+        //task 6.2
+        private void aggiungiInCoda(Brano brano) {
+            if (brano != null && brano.getId() != -1 && mainController != null) {
+                mainController.aggiungiInCoda(brano);
+                System.out.println("Aggiunto in coda: " + brano.getTitolo());
+            }
+        }
+
+        //task 6.2 collega il bottone per aggiungere un elemento in coda
         public BranoListCell() {
             super();
 
@@ -202,6 +211,12 @@ public class LibreriaController implements Observer {
                     branoDAO.aggiornaPreferito(b.getId(), nuovoStato);
                     btnPreferito.setText(nuovoStato ? "★" : "☆");
                 }
+            });
+
+            // Gestione bottone Coda
+            btnCoda.setOnAction(e -> {
+                Brano b = getItem();
+                aggiungiInCoda(b);
             });
 
             // Configurazione "Elemento" Aggiungi

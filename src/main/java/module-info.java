@@ -1,6 +1,8 @@
 module org.example.musicplayergruppo9 {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.media;
+
 
 
     requires java.sql; // per il database in SQLite
