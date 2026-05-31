@@ -16,6 +16,13 @@ public class PlayerService {
     private Player jPlayer;
     private PlayerState currentState;
 
+    private Runnable onEndOfMediaCallback;
+
+    //permette a PlayerController di registrare il codice da eseguire quando il brano termina
+    public void setOnEndOfMediaCallback(Runnable callback) {
+        this.onEndOfMediaCallback = callback;
+    }
+
     // Volatile per garantire la corretta sincronizzazione tra i thread
     private volatile Thread playerThread;
 
@@ -160,10 +167,17 @@ public class PlayerService {
     private void onEndOfMedia() {
         stopAudio();
         currentSeconds = 0;
+        //riporta lo stato interno a pausa (pattern state)
         this.currentState = new PausedState();
+        //aggiorna il bottone
         updatePlayButtonUI("▶");
+        //resetta lo slider
         if (updateTimeCallback != null) {
             updateTimeCallback.accept(Duration.ZERO);
+        }
+        // Notifica il PlayerController che il brano è finito
+        if (onEndOfMediaCallback != null) {
+            Platform.runLater(onEndOfMediaCallback);
         }
     }
 
