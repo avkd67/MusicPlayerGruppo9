@@ -248,12 +248,13 @@ public class BranoDAO implements Subject {
             pstmt.setInt(1, id);
 
             //ti ho aggiunto questo if perché sto implementando Observer :P
-            if(pstmt.executeUpdate() > 0){
+            int eliminato = pstmt.executeUpdate();
+            if(eliminato > 0){
                 notifyObservers();
             }
 
             // Se executeUpdate è maggiore di 0, ha eliminato correttamente la riga
-            return pstmt.executeUpdate() > 0;
+            return eliminato > 0;
 
         } catch (SQLException e) {
             System.err.println("[BranoDAO] Errore durante l'eliminazione del brano con ID: " + id);
