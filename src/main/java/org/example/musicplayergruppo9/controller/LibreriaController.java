@@ -31,6 +31,13 @@ public class LibreriaController implements Observer {
     private ObservableList<Brano> braniObservableList;
     private BranoDAO branoDAO;
 
+    // per il passaggio delle informazioni delle canzoni al main
+    private MainController mainController;
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
+
     // Un oggetto vuoto, usato come "segnaposto" per l'ultima riga
     private final Brano SEGNAPOSTO_AGGIUNGI = new Brano();
 
@@ -87,9 +94,11 @@ public class LibreriaController implements Observer {
 
     }
 
-    private void riproduciBrano() {
-        System.out.println("Apertura della vista riproduci Brano...");
-
+    private void riproduciBrano(Brano branoSelezionato) {
+        if (branoSelezionato != null && branoSelezionato.getId() != -1 && mainController != null) {
+            System.out.println("Apertura della vista riproduci Brano per: " + branoSelezionato.getTitolo());
+            mainController.apriPlayer(branoSelezionato);
+        }
     }
 
 
@@ -206,7 +215,10 @@ public class LibreriaController implements Observer {
 
             // Rende l'intera riga cliccabile come se fosse un bottone
             hboxAggiungi.setOnMouseClicked(e -> apriVistaAggiungiBrano());
-            hboxContainer.setOnMouseClicked(e -> riproduciBrano());
+            hboxContainer.setOnMouseClicked(e -> {
+                Brano branoCliccato = getItem();
+                riproduciBrano(branoCliccato);
+            });
 
             // Cambia il cursore con il ditp per far capire che è cliccabile
             hboxAggiungi.setStyle("-fx-cursor: hand;");

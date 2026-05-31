@@ -47,6 +47,10 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/LibreriaView.fxml"));
             Node viewLibreria = loader.load();
 
+            // INIEZIONE: Passiamo al LibreriaController un riferimento a questo MainController
+            LibreriaController libreriaController = loader.getController();
+            libreriaController.setMainController(this);
+
             areaContenuti.getChildren().setAll(viewLibreria);
 
         } catch (IOException e) {
@@ -54,35 +58,14 @@ public class MainController {
         }
     }
 
-    @FXML
-    public void play() {
-        System.out.println("Pulsante Play cliccato!");
-    }
-
-    @FXML
-    public void skipSong() {
-        System.out.println("Pulsante skip cliccato!");
-    }
-
-    @FXML
-    public void skipPlaylist() {
-        System.out.println("Pulsante skipPlaylist cliccato!");
-    }
-
-    @FXML
-    public void loopSong() {
-        System.out.println("Pulsante loop cliccato!");
-    }
-
-    @FXML
-    public void unDo() {
-        System.out.println("Pulsante unDo cliccato!");
-    }
-
     public void apriPlayer(Brano branoSelezionato) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
             Node playerView = loader.load();
+
+            // PASSA I DATI: Prendi il controller del player e passagli il brano
+            PlayerController playerController = loader.getController();
+            playerController.setBrano(branoSelezionato);
 
             // Inserisce dinamicamente il player nella parte in basso del BorderPane
             mainContainer.setBottom(playerView);
@@ -91,4 +74,13 @@ public class MainController {
             e.printStackTrace();
         }
     }
+
+
+
+    @FXML
+    public void unDo() {
+        System.out.println("Pulsante unDo cliccato!");
+    }
+
+
 }
