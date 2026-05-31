@@ -13,7 +13,7 @@ public class AggiungiBranoService {
     private BranoDAO branoDAO;
 
     public AggiungiBranoService() {
-        this.branoDAO = new BranoDAO();
+        branoDAO = BranoDAO.getInstance();
     }
 
     public boolean gestisciSalvataggio(String titolo, String artista, String genere,

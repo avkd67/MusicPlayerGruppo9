@@ -34,7 +34,7 @@ public class LibreriaController {
 
     @FXML
     public void initialize() {
-        branoDAO = new BranoDAO();
+        branoDAO = BranoDAO.getInstance();
 
         // Carica i brani reali dal database
         List<Brano> braniRecuperati = branoDAO.getTuttiIBrani();
