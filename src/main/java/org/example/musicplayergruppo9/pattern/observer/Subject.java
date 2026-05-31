@@ -1,4 +1,4 @@
-package org.example.musicplayergruppo9.pattern;
+package org.example.musicplayergruppo9.pattern.observer;
 
 public interface Subject {
     void attach(Observer o);

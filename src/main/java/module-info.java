@@ -5,7 +5,8 @@ module org.example.musicplayergruppo9 {
 
 
 
-    requires java.sql; // per il database in SQLite
+    requires java.sql;
+    requires jlayer; // per il database in SQLite
 
     opens org.example.musicplayergruppo9 to javafx.fxml;
     exports org.example.musicplayergruppo9;

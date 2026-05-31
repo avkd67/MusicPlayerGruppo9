@@ -68,8 +68,9 @@ public class AggiungiBranoService {
         boolean newRelease = (annoRilascio > 0) && (annoRilascio == annoCorrente);
 
         // Calcolo/Estrazione della durata
-        // non sapevo come farlo, per ora ho fatto 180s toDo
-        int durataSecondi = 180;
+        int durataSecondi = 0;
+        File fileAudioSalvato = new File(percorsoAudioDefinitivo);
+        durataSecondi = (int) (fileAudioSalvato.length() / 24000);
 
         // Creazione dell'oggetto Model (uso il costruttore senza ID)
         Brano nuovoBrano = new Brano(

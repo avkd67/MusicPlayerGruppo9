@@ -4,7 +4,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -18,7 +17,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.example.musicplayergruppo9.database.DAO.BranoDAO;
 import org.example.musicplayergruppo9.model.Brano;
-import org.example.musicplayergruppo9.pattern.Observer;
+import org.example.musicplayergruppo9.pattern.observer.Observer;
 
 import java.io.File;
 import java.util.List;

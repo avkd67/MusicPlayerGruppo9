@@ -43,7 +43,7 @@ public class AggiungiBranoController {
 
         // Filtro estensioni (Task 1.3: Logica di validazione estensione)
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("File Audio (*.mp3, *.wav)", "*.mp3", "*.wav") //ringraziamo i tutorial su youtbe per ExtensionFilter ^-^
+                new FileChooser.ExtensionFilter("File Audio (*.mp3)", "*.mp3") //ringraziamo i tutorial su youtbe per ExtensionFilter ^-^
         );
 
         // Mostra la finestra di dialogo aperta sopra la finestra attuale
@@ -71,7 +71,7 @@ public class AggiungiBranoController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleziona l'immagine di coeprtina");
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Immagini (*.png, *.jpg, *.jpeg)", "*.png", "*.jpg", "*.jpeg") //grazie .ExtensionFilter
+                new FileChooser.ExtensionFilter("Immagini (*.jpg, *.jpeg)", "*.jpg", "*.jpeg") //grazie .ExtensionFilter
         );
 
         Stage stage = (Stage) imgCopertina.getScene().getWindow();
