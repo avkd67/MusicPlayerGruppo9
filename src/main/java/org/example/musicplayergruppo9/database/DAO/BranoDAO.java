@@ -2,15 +2,21 @@ package org.example.musicplayergruppo9.database.DAO;
 
 import org.example.musicplayergruppo9.database.DatabaseConnection;
 import org.example.musicplayergruppo9.model.Brano;
+import org.example.musicplayergruppo9.pattern.Observer;
+import org.example.musicplayergruppo9.pattern.Subject;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BranoDAO {
+public class BranoDAO implements Subject {
 
     // rendo BranoDAO un singleton creando l'istanza privata e statica della classe stessa
     private static BranoDAO instance;
+
+
+    // List<Observer> per il pattern observerS
+    private List<Observer> observers = new ArrayList<>();
 
     // Costruttore privato: esegue il "warm-up" del database al primo avvio
     private BranoDAO() {
@@ -76,6 +82,7 @@ public class BranoDAO {
                         brano.setId(generatedKeys.getInt(1));
                     }
                 }
+                notifyObservers();
                 return true;
             }
 
@@ -168,7 +175,12 @@ public class BranoDAO {
 
             pstmt.setInt(1, preferito ? 1 : 0);
             pstmt.setInt(2, id);
-            return pstmt.executeUpdate() > 0;
+            boolean aggiornato = pstmt.executeUpdate() > 0;
+            if(aggiornato){
+                // NOTIFICA!
+                notifyObservers();
+            }
+            return aggiornato;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -234,15 +246,39 @@ public class BranoDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
-            
+
+            //ti ho aggiunto questo if perché sto implementando Observer :P
+            if(pstmt.executeUpdate() > 0){
+                notifyObservers();
+            }
+
             // Se executeUpdate è maggiore di 0, ha eliminato correttamente la riga
-            return pstmt.executeUpdate() > 0; 
+            return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             System.err.println("[BranoDAO] Errore durante l'eliminazione del brano con ID: " + id);
             e.printStackTrace();
             return false;
         }
-    }    
+    }
 
-} 
+    //metodi di Observer
+    @Override
+    public void attach(Observer o) {
+        if (!observers.contains(o)) {
+            observers.add(o);
+        }
+    }
+
+    @Override
+    public void detach(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.update();
+        }
+    }
+}
