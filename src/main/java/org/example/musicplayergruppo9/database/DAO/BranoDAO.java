@@ -2,12 +2,44 @@ package org.example.musicplayergruppo9.database.DAO;
 
 import org.example.musicplayergruppo9.database.DatabaseConnection;
 import org.example.musicplayergruppo9.model.Brano;
+import org.example.musicplayergruppo9.pattern.Observer;
+import org.example.musicplayergruppo9.pattern.Subject;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BranoDAO {
+public class BranoDAO implements Subject {
+
+    // rendo BranoDAO un singleton creando l'istanza privata e statica della classe stessa
+    private static BranoDAO instance;
+
+
+    // List<Observer> per il pattern observerS
+    private List<Observer> observers = new ArrayList<>();
+
+    // Costruttore privato: esegue il "warm-up" del database al primo avvio
+    private BranoDAO() {
+        try {
+            // Richiamando getInstance(), costringiamo DatabaseConnection a inizializzarsi,
+            // caricare i driver e creare la tabella 'brani' se non esiste.
+            DatabaseConnection.getInstance().getConnection();
+
+            System.out.println("BranoDAO: Inizializzazione unica del Database avvenuta con successo.");
+        } catch (SQLException e) {
+            System.err.println("BranoDAO: Errore critico durante l'inizializzazione del database.");
+            e.printStackTrace();
+
+            throw new RuntimeException("Impossibile stabilire la connessione al database al lancio dell'app.", e);
+        }
+    }
+
+    public static synchronized BranoDAO getInstance() {
+        if (instance == null) {
+            instance = new BranoDAO();
+        }
+        return instance;
+    }
 
     /**
      * TASK 1.3: Salva un brano nel database.
@@ -19,7 +51,8 @@ public class BranoDAO {
                 "percorso_file_audio, estensione, percorso_copertina, preferito, new_release, explicit) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        // Chiede l'istanza Singleton di DatabaseConnection
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, brano.getTitolo());
@@ -49,6 +82,7 @@ public class BranoDAO {
                         brano.setId(generatedKeys.getInt(1));
                     }
                 }
+                notifyObservers();
                 return true;
             }
 
@@ -66,7 +100,8 @@ public class BranoDAO {
     public boolean esisteOmonimo(String titolo, String artista) {
         String sql = "SELECT COUNT(*) FROM brani WHERE LOWER(titolo) = LOWER(?) AND LOWER(artista) = LOWER(?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        // Chiede l'istanza Singleton di DatabaseConnection
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, titolo.trim());
@@ -93,7 +128,8 @@ public class BranoDAO {
         String sql = "SELECT * FROM brani";
         int annoCorrente = java.time.LocalDate.now().getYear();
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        // Chiede l'istanza Singleton di DatabaseConnection
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -132,11 +168,19 @@ public class BranoDAO {
 
     public boolean aggiornaPreferito(int id, boolean preferito) {
         String sql = "UPDATE brani SET preferito = ? WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+
+        // Chiede l'istanza Singleton di DatabaseConnection
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setInt(1, preferito ? 1 : 0);
             pstmt.setInt(2, id);
-            return pstmt.executeUpdate() > 0;
+            boolean aggiornato = pstmt.executeUpdate() > 0;
+            if(aggiornato){
+                // NOTIFICA!
+                notifyObservers();
+            }
+            return aggiornato;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -151,14 +195,15 @@ public class BranoDAO {
         String sqlCascataPlaylist = "DELETE FROM playlist_brani WHERE id_brano = ?";
         // Query 2: Rimuove il brano dalla libreria principale
         String sqlLibreria = "DELETE FROM brani WHERE id = ?";
-        
-        try (Connection conn = DatabaseConnection.getConnection()) {
+
+        // MODIFICA: Ora chiediamo prima l'istanza Singleton di DatabaseConnection
+        try (Connection conn = DatabaseConnection.getInstance().getConnection()) {
             // Disabilitiamo l'autocommit per eseguire entrambe le query in blocco (Transazione)
-            conn.setAutoCommit(false); 
+            conn.setAutoCommit(false);
 
             try (PreparedStatement pstmtPlaylist = conn.prepareStatement(sqlCascataPlaylist);
                  PreparedStatement pstmtLibreria = conn.prepareStatement(sqlLibreria)) {
-                
+
                 // 1. Eliminazione a cascata (anche se la tabella non esiste ancora, ci prepariamo)
                 try {
                     pstmtPlaylist.setInt(1, id);
@@ -172,8 +217,8 @@ public class BranoDAO {
                 int righeEliminate = pstmtLibreria.executeUpdate();
 
                 // Confermiamo le modifiche al database
-                conn.commit(); 
-                
+                conn.commit();
+
                 return righeEliminate > 0;
 
             } catch (SQLException ex) {
@@ -195,20 +240,46 @@ public class BranoDAO {
      */
     public boolean eliminaBrano(int id) {
         String sql = "DELETE FROM brani WHERE id = ?";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
+
+        // Chiede l'istanza Singleton di DatabaseConnection
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
-            
+
+            //ti ho aggiunto questo if perché sto implementando Observer :P
+            int eliminato = pstmt.executeUpdate();
+            if(eliminato > 0){
+                notifyObservers();
+            }
+
             // Se executeUpdate è maggiore di 0, ha eliminato correttamente la riga
-            return pstmt.executeUpdate() > 0; 
+            return eliminato > 0;
 
         } catch (SQLException e) {
             System.err.println("[BranoDAO] Errore durante l'eliminazione del brano con ID: " + id);
             e.printStackTrace();
             return false;
         }
-    }    
+    }
 
-} 
+    //metodi di Observer
+    @Override
+    public void attach(Observer o) {
+        if (!observers.contains(o)) {
+            observers.add(o);
+        }
+    }
+
+    @Override
+    public void detach(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.update();
+        }
+    }
+}

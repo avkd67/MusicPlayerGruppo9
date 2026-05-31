@@ -11,12 +11,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane maxHeight="110.0" minHeight="110.0" prefHeight="110.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.fxml.PlayerView">
+<AnchorPane maxHeight="110.0" minHeight="110.0" prefHeight="110.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.PlayerController">
    <children>
-      <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0">
-         <children>
-            <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
+      <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">         <children>
+            <ImageView fx:id="imgCopertina" fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
                <HBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </HBox.margin>
@@ -24,14 +22,24 @@
                   <Image url="@../img/music-note-icon-1.png" />
                </image>
             </ImageView>
-            <Label text="Titolo">
-               <font>
-                  <Font size="21.0" />
-               </font>
+            <VBox alignment="CENTER">
+               <children>
+                  <Label fx:id="lblTitolo" text="Titolo">
+                     <font>
+                        <Font name="System Bold" size="21.0" />
+                     </font>
+                  </Label>
+      
+                  <Label fx:id="lblArtista" text="Artista" textFill="#6e6d6d">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
                <HBox.margin>
-                  <Insets right="10.0" />
+                  <Insets />
                </HBox.margin>
-            </Label>
+            </VBox>
             <VBox prefHeight="100.0" prefWidth="211.0" HBox.hgrow="ALWAYS">
                <HBox.margin>
                   <Insets right="10.0" />

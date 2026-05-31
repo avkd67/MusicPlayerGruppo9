@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,11 +18,12 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.example.musicplayergruppo9.database.DAO.BranoDAO;
 import org.example.musicplayergruppo9.model.Brano;
+import org.example.musicplayergruppo9.pattern.Observer;
 
 import java.io.File;
 import java.util.List;
 
-public class LibreriaController {
+public class LibreriaController implements Observer {
 
     @FXML
     private ListView<Brano> listaBrani;
@@ -29,12 +31,21 @@ public class LibreriaController {
     private ObservableList<Brano> braniObservableList;
     private BranoDAO branoDAO;
 
+    // per il passaggio delle informazioni delle canzoni al main
+    private MainController mainController;
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
+
     // Un oggetto vuoto, usato come "segnaposto" per l'ultima riga
     private final Brano SEGNAPOSTO_AGGIUNGI = new Brano();
 
     @FXML
     public void initialize() {
-        branoDAO = new BranoDAO();
+        branoDAO = BranoDAO.getInstance();
+
+        branoDAO.attach(this);
 
         // Carica i brani reali dal database
         List<Brano> braniRecuperati = branoDAO.getTuttiIBrani();
@@ -75,7 +86,6 @@ public class LibreriaController {
 
             // Quando viene premuto ok, annulla o chiusura (equivalente ad annulla)
             // il codice riparte da qui. Aggiorniamo la lista per mostrare il nuovo brano!!!!!!!
-            aggiornaListaBrani();
 
         } catch (java.io.IOException e) {
             System.err.println("Errore nel caricamento della vista AggiungiBranoView.fxml");
@@ -84,26 +94,24 @@ public class LibreriaController {
 
     }
 
-     /**
-     * Ricarica i brani dal database e aggiorna la ListView
-     */
-    private void aggiornaListaBrani() {
-        System.out.println("Si si... sto aggiornando i brani -_-/ ");
-
-        // Pulisce la lista attuale
-        braniObservableList.clear();
-
-        // Ripesca tutti i brani aggiornati dal DB
-        List<Brano> braniAggiornati = branoDAO.getTuttiIBrani();
-        braniObservableList.addAll(braniAggiornati);
-
-        // Reinserisce il pulsante finto "Aggiungi Brano" in fondo
-        braniObservableList.add(SEGNAPOSTO_AGGIUNGI);
+    private void riproduciBrano(Brano branoSelezionato) {
+        if (branoSelezionato != null && branoSelezionato.getId() != -1 && mainController != null) {
+            System.out.println("Apertura della vista riproduci Brano per: " + branoSelezionato.getTitolo());
+            mainController.apriPlayer(branoSelezionato);
+        }
     }
 
-    private void riproduciBrano() {
-        System.out.println("Apertura della vista riproduci Brano...");
 
+    /**
+    * Usa il metodo dell'interfaccia Obsrever per aggiornare la vista dei brani
+    * */
+    @Override
+    public void update() {
+        System.out.println("Sto recuperando i brani dal DB!!");
+        braniObservableList.clear();
+        List<Brano> braniAggiornati = branoDAO.getTuttiIBrani();
+        braniObservableList.addAll(braniAggiornati);
+        braniObservableList.add(SEGNAPOSTO_AGGIUNGI);
     }
 
     // Definisce il layout grafico per ogni singola cella della ListView
@@ -207,7 +215,10 @@ public class LibreriaController {
 
             // Rende l'intera riga cliccabile come se fosse un bottone
             hboxAggiungi.setOnMouseClicked(e -> apriVistaAggiungiBrano());
-            hboxContainer.setOnMouseClicked(e -> riproduciBrano());
+            hboxContainer.setOnMouseClicked(e -> {
+                Brano branoCliccato = getItem();
+                riproduciBrano(branoCliccato);
+            });
 
             // Cambia il cursore con il ditp per far capire che è cliccabile
             hboxAggiungi.setStyle("-fx-cursor: hand;");
