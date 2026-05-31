@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import org.example.musicplayergruppo9.model.Brano;
+import org.example.musicplayergruppo9.model.ElementoCoda;
 
 import java.io.IOException;
 
@@ -16,6 +17,8 @@ public class MainController {
 
     @FXML
     private StackPane areaContenuti; // Lo StackPane che fa da schermo per le due view Home e Libreria
+
+    private final PlayerController playerController = new PlayerController();
 
     // Metodo collegato al click del tasto "Home" a sinistra
     @FXML
@@ -54,6 +57,8 @@ public class MainController {
 
     @FXML
     public void skipSong() {
+        //delega al PlayerController
+        playerController.skipBrano();
         System.out.println("Pulsante skip cliccato!");
     }
 
@@ -64,6 +69,8 @@ public class MainController {
 
     @FXML
     public void loopSong() {
+        //delega al PlayerController
+        playerController.loopBrano();
         System.out.println("Pulsante loop cliccato!");
     }
 
@@ -72,16 +79,26 @@ public class MainController {
         System.out.println("Pulsante unDo cliccato!");
     }
 
-    public void apriPlayer(Brano branoSelezionato) {
+    //Chiamato quando l'utetne clicca su brano/playlist, 
+    // e aggiunge l'elemento alla coda o apre la player
+    public void apriPlayer(ElementoCoda elemento) {
+        playerController.aggiungiInCoda(elemento);
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass()
+                    .getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
             Node playerView = loader.load();
-
-            // Inserisce dinamicamente il player nella parte in basso del BorderPane
             mainContainer.setBottom(playerView);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    //accetta ancora un Brano direttamente
+    public void apriPlayer(Brano branoSelezionato) {
+        apriPlayer((ElementoCoda) branoSelezionato);
+    }
+
+    public PlayerController getPlayerController() {
+        return playerController;
     }
 }
