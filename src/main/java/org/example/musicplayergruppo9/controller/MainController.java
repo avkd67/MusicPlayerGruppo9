@@ -1,13 +1,14 @@
 package org.example.musicplayergruppo9.controller;
 
+import java.io.IOException;
+
+import org.example.musicplayergruppo9.model.Brano;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import org.example.musicplayergruppo9.model.Brano;
-
-import java.io.IOException;
 
 public class MainController {
 
@@ -31,6 +32,12 @@ public class MainController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // inizializzazione della home
+    @FXML
+    public void initialize() {
+        mostraHome(); // Mostra la home all'avvio dell'app
     }
 
     // Metodo collegato al click del tasto "Libreria" a sinistra

@@ -57,10 +57,37 @@ public class DatabaseConnection {
                 "explicit INTEGER DEFAULT 0" +
                 ");";
 
-        try (Statement stmt = this.connection.createStatement()) {
+        String sqlTabellaPlaylist = "CREATE TABLE IF NOT EXISTS playlist (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "nome TEXT NOT NULL, " +
+                "copertina TEXT" +
+                ");";
 
+        String sqlTabellaPlaylistBrani = "CREATE TABLE IF NOT EXISTS playlist_brani (" +
+            "playlist_id INTEGER NOT NULL, " +
+            "brano_id INTEGER NOT NULL, " +
+            "PRIMARY KEY (playlist_id, brano_id), " +
+            "FOREIGN KEY (playlist_id) REFERENCES playlist(id) ON DELETE CASCADE, " +
+            "FOREIGN KEY (brano_id) REFERENCES brani(id) ON DELETE CASCADE" +
+            ");";
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             Statement stmt = conn.createStatement()) {
+
+            // attivo i foreign keys per sqlite 
+            stmt.execute("PRAGMA foreign_keys = ON;");
+
+            // creazione tabella brani
             stmt.execute(sqlTabellaBrani);
             System.out.println("[Database] Tabella 'brani' verificata/creata con successo.");
+
+            // creazione tabella playlist
+            stmt.execute(sqlTabellaPlaylist);
+            System.out.println("[Database] Tabella 'playlist' verificata/creata con successo.");
+            
+            // creazione tabella di relazione playlist-brani
+            stmt.execute(sqlTabellaPlaylistBrani);
+            System.out.println("[Database] Tabella 'playlist_brani' verificata/creata con successo.");
 
         } catch (SQLException e) {
             System.err.println("[Database] Errore durante l'inizializzazione delle tabelle:");
