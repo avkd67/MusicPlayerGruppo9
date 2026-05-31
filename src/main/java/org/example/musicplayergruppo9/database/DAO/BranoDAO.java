@@ -2,8 +2,8 @@ package org.example.musicplayergruppo9.database.DAO;
 
 import org.example.musicplayergruppo9.database.DatabaseConnection;
 import org.example.musicplayergruppo9.model.Brano;
-import org.example.musicplayergruppo9.pattern.Observer;
-import org.example.musicplayergruppo9.pattern.Subject;
+import org.example.musicplayergruppo9.pattern.observer.Observer;
+import org.example.musicplayergruppo9.pattern.observer.Subject;
 
 import java.sql.*;
 import java.util.ArrayList;

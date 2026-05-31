@@ -1,41 +1,70 @@
 package org.example.musicplayergruppo9.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.util.Duration;
 import org.example.musicplayergruppo9.model.Brano;
+import org.example.musicplayergruppo9.service.PlayerService;
 
 import java.io.File;
 
 public class PlayerController {
 
-    @FXML
-    private ImageView imgCopertina;
+    @FXML private ImageView imgCopertina;
+    @FXML private Label lblTitolo;
+    @FXML private Label lblArtista;
+    @FXML private Button btnPlayPause;
+    @FXML private Label lblTempo;
+    @FXML private Slider sliderProgresso;
+
+    private static PlayerService playerService;
+
+    private Brano branoInRiproduzione;
 
     @FXML
-    private Label lblTitolo;
-    @FXML
-    private Label lblArtista;
+    public void initialize() {
+        if (playerService == null) {
+            playerService = new PlayerService();
+        }
 
+        // Questo va fatto sempre per ricollegare l'interfaccia grafica aggiornata
+        playerService.setCallbacks(
+                testoBottone -> btnPlayPause.setText(testoBottone),
+                tempoAttuale -> aggiornaUIProgresso(tempoAttuale),
+                () -> sliderProgresso.setMax(playerService.getTotalDuration().toSeconds())
+        );
+    }
 
-    Brano branoInRiproduzione = new Brano();
-
-    // Metodo per ricevere il brano e aggiornare la UI
     public void setBrano(Brano brano) {
-        branoInRiproduzione = brano;
+        this.branoInRiproduzione = brano;
         lblTitolo.setText(brano.getTitolo());
         lblArtista.setText(brano.getArtista());
+
         File fileCopertina = brano.getCopertina();
         if (fileCopertina != null && fileCopertina.exists()) {
             imgCopertina.setImage(new Image(fileCopertina.toURI().toString()));
         } else {
             imgCopertina.setImage(null);
         }
+
+        playerService.loadTrack(brano);
     }
 
     @FXML
-    public void play() { System.out.println("Pulsante Play cliccato!"); }
+    public void togglePlayPause() {
+        playerService.togglePlayPause();
+    }
+
+    private void aggiornaUIProgresso(Duration currentTime) {
+
+        int minuti = (int) currentTime.toMinutes();
+        int secondi = (int) currentTime.toSeconds() % 60;
+        lblTempo.setText(String.format("%02d:%02d", minuti, secondi));
+    }
 
     @FXML
     public void skipSong() { System.out.println("Pulsante skip cliccato!"); }

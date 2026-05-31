@@ -47,7 +47,7 @@
                <children>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Button maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#play" prefHeight="35.0" prefWidth="35.0" text="▶">
+                        <Button fx:id="btnPlayPause" maxHeight="35.0" maxWidth="40.0" minHeight="35.0" minWidth="40.0" mnemonicParsing="false" onAction="#togglePlayPause" prefHeight="35.0" prefWidth="40.0" text="▶">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -75,7 +75,7 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Label text="00:00">
+                        <Label fx:id="lblTempo" text="00:00">
                            <HBox.margin>
                               <Insets left="5.0" right="5.0" />
                            </HBox.margin>
@@ -83,7 +83,7 @@
                               <Font size="16.0" />
                            </font>
                         </Label>
-                        <Slider HBox.hgrow="ALWAYS">
+                        <Slider fx:id="sliderProgresso" HBox.hgrow="ALWAYS">
                            <HBox.margin>
                               <Insets right="5.0" />
                            </HBox.margin>
