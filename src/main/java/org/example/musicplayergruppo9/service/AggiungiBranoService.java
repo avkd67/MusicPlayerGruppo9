@@ -1,6 +1,10 @@
 package org.example.musicplayergruppo9.service;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import org.example.musicplayergruppo9.database.DAO.BranoDAO;
 import org.example.musicplayergruppo9.model.Brano;
@@ -24,37 +28,35 @@ public class AggiungiBranoService {
         }
 
         // copia i file nella cartella del progetto
-        String percorsoAudioDefinitivo = percorsoFileAudioSelezionato;
-        String percorsoCopertinaDefinitiva = percorsoCopertinaSelezionata;
+        String percorsoAudioRelativo = "";
+        String percorsoCopertinaRelativa = "";
 
         try {
             // Creazione cartella Audio
-            java.nio.file.Path cartellaAudio = java.nio.file.Paths.get("AltriFile", "Audio");
-            if (!java.nio.file.Files.exists(cartellaAudio)) {
-                java.nio.file.Files.createDirectories(cartellaAudio); // questo l'ho messo perché non dovremmo tutti pushare le canzoni che ascoltiamo, speriamo funzioni
+            Path cartellaAudio = Paths.get("AltriFile", "Audio");
+            if (!Files.exists(cartellaAudio)) {
+                Files.createDirectories(cartellaAudio);
             }
 
             // Copia del file Audio
             File fileAudioOriginale = new File(percorsoFileAudioSelezionato);
-            java.nio.file.Path targetAudio = cartellaAudio.resolve(fileAudioOriginale.getName());
+            Path targetAudio = cartellaAudio.resolve(fileAudioOriginale.getName());
 
             // StandardCopyOption.REPLACE_EXISTING sovrascrive il file se ne esiste già uno con lo stesso nome, non sapevo come gestirlo sincero
-            java.nio.file.Files.copy(fileAudioOriginale.toPath(), targetAudio, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            percorsoAudioDefinitivo = targetAudio.toString(); // Aggiorno il percorso salvato nel dB
+            Files.copy(fileAudioOriginale.toPath(), targetAudio, StandardCopyOption.REPLACE_EXISTING);
+            percorsoAudioRelativo = "AltriFile/Audio/" + fileAudioOriginale.getName();
 
             // Stessa cosa ma per la Copertina praticamente
             if (percorsoCopertinaSelezionata != null) {
-                java.nio.file.Path cartellaCopertine = java.nio.file.Paths.get("AltriFile", "Copertine");
+                Path cartellaCopertine = java.nio.file.Paths.get("AltriFile", "Copertine");
                 if (!java.nio.file.Files.exists(cartellaCopertine)) {
                     java.nio.file.Files.createDirectories(cartellaCopertine);
                 }
 
                 File fileCopertinaOriginale = new File(percorsoCopertinaSelezionata);
-                System.out.println("Percorso copertina originale: " + percorsoCopertinaSelezionata);
-                java.nio.file.Path targetCopertina = cartellaCopertine.resolve(fileCopertinaOriginale.getName());
-                java.nio.file.Files.copy(fileCopertinaOriginale.toPath(), targetCopertina, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                percorsoCopertinaDefinitiva = targetCopertina.toString();
-            }
+                Path targetCopertina = cartellaCopertine.resolve(fileCopertinaOriginale.getName());
+                Files.copy(fileCopertinaOriginale.toPath(), targetCopertina, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                percorsoCopertinaRelativa = "AltriFile/Copertine/" + fileCopertinaOriginale.getName();            }
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
@@ -67,7 +69,7 @@ public class AggiungiBranoService {
 
         // Calcolo/Estrazione della durata
         int durataSecondi = 0;
-        File fileAudioSalvato = new File(percorsoAudioDefinitivo);
+        File fileAudioSalvato = new File(percorsoAudioRelativo);
         durataSecondi = (int) (fileAudioSalvato.length() / 24000);
 
         // Creazione dell'oggetto Model (uso il costruttore senza ID)
@@ -77,9 +79,9 @@ public class AggiungiBranoService {
                 genere,
                 annoRilascio,
                 durataSecondi,
-                percorsoAudioDefinitivo,
+                percorsoAudioRelativo,
                 estensioneFileAudio,
-                percorsoCopertinaDefinitiva,
+                percorsoCopertinaRelativa,
                 newRelease,
                 explicit
         );
