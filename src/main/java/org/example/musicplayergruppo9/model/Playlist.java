@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class Playlist implements Iterable<Brano>, java.io.Serializable {
+public class Playlist implements Iterable<Brano>, ElementoCoda {
 
     // nome della playlist, lista contenente i brani e ID della playlist nel database
     private String nome; 
@@ -21,8 +21,9 @@ public class Playlist implements Iterable<Brano>, java.io.Serializable {
         this.id = -1; // ID non ancora assegnato
     }
 
+    // costruttore vuoto per creare nuove playlist da riempire successivamente
     public Playlist(){
-
+        brani = new ArrayList<Brano>();
     }
 
     // Override di Iterator
@@ -32,13 +33,13 @@ public class Playlist implements Iterable<Brano>, java.io.Serializable {
     }
 
     // metodo per aggiungere un brano alla playlist
-    public void addBrano(Brano Brano){
-        brani.add(Brano);
+    public void aggiungiBrano(Brano brano){
+        brani.add(brano);
     }
 
     // metodo per rimuovere un brano dalla playlist
-    public void removeBrano(Brano Brano){
-        brani.remove(Brano);
+    public void rimuoviBrano(Brano brano){
+        brani.remove(brano);
     }
 
     // metodo per ottenere il nome della playlist
@@ -81,6 +82,12 @@ public class Playlist implements Iterable<Brano>, java.io.Serializable {
     public String toString(){
         return "nome playlist: " + this.nome + "\n" +
             "numero brani: " + this.brani.size() + "\n" + "brani: " + this.brani.toString() + ")";
+    }
+
+    // da ElementoCoda
+    @Override
+    public String getTitolo() {
+        return nome;
     }
        
     /* brani.forEach(brano -> {
