@@ -2,7 +2,10 @@ package org.example.musicplayergruppo9.model;
 
 import java.io.File;
 import java.util.Objects;
-public class Brano {
+import java.util.Collections;
+import java.util.Iterator;
+
+public class Brano implements ElementoCoda{
 
     //toDo aggiungere campi preferiti, explicit e new release
     private int id;
@@ -206,5 +209,11 @@ public class Brano {
         }
     }
 
+    //Da ElementoCoda.java per soddisfare la task 6.2
+    @Override
+    public Iterator<Brano> iterator() {
+        //per restituire se stesso
+        return Collections.singletonList(this).iterator();
+    }
 
 }
