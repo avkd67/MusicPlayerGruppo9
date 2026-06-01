@@ -36,6 +36,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+<<<<<<< Updated upstream
 /AltriFile/Copertine/
 /AltriFile/Audio/
 musicplayer.db
@@ -43,3 +44,6 @@ musicplayer.db
 *.db
 musicplayer.db
 pom.xml
+=======
+musicplayer.db
+>>>>>>> Stashed changes

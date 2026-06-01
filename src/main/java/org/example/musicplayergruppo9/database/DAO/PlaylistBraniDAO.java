@@ -11,6 +11,17 @@ import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.Playlist;
 
 public class PlaylistBraniDAO {
+
+    // singleton
+    private static PlaylistBraniDAO instance;
+
+    public static synchronized PlaylistBraniDAO getInstance() {
+        if (instance == null) {
+            instance = new PlaylistBraniDAO();
+        }
+        return instance;
+    }
+
     // metodo per salvare l'associazione tra playlist e brano
     public boolean salvaPlaylistBrano(int playlistId, int branoId) {
         String sql = "INSERT INTO playlist_brani (playlist_id, brano_id) VALUES (?, ?)";

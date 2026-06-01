@@ -23,7 +23,7 @@ public class CreaPlaylistController {
 
     @FXML
     public void initialize() {
-        playlistDAO = new PlaylistDAO();
+        playlistDAO = PlaylistDAO.getInstance();
     }
 
     // selezione dell'immagine della copertina della playlist
