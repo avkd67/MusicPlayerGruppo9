@@ -1,4 +1,4 @@
-package org.example.musicplayergruppo9.service;
+package org.example.musicplayergruppo9;
 
 import javafx.application.Platform;
 import javafx.util.Duration;

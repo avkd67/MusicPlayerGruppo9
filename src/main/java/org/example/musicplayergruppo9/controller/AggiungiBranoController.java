@@ -6,7 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.example.musicplayergruppo9.service.AggiungiBranoService;
+import org.example.musicplayergruppo9.AggiungiBranoService;
 
 import java.io.File;
 

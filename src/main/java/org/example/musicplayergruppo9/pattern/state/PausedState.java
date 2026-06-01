@@ -1,6 +1,6 @@
 package org.example.musicplayergruppo9.pattern.state;
 
-import org.example.musicplayergruppo9.service.PlayerService;
+import org.example.musicplayergruppo9.PlayerService;
 
 public class PausedState implements PlayerState {
     @Override
