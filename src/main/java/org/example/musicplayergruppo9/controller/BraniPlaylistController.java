@@ -176,6 +176,14 @@ public class BraniPlaylistController {
                 System.out.println("Cliccato Elimina sul brano: " + b.getTitolo());
             });
 
+            // Bottone Info apre l'infografica del brano
+            btnInfo.setOnAction(e -> {
+                Brano b = getItem();
+                if (b != null && b.getId() != -1) {
+                    apriVistaInfoBrano(b);
+                }
+            });
+
             // Configurazione "Elemento" Aggiungi
             hboxAggiungi.setAlignment(Pos.CENTER_LEFT);
 
@@ -225,6 +233,26 @@ public class BraniPlaylistController {
             e.printStackTrace();
         }
 
+    }
+
+    private void apriVistaInfoBrano(Brano brano) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/InfoBrano.fxml"));
+            javafx.scene.Parent root = loader.load();
+
+            javafx.stage.Stage stageInfo = new javafx.stage.Stage();
+            stageInfo.setTitle("Info brano");
+            stageInfo.setScene(new javafx.scene.Scene(root));
+            stageInfo.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+
+            InfoBranoController controller = loader.getController();
+            controller.setBrano(brano);
+
+            stageInfo.showAndWait();
+        } catch (java.io.IOException e) {
+            System.err.println("Errore nel caricamento della vista InfoBrano.fxml");
+            e.printStackTrace();
+        }
     }
 
 

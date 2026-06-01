@@ -120,6 +120,63 @@ public class BranoDAO implements Subject {
         return false;
     }
 
+    public boolean esisteOmonimoDiversoDaId(String titolo, String artista, int id) {
+        String sql = "SELECT COUNT(*) FROM brani WHERE LOWER(titolo) = LOWER(?) AND LOWER(artista) = LOWER(?) AND id <> ?";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, titolo.trim());
+            pstmt.setString(2, artista.trim());
+            pstmt.setInt(3, id);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[BranoDAO] Errore durante la verifica dell'omonimo diversamente dall'ID.");
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean aggiornaBrano(Brano brano) {
+        String sql = "UPDATE brani SET titolo = ?, artista = ?, genere = ?, data_rilascio = ?, percorso_copertina = ?, explicit = ?, new_release = ? WHERE id = ?";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, brano.getTitolo());
+            pstmt.setString(2, brano.getArtista());
+            pstmt.setString(3, brano.getGenere());
+
+            if (brano.getDataRilascio() > 0) {
+                pstmt.setInt(4, brano.getDataRilascio());
+            } else {
+                pstmt.setNull(4, Types.INTEGER);
+            }
+
+            pstmt.setString(5, brano.getPercorsoCopertina());
+            pstmt.setInt(6, brano.isExplicit() ? 1 : 0);
+            pstmt.setInt(7, brano.isNewRelease() ? 1 : 0);
+            pstmt.setInt(8, brano.getId());
+
+            int righeAggiornate = pstmt.executeUpdate();
+            if (righeAggiornate > 0) {
+                notifyObservers();
+                return true;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[BranoDAO] Errore durante l'aggiornamento del brano: " + brano.getTitolo());
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     /**
      * FONDAMENTA: Recupera tutti i brani dal database per caricarli nel Player (Playlist generale).
      */

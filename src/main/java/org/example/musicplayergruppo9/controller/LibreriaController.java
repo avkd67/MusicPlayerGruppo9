@@ -192,12 +192,23 @@ public class LibreriaController implements Observer {
                     boolean eliminato = branoDAO.eliminaBrano(b.getId());
                     
                     if (eliminato) {
-                        // 2. Lo togliamo dalla lista grafica per farlo sparire subito dallo schermo!
+                        // 2. Proviamo a cancellare i file associati (solo nella cartella AltriFile)
+                        eliminaFileAssociati(b);
+
+                        // 3. Lo togliamo dalla lista grafica per farlo sparire subito dallo schermo!
                         braniObservableList.remove(b);
                         System.out.println("Brano eliminato con successo: " + b.getTitolo());
                     } else {
                         System.out.println("Errore: impossibile eliminare il brano dal database.");
                     }
+                }
+            });
+
+            // Gestione bottone Info: apre l'infografica del brano
+            btnInfo.setOnAction(e -> {
+                Brano b = getItem();
+                if (b != null && b.getId() != -1) {
+                    apriVistaInfoBrano(b);
                 }
             });
 
@@ -236,6 +247,91 @@ public class LibreriaController implements Observer {
 
             // Cambia il cursore con il ditp per far capire che è cliccabile
             hboxAggiungi.setStyle("-fx-cursor: hand;");
+        }
+
+        private void apriVistaModificaBrano(Brano brano) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/ModificaBrano.fxml"));
+                javafx.scene.Parent root = loader.load();
+
+                javafx.stage.Stage stageModifica = new javafx.stage.Stage();
+                stageModifica.setTitle("Modifica Brano");
+                stageModifica.setScene(new javafx.scene.Scene(root));
+                stageModifica.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+
+                ModificaBranoController controller = loader.getController();
+                controller.setBrano(brano);
+
+                stageModifica.showAndWait();
+                update();
+            } catch (java.io.IOException e) {
+                System.err.println("Errore nel caricamento della vista ModificaBrano.fxml");
+                e.printStackTrace();
+            }
+        }
+
+        private void apriVistaInfoBrano(Brano brano) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/InfoBrano.fxml"));
+                javafx.scene.Parent root = loader.load();
+
+                javafx.stage.Stage stageInfo = new javafx.stage.Stage();
+                stageInfo.setTitle("Info brano");
+                stageInfo.setScene(new javafx.scene.Scene(root));
+                stageInfo.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+
+                InfoBranoController controller = loader.getController();
+                controller.setBrano(brano);
+
+                stageInfo.showAndWait();
+            } catch (java.io.IOException e) {
+                System.err.println("Errore nel caricamento della vista InfoBrano.fxml");
+                e.printStackTrace();
+            }
+        }
+
+        /**
+         * Elimina in modo sicuro i file fisici associati ad un brano (copertina e file audio)
+         * Solo se i percorsi sono relativi alla cartella `AltriFile` all'interno del progetto.
+         */
+        private void eliminaFileAssociati(Brano brano) {
+            if (brano == null) return;
+
+            java.nio.file.Path rootAltri = java.nio.file.Paths.get("AltriFile");
+
+            // Percorso copertina
+            String percorsoCop = brano.getPercorsoCopertina();
+            if (percorsoCop != null && !percorsoCop.isBlank()) {
+                try {
+                    java.nio.file.Path p = java.nio.file.Paths.get(percorsoCop).normalize();
+                    if (!p.isAbsolute() && p.startsWith(rootAltri)) {
+                        java.nio.file.Files.deleteIfExists(p);
+                        System.out.println("Eliminata copertina: " + p);
+                    } else {
+                        System.out.println("Saltata eliminazione copertina non sicura: " + p);
+                    }
+                } catch (Exception ex) {
+                    System.err.println("Errore eliminazione copertina: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+
+            // Percorso file audio
+            String percorsoAudio = brano.getPercorsoFileAudio();
+            if (percorsoAudio != null && !percorsoAudio.isBlank()) {
+                try {
+                    java.nio.file.Path p = java.nio.file.Paths.get(percorsoAudio).normalize();
+                    if (!p.isAbsolute() && p.startsWith(rootAltri)) {
+                        java.nio.file.Files.deleteIfExists(p);
+                        System.out.println("Eliminato file audio: " + p);
+                    } else {
+                        System.out.println("Saltata eliminazione audio non sicura: " + p);
+                    }
+                } catch (Exception ex) {
+                    System.err.println("Errore eliminazione audio: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
         }
 
         @Override
