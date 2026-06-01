@@ -12,6 +12,7 @@ module org.example.musicplayergruppo9 {
     exports org.example.musicplayergruppo9;
     exports org.example.musicplayergruppo9.controller;
     exports org.example.musicplayergruppo9.model;
-    exports org.example.musicplayergruppo9.service;
     opens org.example.musicplayergruppo9.controller to javafx.fxml;
+    exports org.example.musicplayergruppo9.service;
+    opens org.example.musicplayergruppo9.service to javafx.fxml;
 }

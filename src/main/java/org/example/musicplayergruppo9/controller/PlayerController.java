@@ -9,7 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.ElementoCoda;
-import org.example.musicplayergruppo9.PlayerService;
+import org.example.musicplayergruppo9.service.PlayerService;
 
 import java.io.File;
 import java.util.Iterator;
