@@ -4,42 +4,68 @@ import org.junit.jupiter.api.*;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class PlaylistTest {
 
     private Playlist playlist;
+    private Brano brano1;
+    private Brano brano2;
 
+    // setup prima di ogni esecuzione
     @BeforeEach
     public void setUp(){
+
         playlist = new Playlist();
+        brano1 = new Brano();
+        brano2 = new Brano();
+
+        // ovviamente
+        brano1.setTitolo("Hung up");
+        brano2.setTitolo("Applause");
     }
 
+    // test del costruttore completo
+    @Test
+    public void testCostruttore(){
+        playlist = new Playlist("Nome playlist", "Percorso Fake!");
+
+        Assertions.assertEquals("Nome playlist", playlist.getNome());
+        Assertions.assertEquals("Percorso Fake!", playlist.getPercorsoCopertina());
+        Assertions.assertEquals(-1, playlist.getId());
+        Assertions.assertNotNull(playlist.getBrani());
+
+    }
+
+    // test del costruttore senza info
+    @Test
+    public void testCostruttoreNoInfo(){
+        Assertions.assertNotNull(playlist.getBrani());
+    }
+
+    // test dell'aggiunta di un brano
     @Test
     public void testAggiungiBrano(){
-        Brano brano = new Brano();
-        brano.setTitolo("titolo");
-        playlist.aggiungiBrano(brano);
+        playlist.aggiungiBrano(brano1);
 
         // verifico che il brano sia stato aggiunto alla playlist
-        Assertions.assertTrue(playlist.getBrani().contains(brano));
+        Assertions.assertTrue(playlist.getBrani().contains(brano1));
     }
 
-    // test sull'iterator della playlist
+    // test sull'iterator della playlist, controllo ci siano i giusti elementi e il giusto numeor di elementi
     @Test
-    public void testIterator(){
-        Brano brano1 = new Brano();
-        Brano brano2 = new Brano();
-        ArrayList<Brano> brani;
-
-        brano1.setArtista("artista1");
-        brano2.setArtista("artista2");
-
+    public void testIterator() {
         playlist.aggiungiBrano(brano1);
         playlist.aggiungiBrano(brano2);
 
-        brani = playlist.getBrani();
-        // verifoco che i brani aggiunti siano stati correttamente inseriti
-        Assertions.assertTrue(brani.contains(brano1));
-        Assertions.assertTrue(brani.contains(brano2));
+        Iterator<Brano> iterator = playlist.iterator();
+
+        Assertions.assertTrue(iterator.hasNext());
+        Assertions.assertEquals(brano1, iterator.next());
+
+        Assertions.assertTrue(iterator.hasNext());
+        Assertions.assertEquals(brano2, iterator.next());
+
+        Assertions.assertFalse(iterator.hasNext(), "Non dovrebbero esserci altri elementi");
     }
 }
