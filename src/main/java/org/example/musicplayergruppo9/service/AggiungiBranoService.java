@@ -1,12 +1,9 @@
 package org.example.musicplayergruppo9.service;
 
+import java.io.File;
+
 import org.example.musicplayergruppo9.database.DAO.BranoDAO;
 import org.example.musicplayergruppo9.model.Brano;
-
-import java.io.File;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 
 public class AggiungiBranoService {
 
@@ -53,6 +50,7 @@ public class AggiungiBranoService {
                 }
 
                 File fileCopertinaOriginale = new File(percorsoCopertinaSelezionata);
+                System.out.println("Percorso copertina originale: " + percorsoCopertinaSelezionata);
                 java.nio.file.Path targetCopertina = cartellaCopertine.resolve(fileCopertinaOriginale.getName());
                 java.nio.file.Files.copy(fileCopertinaOriginale.toPath(), targetCopertina, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 percorsoCopertinaDefinitiva = targetCopertina.toString();
