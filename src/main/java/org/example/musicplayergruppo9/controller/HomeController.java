@@ -40,7 +40,7 @@ public class HomeController {
 
     @FXML
     public void initialize() {
-        playlistDAO = new PlaylistDAO();
+        playlistDAO = PlaylistDAO.getInstance();
 
         // prendo le playlists presenti nel db e ci lego l'observable list
         ArrayList<Playlist> playlistRecuperate = playlistDAO.getAllPlaylists();

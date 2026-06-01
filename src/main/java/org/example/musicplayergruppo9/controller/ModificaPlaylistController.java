@@ -10,6 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class ModificaPlaylistController {
@@ -22,6 +23,8 @@ public class ModificaPlaylistController {
 
     private Playlist playlist;
     private Playlist playlistModificata;
+
+    private String percorsoCopertinaSelezionata = null;
 
     private PlaylistDAO playlistDAO;
 
@@ -57,7 +60,7 @@ public class ModificaPlaylistController {
 
         playlistModificata.setNome(TxtFieldNomePlaylist.getText());
 
-        if(!playlistDAO.checkNomePlaylist(playlistModificata)){
+        if(!playlist.getNome().equals(playlistModificata.getNome()) || !playlistDAO.checkNomePlaylist(playlistModificata)){
             mostraAlertErrore("Errore", "Nome playlist non valido", "Una playlist con questo nome esiste già. Inserire un nome diverso.");
             return;
         }
@@ -69,7 +72,20 @@ public class ModificaPlaylistController {
 
     @FXML
     private void onSfogliaCopertina(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Seleziona l'immagine di copertina");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Immagini (*.png, *.jpg, *.jpeg)", "*.png", "*.jpg", "*.jpeg") //grazie .ExtensionFilter
+        );
 
+        Stage stage = (Stage) imgCopertina.getScene().getWindow();
+        File fileSelezionato = fileChooser.showOpenDialog(stage);
+
+        if (fileSelezionato != null) {
+            percorsoCopertinaSelezionata = fileSelezionato.getAbsolutePath();
+            // Carica l'immagine nell'anteprima grafica ImageView
+            imgCopertina.setImage(new Image(fileSelezionato.toURI().toString()));
+        }
     }
 
     private void mostraAlertErrore(String titolo, String header, String contenuto) {

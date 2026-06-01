@@ -1,4 +1,4 @@
-package org.example.musicplayergruppo9;
+package org.example.musicplayergruppo9.service;
 
 import org.example.musicplayergruppo9.database.DAO.BranoDAO;
 import org.example.musicplayergruppo9.model.Brano;
@@ -8,7 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 
 public class AggiungiBranoService {
 
@@ -50,8 +52,8 @@ public class AggiungiBranoService {
             // Stessa cosa ma per la Copertina praticamente
             if (percorsoCopertinaSelezionata != null) {
                 Path cartellaCopertine = java.nio.file.Paths.get("AltriFile", "Copertine");
-                if (!Files.exists(cartellaCopertine)) {
-                    Files.createDirectories(cartellaCopertine);
+                if (!java.nio.file.Files.exists(cartellaCopertine)) {
+                    java.nio.file.Files.createDirectories(cartellaCopertine);
                 }
 
                 File fileCopertinaOriginale = new File(percorsoCopertinaSelezionata);

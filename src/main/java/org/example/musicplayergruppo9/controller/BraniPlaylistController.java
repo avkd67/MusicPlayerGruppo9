@@ -66,8 +66,7 @@ public class BraniPlaylistController {
 
     @FXML
     public void initialize() {
-        playlistBraniDAO = new PlaylistBraniDAO();
-
+        playlistBraniDAO = PlaylistBraniDAO.getInstance();
         braniObservableList = FXCollections.observableArrayList();
         listaBrani.setItems(braniObservableList);
         listaBrani.setCellFactory(param -> new BranoListCell());
@@ -196,8 +195,7 @@ public class BraniPlaylistController {
 
         private void riproduciBrano() {
         System.out.println("Apertura della vista riproduci Brano...");
-
-    }
+        }
 
     private void apriVistaAggiungiBrano() {
         System.out.println("Apertura della vista Aggiungi Brano...");
