@@ -3,7 +3,7 @@ package org.example.musicplayergruppo9.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.example.musicplayergruppo9.database.DAO.PlaylistDAO;
+import org.example.musicplayergruppo9.service.PlaylistService;
 import org.example.musicplayergruppo9.model.Playlist;
 
 import javafx.collections.FXCollections;
@@ -33,17 +33,17 @@ public class HomeController {
     private FlowPane playlistsFlowPane; 
 
     private ObservableList<Playlist> playlistsObservableList;
-    private PlaylistDAO playlistDAO;
+    private PlaylistService playlistService;
 
     // segnaposto per il tasto aggiungi playlist
     private final Playlist segnaposto_aggiungi = new Playlist();
 
     @FXML
     public void initialize() {
-        playlistDAO = PlaylistDAO.getInstance();
+        playlistService = new PlaylistService();
 
         // prendo le playlists presenti nel db e ci lego l'observable list
-        ArrayList<Playlist> playlistRecuperate = playlistDAO.getAllPlaylists();
+        ArrayList<Playlist> playlistRecuperate = playlistService.getAllPlaylists();
         playlistsObservableList = FXCollections.observableArrayList(playlistRecuperate);
 
         segnaposto_aggiungi.setId(-1);
@@ -72,7 +72,7 @@ public class HomeController {
         card.setPadding(new Insets(6));
 
         // Copertina 
-        javafx.scene.Node cover; // inizializzazione generale, per riconoscere cover anche fuori dall'if
+        javafx.scene.Node cover; // inizializzazione generale, per far riconoscere al codice "cover" anche fuori dall'if
         if(playlist.getPercorsoCopertina() == null){
 
             // quando la copertina non è stata caricata
@@ -104,7 +104,7 @@ public class HomeController {
 
         card.getChildren().addAll(cover, nome);
 
-        // Click: apri la playlist
+        // se cliccata: apri la playlist
         card.setOnMouseClicked(e -> apriPlaylist(playlist));
         card.setStyle("-fx-cursor: hand;");
 
@@ -135,6 +135,7 @@ public class HomeController {
         etichetta.setFont(Font.font("System", 12));
         etichetta.setTextAlignment(TextAlignment.CENTER);
 
+        // onPlus è la funzione associata al pulsante +
         card.getChildren().addAll(addBox, etichetta);
         card.setOnMouseClicked(e -> onPlus());
         card.setStyle("-fx-cursor: hand;");
@@ -180,7 +181,7 @@ public class HomeController {
             popupStage.showAndWait();
 
             // Ricarica le playlist dopo la creazione
-            ArrayList<Playlist> aggiornate = playlistDAO.getAllPlaylists();
+            ArrayList<Playlist> aggiornate = playlistService.getAllPlaylists();
             playlistsObservableList = FXCollections.observableArrayList(aggiornate);
             playlistsObservableList.add(segnaposto_aggiungi);
             mostraPlaylists();
