@@ -18,7 +18,7 @@ public class PlaylistService {
 
     public PlaylistService() {
         playlistDAO = PlaylistDAO.getInstance();
-        playlistBraniDAO = playlistBraniDAO.getInstance();
+        playlistBraniDAO = PlaylistBraniDAO.getInstance();
     }
 
     public List<Brano> getBraniByPlaylist(Playlist playlist) {
