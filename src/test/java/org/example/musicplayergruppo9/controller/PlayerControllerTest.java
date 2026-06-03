@@ -83,6 +83,20 @@ public class PlayerControllerTest {
         assertEquals(b1, player.getBranoCorrente());
     }
 
+    //vale anche dopo due skip
+    @Test
+    void skipConLoopAttivoIgnoraCoda() {
+        player.aggiungiInCoda(b1);
+        player.aggiungiInCoda(b2);
+
+        player.loopSong();
+        player.skipSong();
+        player.skipSong();
+
+        assertEquals(b1, player.getBranoCorrente());
+        assertEquals(1, player.getDimensioneCoda());
+    }
+
     //dopo aver disattivato il loop, si deve ripristinare il funzionamento dello skip
     @Test
     void skipConLoopDisattivatoAvanzaCorrettamente() {
@@ -94,5 +108,26 @@ public class PlayerControllerTest {
         player.skipSong();
 
         assertEquals(b2, player.getBranoCorrente());
+    }
+
+    //la strategia iniziale deve essere StrategiaSequenziale
+    @Test
+    void strategiaDefaultESequenziale() {
+        assertFalse(player.isLoopAttivo());
+    }
+
+    //quando il loop è attivo, deve operare la StrategiaLoop
+    @Test
+    void loopSongCambiaStrategiaALoop() {
+        player.loopSong();
+        assertTrue(player.isLoopAttivo());
+    }
+
+    //se disattivo il loop, deve ritornare la StrategiaSequenziale
+    @Test
+    void loopSongToggleTornaASequenziale() {
+        player.loopSong();
+        player.loopSong();
+        assertFalse(player.isLoopAttivo());
     }
 }
