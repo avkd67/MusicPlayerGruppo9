@@ -1,8 +1,10 @@
 package org.example.musicplayergruppo9.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -33,7 +35,29 @@ public class PlaylistService {
         return playlistDAO.checkNomePlaylist(playlist);
     }
 
-    public boolean salvaPlaylist(Playlist playlist) {
+    public boolean salvaPlaylist(Playlist playlist) throws  IOException {
+
+        String percorsoAssoluto = playlist.getPercorsoCopertina();
+        String percorsoRelativo;
+
+        if (percorsoAssoluto != null){
+            try {
+                Path cartellaCopertine = java.nio.file.Paths.get("AltriFile", "Copertine");
+
+                if (!java.nio.file.Files.exists(cartellaCopertine))
+                    Files.createDirectories(cartellaCopertine);
+
+                File copertinaOriginale = new File(percorsoAssoluto);
+                Path targetCopertina = cartellaCopertine.resolve(copertinaOriginale.getName());
+                Files.copy(copertinaOriginale.toPath(), targetCopertina, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                percorsoRelativo = "AltriFile/Copertine/" + copertinaOriginale.getName();
+
+            }catch (java.io.IOException e) {
+                e.printStackTrace();
+                throw e;
+            }
+        }
+
         return playlistDAO.salvaPlaylist(playlist);
     }
 

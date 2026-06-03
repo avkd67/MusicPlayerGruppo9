@@ -1,6 +1,7 @@
 package org.example.musicplayergruppo9.controller;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.example.musicplayergruppo9.model.Playlist;
 import org.example.musicplayergruppo9.service.PlaylistService;
@@ -62,12 +63,16 @@ public class CreaPlaylistController {
                 return;
             }
 
-            if(playlistService.salvaPlaylist(playlist)){
-                chiudiFinestra();
-            }
-            else {
-                System.err.println("Errore: la playlist non è stata salvata. Controllare il nome della playlist");
+            try {
+                if(playlistService.salvaPlaylist(playlist)){
+                    chiudiFinestra();
+                }
+                else {
+                    System.err.println("Errore: la playlist non è stata salvata. Controllare il nome della playlist");
 
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
         else {
