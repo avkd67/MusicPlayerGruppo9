@@ -76,4 +76,29 @@ public class InfoBranoController {
             ex.printStackTrace();
         }
     }
+
+    // Getters utili per i test
+    public String getTitoloText() {
+        return lblTitolo != null ? lblTitolo.getText() : null;
+    }
+
+    public String getArtistaText() {
+        return lblArtista != null ? lblArtista.getText() : null;
+    }
+
+    public String getGenereText() {
+        return lblGenere != null ? lblGenere.getText() : null;
+    }
+
+    public String getAnnoText() {
+        return lblAnno != null ? lblAnno.getText() : null;
+    }
+
+    public String getDurataText() {
+        return lblDurata != null ? lblDurata.getText() : null;
+    }
+
+    public Image getCopertinaImage() {
+        return imgCopertina != null ? imgCopertina.getImage() : null;
+    }
 }
