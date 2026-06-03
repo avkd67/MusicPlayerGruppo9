@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane minHeight="300.0" minWidth="500.0" prefHeight="380.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.InfoBranoController">
+<AnchorPane minHeight="300.0" minWidth="500.0" prefHeight="380.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.InfoBranoController" stylesheets="@../Style.css">
     <children>
         <VBox spacing="18.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
             <children>
@@ -41,8 +41,8 @@
 
                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
                     <children>
-                        <Button mnemonicParsing="false" onAction="#onAnnulla" prefWidth="100.0" text="Annulla" />
-                        <Button mnemonicParsing="false" onAction="#onModifica" prefWidth="100.0" text="Modifica" />
+                        <Button styleClass="button-icona" mnemonicParsing="false" onAction="#onAnnulla" prefWidth="100.0" text="Annulla" />
+                        <Button styleClass="button-icona" mnemonicParsing="false" onAction="#onModifica" prefWidth="100.0" text="Modifica" />
                     </children>
                 </HBox>
             </children>

@@ -1,8 +1,10 @@
 package org.example.musicplayergruppo9.controller;
-import java.io.File;
 
-import org.example.musicplayergruppo9.database.DAO.PlaylistDAO;
+import java.io.File;
+import java.io.IOException;
+
 import org.example.musicplayergruppo9.model.Playlist;
+import org.example.musicplayergruppo9.service.PlaylistService;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -17,13 +19,13 @@ public class CreaPlaylistController {
     @FXML private TextField nomePlaylist;
     @FXML private ImageView imgCopertina;
 
-    private PlaylistDAO playlistDAO;
+    private PlaylistService playlistService;
 
     private String percorsoCopertinaSelezionata = null;
 
     @FXML
     public void initialize() {
-        playlistDAO = PlaylistDAO.getInstance();
+        playlistService = new PlaylistService();
     }
 
     // selezione dell'immagine della copertina della playlist
@@ -55,19 +57,26 @@ public class CreaPlaylistController {
 
         if(!nomePlaylist.getText().isBlank()){
             Playlist playlist = new Playlist(nomePlaylist.getText(), percorsoCopertinaSelezionata);
-            
-            if(!playlistDAO.checkNomePlaylist(playlist)){
+
+            if(!playlistService.checkNomePlaylist(playlist)){
                 mostraAlertErrore("Errore", "Nome playlist già esistente", "Esiste già una playlist con questo nome. Scegliere un nome diverso.");
                 return;
             }
 
-            if(playlistDAO.salvaPlaylist(playlist)){
-                chiudiFinestra();
-            }
-            else {
-                System.err.println("Errore: la playlist non è stata salvata. Controllare il nome della playlist");
+            try {
+                if(playlistService.salvaPlaylist(playlist)){
+                    chiudiFinestra();
+                }
+                else {
+                    System.err.println("Errore: la playlist non è stata salvata. Controllare il nome della playlist");
 
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+        }
+        else {
+            mostraAlertErrore("Errore", "Nome vuoto", "Il nome della playlist non può essere lasciato in bianco.");
         }
     }
 

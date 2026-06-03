@@ -2,8 +2,8 @@ package org.example.musicplayergruppo9.controller;
 
 import java.io.File;
 
-import org.example.musicplayergruppo9.database.DAO.PlaylistDAO;
 import org.example.musicplayergruppo9.model.Playlist;
+import org.example.musicplayergruppo9.service.PlaylistService;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -26,17 +26,19 @@ public class ModificaPlaylistController {
 
     private String percorsoCopertinaSelezionata = null;
 
-    private PlaylistDAO playlistDAO;
+    private PlaylistService playlistService;
 
     @FXML
     public void initialize(){
-        playlistDAO = new PlaylistDAO();
+        playlistService = new PlaylistService();
 
     }
 
     public void setPlaylist(Playlist playlist){
         this.playlist = playlist;
-        playlistModificata = playlist;
+        playlistModificata = new Playlist();
+        playlistModificata.setNome(playlist.getNome());
+        playlistModificata.setPercorsoCopertina(playlist.getPercorsoCopertina());
         TxtFieldNomePlaylist.setText(this.playlist.getNome());
 
 
@@ -51,8 +53,10 @@ public class ModificaPlaylistController {
         chiudiFinestra();
     }
 
+    // pulsante OK che salva le modifiche alla playlist, controllando che siano tutte modifiche valide che non vadano a risultare in stati incoerenti del db
     @FXML
     private void onOk(){
+        // vieta l'aggiornamento del nome della playlist come vuoto
         if(TxtFieldNomePlaylist.getText().isBlank()){
             mostraAlertErrore("Errore", "Nome playlist non valido", "Il nome della playlist non può essere vuoto. Inserire un nome valido.");
             return;
@@ -60,13 +64,20 @@ public class ModificaPlaylistController {
 
         playlistModificata.setNome(TxtFieldNomePlaylist.getText());
 
-        if(!playlist.getNome().equals(playlistModificata.getNome()) || !playlistDAO.checkNomePlaylist(playlistModificata)){
-            mostraAlertErrore("Errore", "Nome playlist non valido", "Una playlist con questo nome esiste già. Inserire un nome diverso.");
-            return;
+        // se il nome è stato effettivamente modificato -> controllo la sua validità nel db (altrimenti, era impossibile uscire dalla schermata senza cambiare il nome della playlist)
+        if(!playlist.getNome().equals(playlistModificata.getNome()))
+                if(!playlistService.checkNomePlaylist(playlistModificata)){
+                    mostraAlertErrore("Errore", "Nome playlist non valido", "Una playlist con questo nome esiste già. Inserire un nome diverso.");
+                    return;
         }
 
-        playlistDAO.aggiornaPlaylist(playlist, playlistModificata);
-        playlist = playlistModificata;
+        // se è stato selezionato un percorso, lo aggiungiamo alla playlistModificata
+        if(percorsoCopertinaSelezionata != null){
+            playlistModificata.setPercorsoCopertina(percorsoCopertinaSelezionata);
+        }
+
+        playlistService.aggiornaPlaylist(playlist, playlistModificata);
+        // playlist = playlistModificata;
         chiudiFinestra();
     }
 

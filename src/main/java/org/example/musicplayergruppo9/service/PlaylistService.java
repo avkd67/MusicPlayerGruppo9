@@ -1,56 +1,67 @@
 package org.example.musicplayergruppo9.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.ArrayList;
 
+import org.example.musicplayergruppo9.database.DAO.PlaylistBraniDAO;
 import org.example.musicplayergruppo9.database.DAO.PlaylistDAO;
+import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.Playlist;
 
 public class PlaylistService {
 
     private PlaylistDAO playlistDAO;
+    private PlaylistBraniDAO playlistBraniDAO;
 
-    public boolean aggiungiPlaylist(Playlist playlist){
+    public PlaylistService() {
         playlistDAO = PlaylistDAO.getInstance();
-
-        String percorsoCopertinaDefinitiva = playlist.getPercorsoCopertina();
-        String percorsoCopertinaRelativa = "";
-
-        try {
-            if (percorsoCopertinaDefinitiva != null) {
-                Path cartellaCopertine = java.nio.file.Paths.get("AltriFile", "Copertine");
-                if (!java.nio.file.Files.exists(cartellaCopertine)) {
-                    java.nio.file.Files.createDirectories(cartellaCopertine);
-                }
-
-                File fileCopertinaOriginale = new File(percorsoCopertinaDefinitiva);
-                Path targetCopertina = cartellaCopertine.resolve(fileCopertinaOriginale.getName());
-                Files.copy(fileCopertinaOriginale.toPath(), targetCopertina, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                percorsoCopertinaRelativa = "AltriFile/Copertine/" + fileCopertinaOriginale.getName();            }
-        }
-        catch (java.io.IOException e) {
-            System.out.println("Errore durante la copia del file copertina della playlist");
-            e.printStackTrace();
-            return false; // Gestione dell'errore di copia del file
-        }
-
-        playlist.setPercorsoCopertina(percorsoCopertinaRelativa);
-
-        if(playlistDAO.checkNomePlaylist(playlist))
-            playlistDAO.salvaPlaylist(playlist);
-        else
-            return false;
-        return true;
+        playlistBraniDAO = PlaylistBraniDAO.getInstance();
     }
 
-    public boolean aggiornaPlaylist(Playlist playlist, Playlist playlistAggiornata){
-        playlistDAO = PlaylistDAO.getInstance();
+    public List<Brano> getBraniByPlaylist(Playlist playlist) {
+        return playlistBraniDAO.getBraniByPlaylist(playlist);
+    }
 
-        if(playlistDAO.checkNomePlaylist(playlistAggiornata))
-            playlistDAO.aggiornaPlaylist(playlist, playlistAggiornata);
-        else
-            return false;
-        return true;
+    public ArrayList<Playlist> getAllPlaylists() {
+        return playlistDAO.getAllPlaylists();
+    }
+
+    public boolean checkNomePlaylist(Playlist playlist) {
+        return playlistDAO.checkNomePlaylist(playlist);
+    }
+
+    public boolean salvaPlaylist(Playlist playlist) throws  IOException {
+
+        String percorsoAssoluto = playlist.getPercorsoCopertina();
+        String percorsoRelativo;
+
+        if (percorsoAssoluto != null){
+            try {
+                Path cartellaCopertine = java.nio.file.Paths.get("AltriFile", "Copertine");
+
+                if (!java.nio.file.Files.exists(cartellaCopertine))
+                    Files.createDirectories(cartellaCopertine);
+
+                File copertinaOriginale = new File(percorsoAssoluto);
+                Path targetCopertina = cartellaCopertine.resolve(copertinaOriginale.getName());
+                Files.copy(copertinaOriginale.toPath(), targetCopertina, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                percorsoRelativo = "AltriFile/Copertine/" + copertinaOriginale.getName();
+
+            }catch (java.io.IOException e) {
+                e.printStackTrace();
+                throw e;
+            }
+        }
+
+        return playlistDAO.salvaPlaylist(playlist);
+    }
+
+    public boolean aggiornaPlaylist(Playlist playlist, Playlist playlistAggiornata) {
+        return playlistDAO.aggiornaPlaylist(playlist, playlistAggiornata);
     }
 }

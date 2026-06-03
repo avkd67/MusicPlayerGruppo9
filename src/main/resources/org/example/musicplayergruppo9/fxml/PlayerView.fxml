@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="110.0" minHeight="110.0" prefHeight="110.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.PlayerController">
+<AnchorPane maxHeight="110.0" minHeight="110.0" prefHeight="110.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.PlayerController" stylesheets="@../Style.css">
    <children>
       <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">         <children>
             <ImageView fx:id="imgCopertina" fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
@@ -47,7 +47,7 @@
                <children>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="btnPlayPause" maxHeight="35.0" maxWidth="40.0" minHeight="35.0" minWidth="40.0" mnemonicParsing="false" onAction="#togglePlayPause" prefHeight="35.0" prefWidth="40.0" text="▶">
+                        <Button fx:id="btnPlayPause" styleClass="button-icona"  maxHeight="35.0" maxWidth="40.0" minHeight="35.0" minWidth="40.0" mnemonicParsing="false" onAction="#togglePlayPause" prefHeight="35.0" prefWidth="40.0" text="▶">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -55,7 +55,7 @@
                               <Font size="16.0" />
                            </font>
                         </Button>
-                        <Button maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#skipSong" prefHeight="35.0" prefWidth="35.0" text="⏩">
+                        <Button styleClass="button-icona" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#skipSong" prefHeight="35.0" prefWidth="35.0" text="⏩">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -63,7 +63,7 @@
                               <Font size="16.0" />
                            </font>
                         </Button>
-                        <Button maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#skipPlaylist" prefHeight="35.0" prefWidth="35.0" text="⏭">
+                        <Button styleClass="button-icona" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#skipPlaylist" prefHeight="35.0" prefWidth="35.0" text="⏭">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -92,7 +92,7 @@
                   </HBox>
                </children>
             </VBox>
-            <Button maxHeight="60.0" maxWidth="60.0" minHeight="60.0" minWidth="60.0" mnemonicParsing="false" onAction="#loopSong" prefHeight="60.0" prefWidth="60.0" text="🔁">
+            <Button fx:id="btnLoop" styleClass="button-icona" maxHeight="60.0" maxWidth="60.0" minHeight="60.0" minWidth="60.0" mnemonicParsing="false" onAction="#loopSong" prefHeight="60.0" prefWidth="60.0" text="🔁">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>

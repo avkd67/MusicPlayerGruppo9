@@ -5,12 +5,12 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.CreaPlaylistController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.CreaPlaylistController" stylesheets="@../Style.css">
    <children>
-      <Button layoutX="217.0" layoutY="227.0" mnemonicParsing="false" onAction="#onSfogliaCopertina" prefHeight="25.0" prefWidth="179.0" text="aggiungi copertina" />
+      <Button styleClass="button-icona" layoutX="217.0" layoutY="227.0" mnemonicParsing="false" onAction="#onSfogliaCopertina" prefHeight="25.0" prefWidth="179.0" text="aggiungi copertina" />
       <TextField fx:id="nomePlaylist" layoutX="108.0" layoutY="263.0" prefHeight="25.0" prefWidth="398.0" text="nome playlist" />
-      <Button layoutX="359.0" layoutY="344.0" mnemonicParsing="false" onAction="#onAnnulla" text="annulla" />
-      <Button layoutX="190.0" layoutY="344.0" mnemonicParsing="false" onAction="#onOk" prefHeight="25.0" prefWidth="54.0" text="ok" />
+      <Button styleClass="button-icona" layoutX="359.0" layoutY="344.0" mnemonicParsing="false" onAction="#onAnnulla" text="annulla" />
+      <Button styleClass="button-icona" layoutX="190.0" layoutY="344.0" mnemonicParsing="false" onAction="#onOk" prefHeight="25.0" prefWidth="54.0" text="ok" />
       <ImageView fx:id="imgCopertina" fitHeight="150.0" fitWidth="200.0" layoutX="207.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true" />
    </children>
 </Pane>

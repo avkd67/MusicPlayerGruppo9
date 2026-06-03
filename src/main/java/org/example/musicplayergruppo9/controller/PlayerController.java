@@ -9,6 +9,9 @@ import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.ElementoCoda;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaLoop;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaRiproduzione;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaSequenziale;
 import org.example.musicplayergruppo9.service.PlayerService;
 
 import java.io.File;
@@ -25,6 +28,7 @@ public class PlayerController {
     @FXML private Label lblTempo;
     @FXML private Slider sliderProgresso;
 
+    @FXML private Button btnLoop;
    
     private static PlayerService playerService;
 
@@ -36,9 +40,9 @@ public class PlayerController {
 
     private Brano branoCorrente;
 
-    //flag per svolgere task 7.2
-    private boolean loopAttivo = false;
-
+    //Design Pattern: Strategy
+    //scelto per soddisfare la task 7.2: loop
+    private StrategiaRiproduzione strategia = new StrategiaSequenziale();
     
     @FXML
     public void initialize() {
@@ -54,12 +58,9 @@ public class PlayerController {
         
         // Task 7.2 — se loop attivo riparte, altrimenti Task 6.2 — skippa al successivo
         playerService.setOnEndOfMediaCallback(() -> {
-            if (loopAttivo && branoCorrente != null) {
-                playerService.loadTrack(branoCorrente); // riparte da capo
-            } else {
-                skipSong(); // passa al prossimo elemento in coda
-            }
+            strategia.onFineBrano(this); 
         });
+
     }
 
     //gestione coda
@@ -70,21 +71,29 @@ public class PlayerController {
         }
     }
 
-    //gestione loop 
     @FXML
     public void loopSong() {
-        loopAttivo = !loopAttivo;
-        System.out.println("[PlayerController] Loop: " + (loopAttivo ? "ON" : "OFF"));
+        if (strategia instanceof StrategiaLoop) {
+            strategia = new StrategiaSequenziale();
+            btnLoop.getStyleClass().remove("button-attivo");
+            System.out.println("[PlayerController] Loop: OFF");
+        } else {
+            strategia = new StrategiaLoop();
+            btnLoop.getStyleClass().add("button-attivo");
+            System.out.println("[PlayerController] Loop: ON");
+        }
     }
 
     //task 6.2 gestione skip nelle varie situazioni
     @FXML
     public void skipSong() {
+
         //caso a. loop attivo riparte la stessa canzone
-        if (loopAttivo && branoCorrente != null) {
+        if (strategia instanceof StrategiaLoop) {
             riproduciBranoCorrente();
             return;
         }
+
         //caso b. siamo dentro una playlist, skippa al brano presente nella playlist
         if (iteratorCorrente != null && iteratorCorrente.hasNext()) {
             branoCorrente = iteratorCorrente.next();
@@ -106,9 +115,9 @@ public class PlayerController {
         togglePlayPause();
     }
 
+    //da implementare nell prossime task
     @FXML
     public void skipPlaylist() {
-        // TODO: implementare skip dell'intera playlist
         System.out.println("[PlayerController] skipPlaylist cliccato!");
     }
 
@@ -136,7 +145,7 @@ public class PlayerController {
         }
     }
 
-    private void riproduciBranoCorrente() {
+    public void riproduciBranoCorrente() {
         if (branoCorrente == null) return;
 
         if (lblTitolo != null) lblTitolo.setText(branoCorrente.getTitolo());
@@ -170,6 +179,8 @@ public class PlayerController {
     }
 
     public Brano getBranoCorrente() { return branoCorrente; }
-    public boolean isLoopAttivo() { return loopAttivo; }
+
+    public boolean isLoopAttivo() { return strategia instanceof StrategiaLoop; }
+    
     public int getDimensioneCoda() { return coda.size(); }
 }
