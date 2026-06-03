@@ -1,0 +1,135 @@
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+.root {
+    -fx-background-color: #0e0f13;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ── Tutti i Label ────────────────────────────────────────────────────────── */
+.label {
+    -fx-text-fill: #e0e0e0;
+}
+
+/* ── Tutti i Button — stile base ──────────────────────────────────────────── */
+.button {
+    -fx-background-color: #0d164d;
+    -fx-text-fill: #e0e0e0;
+    -fx-border-color: #38383a;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.button-icona {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-background-color: #1a1a2e;
+    -fx-border-color: #2a2a4a;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 4px 8px;
+}
+
+.button:hover {
+    -fx-background-color: #0c25af;
+    -fx-border-color: #0c25af;
+    -fx-effect: dropshadow(gaussian, #0c25af, 15, 0.6, 0, 0);
+}
+
+/* ── Tasto PREMUTO / attivo — sfumatura blu ───────────────────────────────── */
+.button:pressed {
+    -fx-background-color: #0c25af;
+    -fx-border-color: #0c25af;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, #0c25af, 15, 0.6, 0, 0);
+}
+
+/* ── Classe per tasto "attivo" (es. loop ON) — applicata via Java ─────────── */
+.button-attivo {
+    -fx-background-color: #0c25af;
+    -fx-border-color: #0c25af;
+    -fx-border-width: 2px;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, #0c25af, 15, 0.6, 0, 0);
+}
+
+/* ── TextField ────────────────────────────────────────────────────────────── */
+.text-field {
+    -fx-background-color: #0d164d;
+    -fx-text-fill: #ffffff;
+    -fx-prompt-text-fill: #5a5a6f;
+    -fx-border-color: #38383a;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+.text-field:focused {
+    -fx-border-color: #38383a;
+}
+
+/* ── Slider ───────────────────────────────────────────────────────────────── */
+.slider .track {
+    -fx-background-color: #0d164d;
+}
+
+.slider .thumb {
+    -fx-background-color: #0c25af;
+}
+
+/* ── ListView ─────────────────────────────────────────────────────────────── */
+.list-view {
+    -fx-background-color: #0e0f13;
+    -fx-border-color: #5a5a6f;
+}
+
+.list-cell {
+    -fx-background-color: #0e0f13;
+    -fx-text-fill: #e0e0e0;
+}
+
+.list-cell:hover {
+    -fx-background-color: #0d164d;
+}
+
+.list-cell:selected {
+    -fx-background-color: #0d164d;
+    -fx-text-fill: #ffffff;
+}
+
+/* ── ScrollPane ───────────────────────────────────────────────────────────── */
+.scroll-pane {
+    -fx-background-color: #0e0f13;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: #0e0f13;
+}
+
+/* ── SplitPane ────────────────────────────────────────────────────────────── */
+.split-pane {
+    -fx-background-color: #0e0f13;
+    -fx-padding: 0;
+}
+
+.split-pane-divider {
+    -fx-background-color: #5a5a6f;
+    -fx-padding: 0 1px;
+}
+
+/* ── CheckBox ─────────────────────────────────────────────────────────────── */
+.check-box .box {
+    -fx-background-color: #0d164d;
+    -fx-border-color: #38383a;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #0c25af;
+    -fx-border-color: #0c25af;
+    -fx-effect: dropshadow(gaussian, #0c25af, 15, 0.6, 0, 0);
+}
+
+.check-box .mark {
+    -fx-background-color: #0c25af;
+    -fx-effect: dropshadow(gaussian, #0c25af, 15, 0.6, 0, 0);
+}

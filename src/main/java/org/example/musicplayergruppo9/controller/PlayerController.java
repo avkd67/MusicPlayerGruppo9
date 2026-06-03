@@ -28,6 +28,7 @@ public class PlayerController {
     @FXML private Label lblTempo;
     @FXML private Slider sliderProgresso;
 
+    @FXML private Button btnLoop;
    
     private static PlayerService playerService;
 
@@ -74,9 +75,11 @@ public class PlayerController {
     public void loopSong() {
         if (strategia instanceof StrategiaLoop) {
             strategia = new StrategiaSequenziale();
+            btnLoop.getStyleClass().remove("button-attivo");
             System.out.println("[PlayerController] Loop: OFF");
         } else {
             strategia = new StrategiaLoop();
+            btnLoop.getStyleClass().add("button-attivo");
             System.out.println("[PlayerController] Loop: ON");
         }
     }

@@ -11,7 +11,7 @@
             prefHeight="553.0" prefWidth="836.0"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.example.musicplayergruppo9.controller.HomeController">
+            fx:controller="org.example.musicplayergruppo9.controller.HomeController" stylesheets="@../Style.css">
   <content>
     <AnchorPane minHeight="0.0" minWidth="0.0">
       <children>
