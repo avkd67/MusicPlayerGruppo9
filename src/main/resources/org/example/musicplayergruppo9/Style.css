@@ -48,7 +48,7 @@
 
 /* FIX MIRATO PER I BOTTONI DEL MENU LATERALE (per evitare i "...") */
 .button-icona {
-    -fx-padding: 0 0 0 5px;
+    -fx-padding: 0 0 0 0px;
 }
 
 .button:hover, .button-icona:hover {
@@ -124,8 +124,8 @@
 
 .slider .thumb {
     -fx-background-color: #8A30CF;
-    -fx-background-radius: 0;
-    -fx-border-radius: 0;
+    -fx-background-radius: 10em;
+    -fx-border-radius: 10em;
 }
 
 .slider:hover .thumb {

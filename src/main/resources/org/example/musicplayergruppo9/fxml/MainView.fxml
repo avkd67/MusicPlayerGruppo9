@@ -41,12 +41,12 @@
                         </HBox>
                         <VBox prefHeight="600.0" prefWidth="250.0">
                            <children>
-                              <Button alignment="BASELINE_LEFT" maxHeight="80.0" maxWidth="250.0" minHeight="80.0" minWidth="250.0" mnemonicParsing="false" onAction="#mostraHome" prefHeight="80.0" prefWidth="250.0" styleClass="button-icona" text="🏠 Home">
+                              <Button alignment="BASELINE_LEFT" maxHeight="80.0" maxWidth="250.0" minHeight="80.0" minWidth="250.0" mnemonicParsing="false" onAction="#mostraHome" prefHeight="80.0" prefWidth="250.0" style="-fx-padding: 10px !important;" styleClass="button-icona" text="🏠 Home">
                                  <font>
                                     <Font size="21.0" />
                                  </font>
                               </Button>
-                              <Button alignment="BASELINE_LEFT" maxHeight="80.0" maxWidth="250.0" minHeight="80.0" minWidth="250.0" mnemonicParsing="false" onAction="#mostraLibreria" prefHeight="80.0" prefWidth="250.0" styleClass="button-icona" text="📚 Libreria">
+                              <Button alignment="BASELINE_LEFT" maxHeight="80.0" maxWidth="250.0" minHeight="80.0" minWidth="250.0" mnemonicParsing="false" onAction="#mostraLibreria" prefHeight="80.0" prefWidth="250.0" style="-fx-padding: 10px !important;" styleClass="button-icona" text="📚 Libreria">
                                  <font>
                                     <Font size="21.0" />
                                  </font>
