@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.example.musicplayergruppo9.utilities.FXutilities;
 
 public class CreaPlaylistController {
 
@@ -31,25 +32,12 @@ public class CreaPlaylistController {
     // selezione dell'immagine della copertina della playlist
     @FXML
     private void onSfogliaCopertina() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleziona l'immagine di copertina");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Immagini (*.png, *.jpg, *.jpeg)", "*.png", "*.jpg", "*.jpeg") //grazie .ExtensionFilter
-        );
-
-        Stage stage = (Stage) imgCopertina.getScene().getWindow();
-        File fileSelezionato = fileChooser.showOpenDialog(stage);
-
-        if (fileSelezionato != null) {
-            percorsoCopertinaSelezionata = fileSelezionato.getAbsolutePath();
-            // Carica l'immagine nell'anteprima grafica ImageView
-            imgCopertina.setImage(new Image(fileSelezionato.toURI().toString()));
-        }
+        percorsoCopertinaSelezionata = FXutilities.cercaCopertina(imgCopertina);
     }
 
     @FXML
     private void onAnnulla() {
-        chiudiFinestra();
+        FXutilities.chiudiFinestra(nomePlaylist);
     }
 
     @FXML
@@ -59,13 +47,13 @@ public class CreaPlaylistController {
             Playlist playlist = new Playlist(nomePlaylist.getText(), percorsoCopertinaSelezionata);
 
             if(!playlistService.checkNomePlaylist(playlist)){
-                mostraAlertErrore("Errore", "Nome playlist già esistente", "Esiste già una playlist con questo nome. Scegliere un nome diverso.");
+                FXutilities.mostraAlertErrore("Errore", "Nome playlist già esistente", "Esiste già una playlist con questo nome. Scegliere un nome diverso.");
                 return;
             }
 
             try {
                 if(playlistService.salvaPlaylist(playlist)){
-                    chiudiFinestra();
+                    FXutilities.chiudiFinestra(nomePlaylist);
                 }
                 else {
                     System.err.println("Errore: la playlist non è stata salvata. Controllare il nome della playlist");
@@ -76,21 +64,7 @@ public class CreaPlaylistController {
             }
         }
         else {
-            mostraAlertErrore("Errore", "Nome vuoto", "Il nome della playlist non può essere lasciato in bianco.");
+            FXutilities.mostraAlertErrore("Errore", "Nome vuoto", "Il nome della playlist non può essere lasciato in bianco.");
         }
-    }
-
-    private void chiudiFinestra() {
-        // Recupera lo stage corrente partendo da uno qualsiasi dei nodi grafici e lo chiude
-        Stage stage = (Stage) nomePlaylist.getScene().getWindow();
-        stage.close();
-    }
-
-    private void mostraAlertErrore(String titolo, String header, String contenuto) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(titolo);
-        alert.setHeaderText(header);
-        alert.setContentText(contenuto);
-        alert.showAndWait();
     }
 }

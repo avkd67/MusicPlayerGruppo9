@@ -123,7 +123,8 @@ public class BraniPlaylistController {
         // Reinserisce il pulsante finto "Aggiungi Brano" in fondo
         braniObservableList.add(segnaposto_aggiungi);
     }
- 
+
+    // per la visualizzazione dei brani !
     private class BranoListCell extends ListCell<Brano> {
         private HBox hboxContainer = new HBox(15);
         private ImageView imgCopertina = new ImageView();

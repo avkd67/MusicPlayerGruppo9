@@ -6,6 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.example.musicplayergruppo9.model.Brano;
+import org.example.musicplayergruppo9.utilities.FXutilities;
 
 import java.io.File;
 
@@ -48,8 +49,7 @@ public class InfoBranoController {
 
     @FXML
     private void onAnnulla() {
-        Stage stage = (Stage) lblTitolo.getScene().getWindow();
-        stage.close();
+        FXutilities.chiudiFinestra(lblTitolo);
     }
 
     @FXML
@@ -70,8 +70,8 @@ public class InfoBranoController {
             stageModifica.showAndWait();
 
             // Dopo la chiusura della finestra di modifica, chiudi anche la finestra Info
-            Stage stage = (Stage) lblTitolo.getScene().getWindow();
-            stage.close();
+            FXutilities.chiudiFinestra(lblTitolo);
+
         } catch (java.io.IOException ex) {
             ex.printStackTrace();
         }

@@ -2,6 +2,7 @@ package org.example.musicplayergruppo9.controller;
 
 import java.io.File;
 
+import org.example.musicplayergruppo9.utilities.FXutilities;
 import org.example.musicplayergruppo9.model.Playlist;
 import org.example.musicplayergruppo9.service.PlaylistService;
 
@@ -50,7 +51,7 @@ public class ModificaPlaylistController {
 
     @FXML
     private void onAnnulla(){
-        chiudiFinestra();
+        FXutilities.chiudiFinestra(TxtFieldNomePlaylist);
     }
 
     // pulsante OK che salva le modifiche alla playlist, controllando che siano tutte modifiche valide che non vadano a risultare in stati incoerenti del db
@@ -58,7 +59,7 @@ public class ModificaPlaylistController {
     private void onOk(){
         // vieta l'aggiornamento del nome della playlist come vuoto
         if(TxtFieldNomePlaylist.getText().isBlank()){
-            mostraAlertErrore("Errore", "Nome playlist non valido", "Il nome della playlist non può essere vuoto. Inserire un nome valido.");
+            FXutilities.mostraAlertErrore("Errore", "Nome playlist non valido", "Il nome della playlist non può essere vuoto. Inserire un nome valido.");
             return;
         }
 
@@ -67,7 +68,7 @@ public class ModificaPlaylistController {
         // se il nome è stato effettivamente modificato -> controllo la sua validità nel db (altrimenti, era impossibile uscire dalla schermata senza cambiare il nome della playlist)
         if(!playlist.getNome().equals(playlistModificata.getNome()))
                 if(!playlistService.checkNomePlaylist(playlistModificata)){
-                    mostraAlertErrore("Errore", "Nome playlist non valido", "Una playlist con questo nome esiste già. Inserire un nome diverso.");
+                    FXutilities.mostraAlertErrore("Errore", "Nome playlist non valido", "Una playlist con questo nome esiste già. Inserire un nome diverso.");
                     return;
         }
 
@@ -78,39 +79,7 @@ public class ModificaPlaylistController {
 
         playlistService.aggiornaPlaylist(playlist, playlistModificata);
         // playlist = playlistModificata;
-        chiudiFinestra();
-    }
-
-    @FXML
-    private void onSfogliaCopertina(){
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Seleziona l'immagine di copertina");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Immagini (*.png, *.jpg, *.jpeg)", "*.png", "*.jpg", "*.jpeg") //grazie .ExtensionFilter
-        );
-
-        Stage stage = (Stage) imgCopertina.getScene().getWindow();
-        File fileSelezionato = fileChooser.showOpenDialog(stage);
-
-        if (fileSelezionato != null) {
-            percorsoCopertinaSelezionata = fileSelezionato.getAbsolutePath();
-            // Carica l'immagine nell'anteprima grafica ImageView
-            imgCopertina.setImage(new Image(fileSelezionato.toURI().toString()));
-        }
-    }
-
-    private void mostraAlertErrore(String titolo, String header, String contenuto) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(titolo);
-        alert.setHeaderText(header);
-        alert.setContentText(contenuto);
-        alert.showAndWait();
-    }
-
-    private void chiudiFinestra() {
-        // Recupera lo stage corrente partendo da uno qualsiasi dei nodi grafici e lo chiude
-        Stage stage = (Stage) TxtFieldNomePlaylist.getScene().getWindow();
-        stage.close();
+        FXutilities.chiudiFinestra(TxtFieldNomePlaylist);
     }
 
 
