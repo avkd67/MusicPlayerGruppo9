@@ -62,6 +62,20 @@
     -fx-border-color: #6a25a0;
 }
 
+/*bottone loop*/
+.button-attivo {
+    -fx-background-color: #8A30CF;
+    -fx-border-color: #8A30CF;
+    -fx-border-width: 2px;
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(gaussian, #8A30CF, 12, 0.6, 0, 0);
+}
+
+.button-attivo:hover {
+    -fx-background-color: #9d4ced;
+    -fx-border-color: #9d4ced;
+}
+
 /* --- CHECKBOX --- */
 .check-box {
     -fx-text-fill: #FFFFFF;
