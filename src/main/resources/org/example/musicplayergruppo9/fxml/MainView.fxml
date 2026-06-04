@@ -9,11 +9,12 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="mainContainer" maxHeight="800.0" maxWidth="1200.0" minHeight="800.0" minWidth="1200.0" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.MainController" stylesheets="@../Style.css">
+<BorderPane fx:id="mainContainer" maxHeight="800.0" maxWidth="1200.0" minHeight="800.0" minWidth="1200.0" prefHeight="800.0" prefWidth="1200.0" stylesheets="@../Style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.MainController">
    <center>
       <SplitPane dividerPositions="0.29797979797979796" maxWidth="1200.0" minHeight="700.0" minWidth="1200.0" prefHeight="600.0" prefWidth="1200.0" BorderPane.alignment="CENTER">
         <items>
@@ -40,12 +41,12 @@
                         </HBox>
                         <VBox prefHeight="600.0" prefWidth="250.0">
                            <children>
-                              <Button styleClass="button-icona" alignment="BASELINE_LEFT" maxHeight="80.0" maxWidth="250.0" minHeight="80.0" minWidth="250.0" mnemonicParsing="false" onAction="#mostraHome" prefHeight="80.0" prefWidth="250.0" text="🏠 Home">
+                              <Button alignment="BASELINE_LEFT" maxHeight="80.0" maxWidth="250.0" minHeight="80.0" minWidth="250.0" mnemonicParsing="false" onAction="#mostraHome" prefHeight="80.0" prefWidth="250.0" styleClass="button-icona" text="🏠 Home">
                                  <font>
                                     <Font size="21.0" />
                                  </font>
                               </Button>
-                              <Button styleClass="button-icona" alignment="BASELINE_LEFT" maxHeight="80.0" maxWidth="250.0" minHeight="80.0" minWidth="250.0" mnemonicParsing="false" onAction="#mostraLibreria" prefHeight="80.0" prefWidth="250.0" text="📚 Libreria">
+                              <Button alignment="BASELINE_LEFT" maxHeight="80.0" maxWidth="250.0" minHeight="80.0" minWidth="250.0" mnemonicParsing="false" onAction="#mostraLibreria" prefHeight="80.0" prefWidth="250.0" styleClass="button-icona" text="📚 Libreria">
                                  <font>
                                     <Font size="21.0" />
                                  </font>
@@ -58,12 +59,23 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <StackPane fx:id="areaContenuti" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                  <Button styleClass="button-icona" alignment="CENTER" contentDisplay="CENTER" layoutX="883.0" maxHeight="60.0" maxWidth="60.0" minHeight="60.0" minWidth="60.0" mnemonicParsing="false" onAction="#unDo" prefHeight="60.0" prefWidth="60.0" text="⟲">
-                     <font>
-                        <Font size="27.0" />
-                     </font>
-                  </Button>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <center>
+                        <StackPane fx:id="areaContenuti" prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                     </center>
+                     <top>
+                        <HBox alignment="BASELINE_RIGHT" nodeOrientation="RIGHT_TO_LEFT" BorderPane.alignment="CENTER">
+                           <children>
+                              <Button alignment="CENTER" contentDisplay="CENTER" maxHeight="60.0" maxWidth="60.0" minHeight="60.0" minWidth="60.0" mnemonicParsing="false" onAction="#unDo" prefHeight="60.0" prefWidth="60.0" styleClass="button-icona" text="⟲">
+                                 <font>
+                                    <Font size="27.0" />
+                                 </font>
+                              </Button>
+                              <Region HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                     </top>
+                  </BorderPane>
                </children></AnchorPane>
         </items>
       </SplitPane>

@@ -1,125 +1,192 @@
+/*
+ * Palette Tema Scuro / Spigoloso
+ * Sfondo principale: #262626 (Grigio scuro, fa risaltare i PNG neri)
+ * Sfondo alternato: #303030 (Grigio leggermente più chiaro per la ListView)
+ * Testo primario: #FFFFFF (Bianco puro per alto contrasto)
+ * Colore accento: #8A30CF (Viola)
+ */
 
 .root {
-    -fx-background-color: #0e0f13;
+    -fx-background-color: #262626;
     -fx-font-family: "Segoe UI", Arial, sans-serif;
 }
 
+/* --- TESTO E LABEL --- */
 .label {
-    -fx-text-fill: #e0e0e0;
+    -fx-text-fill: #FFFFFF;
 }
 
-.button {
-    -fx-background-color: #0d164d;
-    -fx-text-fill: #e0e0e0;
-    -fx-border-color: #38383a;
-    -fx-border-width: 1px;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-cursor: hand;
+.label[textFill="#999999"] {
+    -fx-text-fill: #AAAAAA !important;
 }
 
-.button-icona {
-    -fx-text-fill: white;
-    -fx-font-size: 16px;
-    -fx-background-color: #1a1a2e;
-    -fx-border-color: #2a2a4a;
-    -fx-border-width: 1px;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-padding: 4px 8px;
-}
-
-.button:hover {
-    -fx-background-color: #0c25af;
-    -fx-border-color: #0c25af;
-    -fx-effect: dropshadow(gaussian, #0c25af, 15, 0.6, 0, 0);
-}
-
-.button:pressed {
-    -fx-background-color: #0c25af;
-    -fx-border-color: #0c25af;
-    -fx-border-width: 2px;
-    -fx-effect: dropshadow(gaussian, #0c25af, 15, 0.6, 0, 0);
-}
-
-.button-attivo {
-    -fx-background-color: #0c25af;
-    -fx-border-color: #0c25af;
-    -fx-border-width: 2px;
-    -fx-text-fill: #ffffff;
-    -fx-effect: dropshadow(gaussian, #0c25af, 15, 0.6, 0, 0);
-}
-
+/* --- CAMPI DI TESTO --- */
 .text-field {
-    -fx-background-color: #0d164d;
-    -fx-text-fill: #ffffff;
-    -fx-prompt-text-fill: #5a5a6f;
-    -fx-border-color: #38383a;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
+    -fx-background-color: #1E1E1E;
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: #CCCCCC;
+    -fx-border-color: #555555;
+    -fx-border-width: 1px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
 }
 
 .text-field:focused {
-    -fx-border-color: #38383a;
+    -fx-border-color: #8A30CF;
 }
 
-.slider .track {
-    -fx-background-color: #0d164d;
+/* --- BOTTONI E BOTTONI ICONA --- */
+.button, .button-icona {
+    -fx-background-color: #333333;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #555555;
+    -fx-border-width: 1px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-cursor: hand;
 }
 
-.slider .thumb {
-    -fx-background-color: #0c25af;
+/* FIX MIRATO PER I BOTTONI DEL MENU LATERALE (per evitare i "...") */
+.button-icona {
+    -fx-padding: 0 0 0 5px;
 }
 
-.list-view {
-    -fx-background-color: #0e0f13;
-    -fx-border-color: #5a5a6f;
+.button:hover, .button-icona:hover {
+    -fx-background-color: #8A30CF;
+    -fx-border-color: #8A30CF;
+    -fx-text-fill: #FFFFFF;
 }
 
-.list-cell {
-    -fx-background-color: #0e0f13;
-    -fx-text-fill: #e0e0e0;
+.button:pressed, .button-icona:pressed {
+    -fx-background-color: #6a25a0;
+    -fx-border-color: #6a25a0;
 }
 
-.list-cell:hover {
-    -fx-background-color: #0d164d;
-}
-
-.list-cell:selected {
-    -fx-background-color: #0d164d;
-    -fx-text-fill: #ffffff;
-}
-
-.scroll-pane {
-    -fx-background-color: #0e0f13;
-}
-
-.scroll-pane .viewport {
-    -fx-background-color: #0e0f13;
-}
-
-.split-pane {
-    -fx-background-color: #0e0f13;
-    -fx-padding: 0;
-}
-
-.split-pane-divider {
-    -fx-background-color: #5a5a6f;
-    -fx-padding: 0 1px;
+/* --- CHECKBOX --- */
+.check-box {
+    -fx-text-fill: #FFFFFF;
 }
 
 .check-box .box {
-    -fx-background-color: #0d164d;
-    -fx-border-color: #38383a;
+    -fx-background-color: #1E1E1E;
+    -fx-border-color: #555555;
+    -fx-border-width: 1px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
 }
 
-.check-box:selected .box {
-    -fx-background-color: #0c25af;
-    -fx-border-color: #0c25af;
-    -fx-effect: dropshadow(gaussian, #0c25af, 15, 0.6, 0, 0);
+.check-box:selected .mark {
+    -fx-background-color: #8A30CF;
+    -fx-shape: "M1,4 L3,6 L7,1 L8,2 L3,8 L0,5 Z";
 }
 
-.check-box .mark {
-    -fx-background-color: #0c25af;
-    -fx-effect: dropshadow(gaussian, #0c25af, 15, 0.6, 0, 0);
+/* --- LIST VIEW --- */
+.list-view {
+    -fx-background-color: #262626;
+    -fx-border-color: #555555;
+    -fx-border-width: 1px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.list-cell {
+    -fx-background-color: #262626;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 0;
+}
+
+.list-cell:empty {
+    -fx-background-color: #262626;
+}
+
+.list-cell:odd {
+    -fx-background-color: #303030;
+}
+
+.list-cell:even {
+    -fx-background-color: #262626;
+}
+
+.list-cell:hover {
+    -fx-background-color: #444444;
+}
+
+.list-cell:selected, .list-cell:selected:hover {
+    -fx-background-color: #8A30CF;
+    -fx-text-fill: #FFFFFF;
+}
+
+/* --- SLIDER --- */
+.slider .track {
+    -fx-background-color: #555555;
+    -fx-background-radius: 0;
+}
+
+.slider .thumb {
+    -fx-background-color: #8A30CF;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.slider:hover .thumb {
+    -fx-background-color: #9d4ced;
+}
+
+/* --- SPLIT PANE (Main View) --- */
+.split-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.split-pane *.split-pane-divider {
+    -fx-background-color: #555555; /* Colore della barra divisoria */
+    -fx-padding: 0 1px 0 1px; /* Rende la barra spigolosa e sottile */
+}
+
+/* --- SCROLL PANE & SCROLLBAR (Home View) --- */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: #262626; /* Applica il colore al viewport interno */
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Stile barra di scorrimento laterale/inferiore */
+.scroll-bar {
+    -fx-background-color: #1E1E1E;
+    -fx-border-color: transparent;
+}
+
+.scroll-bar .track {
+    -fx-background-color: #1E1E1E;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #555555;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #8A30CF; /* Colore accento all'hover */
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: #1E1E1E;
+    -fx-background-radius: 0;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: #FFFFFF;
+}
+
+/* Forza TUTTE le Label dentro una riga selezionata a diventare bianche */
+.list-cell:selected .label {
+    -fx-text-fill: #FFFFFF !important;
 }
