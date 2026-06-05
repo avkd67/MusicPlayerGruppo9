@@ -50,6 +50,11 @@ public class ModificaPlaylistController {
     }
 
     @FXML
+    private void onSfogliaCopertina(){
+        FXutilities.cercaCopertina(imgCopertina);
+    }
+
+    @FXML
     private void onAnnulla(){
         FXutilities.chiudiFinestra(TxtFieldNomePlaylist);
     }

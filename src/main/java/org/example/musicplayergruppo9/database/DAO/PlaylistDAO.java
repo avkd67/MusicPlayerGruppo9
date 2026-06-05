@@ -120,4 +120,26 @@ public class PlaylistDAO {
 
         return playlists;
     }
+
+    // metodo per eliminare una playlist
+    public boolean eliminaPlaylist(Playlist playlist){
+
+        String sql = "DELETE FROM playlist WHERE id = ?";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setInt(1, playlist.getId());
+
+            int righeInteressate = pstmt.executeUpdate();
+
+            if (righeInteressate > 0) {
+                return true;
+            }
+
+        } catch (SQLException e) {
+            System.out.println("[Playlist DAO] Errore durante l'eliminazione della playlist");
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
 }

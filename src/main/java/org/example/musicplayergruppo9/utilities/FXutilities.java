@@ -2,12 +2,14 @@ package org.example.musicplayergruppo9.utilities;
 
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Optional;
 
 public final class FXutilities {
 
@@ -59,5 +61,16 @@ public final class FXutilities {
         alert.setHeaderText(header);
         alert.setContentText(null);
         alert.showAndWait();
+    }
+
+    // crea un pop up per confermare la decisione dell'utente
+    public static boolean mostraAlertConferma(String titolo, String domanda){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(titolo);
+        alert.setHeaderText(domanda);
+        alert.setContentText(null);
+        alert.showAndWait();
+
+        return alert.getResult() == ButtonType.OK;
     }
 }

@@ -64,4 +64,8 @@ public class PlaylistService {
     public boolean aggiornaPlaylist(Playlist playlist, Playlist playlistAggiornata) {
         return playlistDAO.aggiornaPlaylist(playlist, playlistAggiornata);
     }
+
+    public boolean eliminaPlaylist(Playlist playlist) {
+        return playlistDAO.eliminaPlaylist(playlist);
+    }
 }

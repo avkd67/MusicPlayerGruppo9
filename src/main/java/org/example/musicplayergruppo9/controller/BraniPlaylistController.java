@@ -22,6 +22,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import org.example.musicplayergruppo9.utilities.FXutilities;
 
 public class BraniPlaylistController {
 
@@ -77,9 +78,16 @@ public class BraniPlaylistController {
 
     }
 
-    // TODO: eliminazione brano dalla playlist ! 
-    public void eliminaBrano(){
+    // TODO: eliminazione brano dalla playlist !
+    public void eliminaBrano(){}
 
+    // eliminazione della playlist selezionata
+    @FXML
+    public void onEliminaPlaylist(){
+        if(FXutilities.mostraAlertConferma("Elimina playlist", "Sicuro di voler eliminare la playlist?")) {
+            playlistService.eliminaPlaylist(playlist);
+            FXutilities.chiudiFinestra(imgCopertina);
+        }
     }
 
     // quando premo "modifica playlist"
