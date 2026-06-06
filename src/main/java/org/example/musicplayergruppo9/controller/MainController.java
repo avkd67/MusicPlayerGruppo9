@@ -10,7 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import org.example.musicplayergruppo9.model.ElementoCoda;
-
+import org.example.musicplayergruppo9.pattern.command.CommandHistory;
 
 public class MainController {
 
@@ -22,6 +22,7 @@ public class MainController {
 
     private PlayerController playerController = new PlayerController();
     private boolean playerAperto = false;
+    private CommandHistory commandHistory = CommandHistory.getInstance();
 
     // Metodo collegato al click del tasto "Home" a sinistra
     @FXML
@@ -89,7 +90,7 @@ public class MainController {
 
     @FXML
     public void unDo() {
-        System.out.println("Pulsante unDo cliccato!");
+        commandHistory.undo();
     }
 
     //Chiamato quando l'utentne clicca su brano/playlist, 

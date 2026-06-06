@@ -204,4 +204,23 @@ public class PlayerController {
     public boolean isLoopAttivo() { return strategia instanceof StrategiaLoop; }
     
     public int getDimensioneCoda() { return coda.size(); }
+
+    // per gestire l'eliminazione di un file in riproduzione
+    public void fermaErilasciaFileSeCorrente(Brano branoDaEliminare) {
+        if (branoCorrente != null && branoCorrente.getId() == branoDaEliminare.getId()) {
+            if (playerService != null) {
+                playerService.stopAudio(); // Chiude il FileInputStream
+            }
+
+            // Ripulisce l'interfaccia utente del player
+            branoCorrente = null;
+            if (lblTitolo != null) lblTitolo.setText("Nessun brano");
+            if (lblArtista != null) lblArtista.setText("");
+            if (imgCopertina != null) imgCopertina.setImage(null);
+            if (lblTempo != null) lblTempo.setText("00:00");
+            if (sliderProgresso != null) sliderProgresso.setValue(0);
+
+            System.out.println("[PlayerController] File rilasciato per eliminazione.");
+        }
+    }
 }

@@ -16,8 +16,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.example.musicplayergruppo9.database.DAO.BranoDAO;
+import org.example.musicplayergruppo9.database.DAO.PlaylistBraniDAO;
 import org.example.musicplayergruppo9.model.Brano;
+import org.example.musicplayergruppo9.pattern.command.RimuoviBranoLibreriaCommand;
 import org.example.musicplayergruppo9.pattern.observer.Observer;
+import org.example.musicplayergruppo9.pattern.command.CommandHistory;
 
 import java.io.File;
 import java.util.List;
@@ -32,6 +35,10 @@ public class LibreriaController implements Observer {
 
     // per il passaggio delle informazioni delle canzoni al main
     private MainController mainController;
+
+    private CommandHistory commandHistory = CommandHistory.getInstance();
+    private PlaylistBraniDAO playlistBraniDAO = PlaylistBraniDAO.getInstance();
+
 
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
@@ -187,10 +194,23 @@ public class LibreriaController implements Observer {
                 Brano b = getItem();
                 // Assicuriamoci di non provare a eliminare il bottone finto "Aggiungi brano" (id -1)
                 if (b != null && b.getId() != -1) {
+
+
+                    // per fermare la riproduzione di un brano eliminato
+                    if (mainController != null && mainController.getPlayerController() != null) {
+                        mainController.getPlayerController().fermaErilasciaFileSeCorrente(b);
+                        try { Thread.sleep(50); } catch (InterruptedException ex) {}
+                    }
                     
                     // 1. Diciamo al DAO di cancellarlo dal database
-                    boolean eliminato = branoDAO.eliminaBrano(b.getId());
-                    
+                    // boolean eliminato = branoDAO.eliminaBrano(b.getId()); prima del command
+
+                    commandHistory.execute(
+                            new RimuoviBranoLibreriaCommand(b, branoDAO, playlistBraniDAO)
+                    );
+
+                    /*
+                    // logica spostata in RimuoviBranoLibreriaCommand e modificata per evitare la cancellazione definitiva
                     if (eliminato) {
                         // 2. Proviamo a cancellare i file associati (solo nella cartella AltriFile)
                         eliminaFileAssociati(b);
@@ -201,6 +221,8 @@ public class LibreriaController implements Observer {
                     } else {
                         System.out.println("Errore: impossibile eliminare il brano dal database.");
                     }
+
+                     */
                 }
             });
 

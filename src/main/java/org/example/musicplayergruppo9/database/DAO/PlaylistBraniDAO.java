@@ -102,4 +102,29 @@ public class PlaylistBraniDAO {
         }
         return false;
     }
+
+    // metodo per ottenere tutte le playlist che contengono uno specifico brano per l'undo
+    public List<Playlist> getPlaylistsByBrano(Brano brano) {
+        List<Playlist> playlists = new ArrayList<>();
+        String sql = "SELECT p.* FROM playlist p " +
+                "JOIN playlist_brani pb ON p.id = pb.playlist_id " +
+                "WHERE pb.brano_id = ?";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, brano.getId());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Playlist playlist = new Playlist(rs.getString("nome"), rs.getString("copertina"));
+                    playlist.setId(rs.getInt("id"));
+                    playlists.add(playlist);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("[PlaylistBraniDAO] Errore durante il recupero delle playlist per il brano: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return playlists;
+    }
 }
