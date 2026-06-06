@@ -101,6 +101,11 @@ public class PlayerService {
             try {
                 FileInputStream fis = new FileInputStream(currentFile);
 
+                long bytesToSkip = (long) (currentSeconds * 24000);
+                if (bytesToSkip > 0) {
+                    fis.skip(bytesToSkip); //funzione di file input stream
+                }
+
                 jPlayer = new Player(fis);
                 long lastTimeMillis = System.currentTimeMillis();
 
@@ -195,5 +200,20 @@ public class PlayerService {
 
     public Duration getTotalDuration() {
         return Duration.seconds(totalSeconds);
+    }
+
+    public void seek(double targetSeconds) { //fun fact: a quanto pare seek vuol dire spostarsi da una parte all'altra di un audio o video velocemente :P
+        if (currentFile == null) return;
+
+        boolean wasPlaying = this.isPlaying; //salva se è in pausa o riproduzione
+
+        stopAudio();
+
+        this.currentSeconds = targetSeconds; //rendiamo il nuovo tempo da cui partire quello passato
+
+        this.isStopped = false;
+        this.isPlaying = wasPlaying; // aggiunta per conflitto UI
+
+        startPlayerThread();
     }
 }

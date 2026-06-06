@@ -55,7 +55,24 @@ public class PlayerController {
                 tempoAttuale -> aggiornaUIProgresso(tempoAttuale),
                 () -> sliderProgresso.setMax(playerService.getTotalDuration().toSeconds())
         );
-        
+
+        //gestione slier per mandare avanti e indietro la musica drag and drop
+        sliderProgresso.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if(sliderProgresso.isValueChanging() && playerService != null) {
+                playerService.seek(sliderProgresso.getValue());
+            }
+        });
+
+        //gestione slier per mandare avanti e indietro la musica onClick
+        /*
+        sliderProgresso.setOnMouseReleased(event -> {
+            if(playerService != null && !sliderProgresso.isValueChanging()) {
+                playerService.seek(sliderProgresso.getValue());
+            }
+        });
+        //Non so perché ma a volte non funziona
+        */
+
         // Task 7.2 — se loop attivo riparte, altrimenti Task 6.2 — skippa al successivo
         playerService.setOnEndOfMediaCallback(() -> {
             strategia.onFineBrano(this); 
@@ -171,6 +188,10 @@ public class PlayerController {
         int secondi = (int) currentTime.toSeconds() % 60;
         if (lblTempo != null) lblTempo.setText(String.format("%02d:%02d", minuti, secondi));
         if (sliderProgresso != null) sliderProgresso.setValue(currentTime.toSeconds());
+
+        if (sliderProgresso != null && !sliderProgresso.isValueChanging()) {
+            sliderProgresso.setValue(currentTime.toSeconds());
+        }
     }
 
     public void setBrano(Brano brano) {
