@@ -49,7 +49,7 @@ public class RimozioneBranoIntegrationTest {
         Assertions.assertTrue(bSaved, "Impossibile salvare il brano di test");
 
         // associa il brano alla playlist
-        boolean assoc = playlistBraniDAO.salvaPlaylistBrano(playlistInserita.getId(), branoInserito.getId());
+        boolean assoc = playlistBraniDAO.aggiungiBranoAPlaylist(playlistInserita, branoInserito);
         Assertions.assertTrue(assoc, "Impossibile associare brano alla playlist");
     }
 
