@@ -75,11 +75,32 @@ public class BraniPlaylistController {
 
     // TODO: aggiunta brano dalla lista di tutti i brani / creazione sul momento ?
     public void aggiungiBrano(){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/AggiungiBranoPlaylistView.fxml"));
+            javafx.scene.Parent root = loader.load();
 
+            javafx.stage.Stage stageInfo = new javafx.stage.Stage();
+            stageInfo.setTitle("Aggiungi un brano");
+            stageInfo.setScene(new javafx.scene.Scene(root));
+            stageInfo.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+
+            AggiungiBranoPlaylistController controller = loader.getController();
+            controller.setPlaylist(playlist);
+            controller.setPreviousController(this);
+
+            stageInfo.showAndWait();
+        } catch (java.io.IOException e) {
+            System.err.println("Errore nel caricamento della vista AggiungiBranoPlaylistView.fxml");
+            e.printStackTrace();
+        }
     }
 
     // TODO: eliminazione brano dalla playlist !
-    public void eliminaBrano(){}
+    public void eliminaBranoDaPlaylist(Brano brano){
+        if(FXutilities.mostraAlertConferma("Rimozione brano", "Sei sicuro di voler rimuovere " + brano.getTitolo() + " dalla playlist?"))
+            playlistService.eliminaBranoDaPlaylist(playlist, brano);
+        aggiornaListaBrani();
+    }
 
     // eliminazione della playlist selezionata
     @FXML
@@ -116,6 +137,12 @@ public class BraniPlaylistController {
             System.err.println("Errore nel caricamento della vista ModificaPlaylist.fxml");
             e.printStackTrace();
         }
+    }
+
+    public void aggiungiBranoAPlaylist(Brano brano){
+        playlist.aggiungiBrano(brano);
+        playlistService.aggiungiBranoAPlaylist(playlist, brano);
+        aggiornaListaBrani();
     }
 
     private void aggiornaListaBrani() {
@@ -182,8 +209,9 @@ public class BraniPlaylistController {
 
             // Definisce l'azione di eliminazione (per la Task 1.4.3)
             btnElimina.setOnAction(e -> {
-                Brano b = getItem();
-                System.out.println("Cliccato Elimina sul brano: " + b.getTitolo());
+                Brano brano = getItem();
+                System.out.println("Cliccato Elimina sul brano: " + brano.getTitolo());
+                eliminaBranoDaPlaylist(brano);
             });
 
             // Bottone Info apre l'infografica del brano
@@ -204,45 +232,10 @@ public class BraniPlaylistController {
             hboxAggiungi.getChildren().addAll(imgAggiungi, lblAggiungi);
 
             // Rende l'intera riga cliccabile come se fosse un bottone
-            hboxAggiungi.setOnMouseClicked(e -> apriVistaAggiungiBrano());
-            hboxContainer.setOnMouseClicked(e -> riproduciBrano());
+            hboxAggiungi.setOnMouseClicked(e -> aggiungiBrano());
 
             // Cambia il cursore con il ditp per far capire che è cliccabile
             hboxAggiungi.setStyle("-fx-cursor: hand;");
-        }
-
-        private void riproduciBrano() {
-        System.out.println("Apertura della vista riproduci Brano...");
-        }
-
-        private void apriVistaAggiungiBrano() {
-            System.out.println("Apertura della vista Aggiungi Brano...");
-
-            try {
-                // Carica il file FXML della vista Aggiungi Brano
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/AggiungiBrano.fxml"));
-                javafx.scene.Parent root = loader.load();
-
-                // Crea una nuova finestra
-                javafx.stage.Stage stageAggiungi = new javafx.stage.Stage();
-                stageAggiungi.setTitle("Aggiungi Nuovo Brano");
-                stageAggiungi.setScene(new javafx.scene.Scene(root));
-
-                // Imposta la finestra come Modale, ovvero non puoi cliccare sotto
-                stageAggiungi.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-
-                // Mostra la finestra e METTE IN PAUSA questo metodo finché non viene chiusa
-                stageAggiungi.showAndWait();
-
-                // Quando viene premuto ok, annulla o chiusura (equivalente ad annulla)
-                // il codice riparte da qui. Aggiorniamo la lista per mostrare il nuovo brano!!!!!!!
-                aggiornaListaBrani();
-
-            } catch (java.io.IOException e) {
-                System.err.println("Errore nel caricamento della vista AggiungiBranoView.fxml");
-                e.printStackTrace();
-            }
-
         }
 
         // Funzione per aprire la schermata dedicata alle info del brano selezionato dall'utente

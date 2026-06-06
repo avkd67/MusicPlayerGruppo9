@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.example.musicplayergruppo9.database.DAO.PlaylistBraniDAO;
 import org.example.musicplayergruppo9.database.DAO.PlaylistDAO;
@@ -24,19 +25,19 @@ public class PlaylistService {
     }
 
     public List<Brano> getBraniByPlaylist(Playlist playlist) {
-        return playlistBraniDAO.getBraniByPlaylist(playlist);
+        return playlistBraniDAO.getInstance().getBraniByPlaylist(playlist);
     }
 
     public ArrayList<Playlist> getAllPlaylists() {
-        return playlistDAO.getAllPlaylists();
+        return playlistDAO.getInstance().getAllPlaylists();
     }
 
     public boolean checkNomePlaylist(Playlist playlist) {
-        return playlistDAO.checkNomePlaylist(playlist);
+        return playlistDAO.getInstance().checkNomePlaylist(playlist);
     }
 
     public boolean salvaPlaylist(Playlist playlist) throws  IOException {
-
+        // prima del salvataggio, rendo il percorso relativo e non più assoluto!
         String percorsoAssoluto = playlist.getPercorsoCopertina();
         String percorsoRelativo;
 
@@ -51,6 +52,7 @@ public class PlaylistService {
                 Path targetCopertina = cartellaCopertine.resolve(copertinaOriginale.getName());
                 Files.copy(copertinaOriginale.toPath(), targetCopertina, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 percorsoRelativo = "AltriFile/Copertine/" + copertinaOriginale.getName();
+                playlist.setPercorsoCopertina(percorsoRelativo);
 
             }catch (java.io.IOException e) {
                 e.printStackTrace();
@@ -58,14 +60,44 @@ public class PlaylistService {
             }
         }
 
-        return playlistDAO.salvaPlaylist(playlist);
+        return playlistDAO.getInstance().salvaPlaylist(playlist);
     }
 
-    public boolean aggiornaPlaylist(Playlist playlist, Playlist playlistAggiornata) {
-        return playlistDAO.aggiornaPlaylist(playlist, playlistAggiornata);
+    public boolean aggiornaPlaylist(Playlist playlist, Playlist playlistAggiornata) throws IOException {
+        // se il percorso della copertina è stato cambiato, devo provvedere a renderlo relativo!
+
+        if(!Objects.equals(playlist.getPercorsoCopertina(), playlistAggiornata.getPercorsoCopertina())){
+            if (playlistAggiornata.getPercorsoCopertina() != null){
+                try {
+                    Path cartellaCopertine = java.nio.file.Paths.get("AltriFile", "Copertine");
+
+                    if(!java.nio.file.Files.exists(cartellaCopertine))
+                        Files.createDirectories(cartellaCopertine); // teoricamente c'è per forza essendoci una modifica
+                                                                    // ma non si sa mai!
+                    File copertinaOriginale = new File(playlistAggiornata.getPercorsoCopertina());
+                    Path targetCopertina = cartellaCopertine.resolve(copertinaOriginale.getName());
+                    Files.copy(copertinaOriginale.toPath(), targetCopertina, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    String percorsoRelativo = "AltriFile/Copertine/" + copertinaOriginale.getName();
+                    playlistAggiornata.setPercorsoCopertina(percorsoRelativo);
+
+                } catch(java.io.IOException e){
+                    e.printStackTrace();
+                    throw e;
+                }
+            }
+        }
+        return PlaylistDAO.getInstance().aggiornaPlaylist(playlist, playlistAggiornata);
     }
 
     public boolean eliminaPlaylist(Playlist playlist) {
-        return playlistDAO.eliminaPlaylist(playlist);
+        return playlistDAO.getInstance().eliminaPlaylist(playlist);
+    }
+
+    public boolean aggiungiBranoAPlaylist(Playlist playlist, Brano brano) {
+        return playlistBraniDAO.getInstance().aggiungiBranoAPlaylist(playlist, brano);
+    }
+
+    public boolean eliminaBranoDaPlaylist(Playlist playlist, Brano brano) {
+        return playlistBraniDAO.getInstance().rimuoviBranoDaPlaylist(playlist, brano);
     }
 }

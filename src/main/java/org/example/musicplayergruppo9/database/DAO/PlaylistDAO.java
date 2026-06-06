@@ -52,7 +52,7 @@ public class PlaylistDAO {
             return false;
         }
 
-        return true;
+        return false;
     }
 
     // metodo per aggiornare i dati di una playlist esistente
@@ -65,7 +65,7 @@ public class PlaylistDAO {
                 pstmt.setString(2, playlistModificata.getPercorsoCopertina());
                 pstmt.setInt(3, playlist.getId());
                 pstmt.executeUpdate();
-                return true;
+                return pstmt.executeUpdate() > 0;
             }
             catch (SQLException e) {
             System.err.println("[PlaylistDAO] Errore durante l'aggiornamento!");

@@ -1,6 +1,7 @@
 package org.example.musicplayergruppo9.controller;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.example.musicplayergruppo9.utilities.FXutilities;
 import org.example.musicplayergruppo9.model.Playlist;
@@ -51,7 +52,7 @@ public class ModificaPlaylistController {
 
     @FXML
     private void onSfogliaCopertina(){
-        FXutilities.cercaCopertina(imgCopertina);
+        percorsoCopertinaSelezionata = FXutilities.cercaCopertina(imgCopertina);
     }
 
     @FXML
@@ -61,7 +62,7 @@ public class ModificaPlaylistController {
 
     // pulsante OK che salva le modifiche alla playlist, controllando che siano tutte modifiche valide che non vadano a risultare in stati incoerenti del db
     @FXML
-    private void onOk(){
+    private void onOk() throws IOException {
         // vieta l'aggiornamento del nome della playlist come vuoto
         if(TxtFieldNomePlaylist.getText().isBlank()){
             FXutilities.mostraAlertErrore("Errore", "Nome playlist non valido", "Il nome della playlist non può essere vuoto. Inserire un nome valido.");
@@ -83,7 +84,6 @@ public class ModificaPlaylistController {
         }
 
         playlistService.aggiornaPlaylist(playlist, playlistModificata);
-        // playlist = playlistModificata;
         FXutilities.chiudiFinestra(TxtFieldNomePlaylist);
     }
 

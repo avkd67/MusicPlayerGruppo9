@@ -22,26 +22,6 @@ public class PlaylistBraniDAO {
         return instance;
     }
 
-    // metodo per salvare l'associazione tra playlist e brano
-    public boolean salvaPlaylistBrano(int playlistId, int branoId) {
-        String sql = "INSERT INTO playlist_brani (playlist_id, brano_id) VALUES (?, ?)";
-
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, playlistId);
-            pstmt.setInt(2, branoId);
-            int righeInteressate = pstmt.executeUpdate();
-            
-            return righeInteressate > 0;
-
-        } catch (SQLException e) {
-            System.err.println("[PlaylistBraniDAO] Errore durante il salvataggio dell'associazione: Playlist ID " + playlistId + ", Brano ID " + branoId);
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     // metodo per ottenere tutte le canzoni associate a una playlist esistente
     public List<Brano> getBraniByPlaylist(Playlist playlist){
 
@@ -81,5 +61,45 @@ public class PlaylistBraniDAO {
             e.printStackTrace();
         }
         return brani;
+    }
+
+    // metodo per l'aggiunta di un brano ad una playlist
+    public boolean aggiungiBranoAPlaylist(Playlist playlist, Brano brano) {
+        String sql = "INSERT OR IGNORE INTO playlist_brani (playlist_id, brano_id) VALUES (?, ?)";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, playlist.getId());
+            pstmt.setInt(2, brano.getId());
+            int righeInteressate = pstmt.executeUpdate();
+
+            return righeInteressate > 0;
+
+        } catch (SQLException e) {
+            System.err.println("[PlaylistBraniDAO] Errore durante il salvataggio dell'associazione: Playlist ID " + playlist.getId() + ", Brano ID " + brano.getId());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // metodo per la rimozione di un brano da una playlist
+    public boolean rimuoviBranoDaPlaylist(Playlist playlist, Brano brano){
+        String sql = "DELETE FROM playlist_brani WHERE playlist_id = ? AND brano_id = ?";
+
+        try(Connection conn = DatabaseConnection.getInstance().getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, playlist.getId());
+            pstmt.setInt(2, brano.getId());
+
+            int righeInteressate = pstmt.executeUpdate();
+            return righeInteressate > 0;
+
+        } catch (SQLException e) {
+            System.out.println("[PlaylistBraniDAO] Errore durante la rimozione del brano: " + brano.getTitolo());
+            e.printStackTrace();
+        }
+        return false;
     }
 }
