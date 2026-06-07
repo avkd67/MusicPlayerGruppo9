@@ -32,7 +32,7 @@ public class ModificaPlaylistController {
 
     @FXML
     public void initialize(){
-        playlistService = new PlaylistService();
+        playlistService = PlaylistService.getInstance();
 
     }
 
@@ -83,7 +83,14 @@ public class ModificaPlaylistController {
             playlistModificata.setPercorsoCopertina(percorsoCopertinaSelezionata);
         }
 
-        playlistService.aggiornaPlaylist(playlist, playlistModificata);
+        boolean successo = playlistService.aggiornaPlaylist(playlist, playlistModificata);
+        if(successo){
+            playlist.setNome(playlistModificata.getNome());
+            playlist.setPercorsoCopertina(playlistModificata.getPercorsoCopertina());
+        }
+        else
+            FXutilities.mostraAlertErrore("Errore","Problema nell'aggiornamento della playlist","Impossibile aggiornare la playlist");
+
         FXutilities.chiudiFinestra(TxtFieldNomePlaylist);
     }
 

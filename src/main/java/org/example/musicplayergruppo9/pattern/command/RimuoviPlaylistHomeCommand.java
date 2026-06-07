@@ -28,7 +28,7 @@ public class RimuoviPlaylistHomeCommand implements Command {
 
     public RimuoviPlaylistHomeCommand(Playlist playlistCancellata) {
         this.playlistCancellata = playlistCancellata;
-        playlistService = new PlaylistService();
+        playlistService = PlaylistService.getInstance();
         this.backupBrani = new ArrayList<>(playlistService.getBraniByPlaylist(playlistCancellata));
     }
 
@@ -45,10 +45,10 @@ public class RimuoviPlaylistHomeCommand implements Command {
 
     // ripristina la playlist e i file associati
     public void undo(){
-        boolean ripristinato = playlistService.salvaPlaylistConBrani(playlistCancellata, backupBrani);
 
-        if(ripristinato)
-            ripristinaDaCestino();
+        // ripristino prima l'immagine dal cestino altrimenti la home non la trova quando viene notificata!!
+        ripristinaDaCestino();
+        playlistService.salvaPlaylistConBrani(playlistCancellata, backupBrani);
 
         FXutilities.mostraAlertSuccesso("Ripristino playlist","Playlist ripristinata correttamente");
     }

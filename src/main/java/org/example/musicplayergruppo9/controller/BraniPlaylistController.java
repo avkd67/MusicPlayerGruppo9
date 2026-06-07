@@ -7,6 +7,7 @@ import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.Playlist;
 import org.example.musicplayergruppo9.pattern.command.CommandHistory;
 import org.example.musicplayergruppo9.pattern.command.RimuoviPlaylistHomeCommand;
+import org.example.musicplayergruppo9.pattern.observer.Observer;
 import org.example.musicplayergruppo9.service.PlaylistService;
 
 import javafx.collections.FXCollections;
@@ -26,7 +27,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.example.musicplayergruppo9.utilities.FXutilities;
 
-public class BraniPlaylistController {
+public class BraniPlaylistController implements Observer {
 
     // lista dei brani della playlist
     @FXML
@@ -49,7 +50,10 @@ public class BraniPlaylistController {
     @FXML
     public void initialize() {
         commandHistory = CommandHistory.getInstance();
-        playlistService =  new PlaylistService();
+
+        playlistService = PlaylistService.getInstance();
+        playlistService.attach(this);
+
         braniObservableList = FXCollections.observableArrayList();
         listaBrani.setItems(braniObservableList);
         listaBrani.setCellFactory(param -> new BranoListCell());
@@ -103,7 +107,7 @@ public class BraniPlaylistController {
     public void eliminaBranoDaPlaylist(Brano brano){
         if(FXutilities.mostraAlertConferma("Rimozione brano", "Sei sicuro di voler rimuovere " + brano.getTitolo() + " dalla playlist?"))
             playlistService.eliminaBranoDaPlaylist(playlist, brano);
-        aggiornaListaBrani();
+        update();
     }
 
     // eliminazione della playlist selezionata
@@ -137,6 +141,11 @@ public class BraniPlaylistController {
 
             stageModifica.showAndWait();
 
+            LblNomePlaylist.setText(this.playlist.getNome());
+
+            if(this.playlist.getPercorsoCopertina() != null)
+                imgCopertina.setImage(new Image(new File(this.playlist.getPercorsoCopertina()).toURI().toString()));
+
         } catch (java.io.IOException e) {
             System.err.println("Errore nel caricamento della vista ModificaPlaylist.fxml");
             e.printStackTrace();
@@ -146,22 +155,25 @@ public class BraniPlaylistController {
     public void aggiungiBranoAPlaylist(Brano brano){
         playlist.aggiungiBrano(brano);
         playlistService.aggiungiBranoAPlaylist(playlist, brano);
-        aggiornaListaBrani();
+        update();
     }
 
-    private void aggiornaListaBrani() {
+    @Override
+    public void update() {
+        // aggiorna i brani
         System.out.println("Si si... sto aggiornando i brani -_-/ ");
-
-        // Pulisce la lista attuale
         braniObservableList.clear();
-
-        // Ripesca tutti i brani aggiornati dal DB
         List<Brano> braniAggiornati = playlistService.getBraniByPlaylist(playlist);
         braniObservableList.addAll(braniAggiornati);
-
-        // Reinserisce il pulsante finto "Aggiungi Brano" in fondo
         braniObservableList.add(segnaposto_aggiungi);
+
+        // aggiorna nome e immagine di copertina
+        LblNomePlaylist.setText(this.playlist.getNome());
+        if(this.playlist.getPercorsoCopertina() != null)
+            imgCopertina.setImage(new Image(new File(this.playlist.getPercorsoCopertina()).toURI().toString()));
+
     }
+
 
     // per la visualizzazione dei brani !
     private class BranoListCell extends ListCell<Brano> {

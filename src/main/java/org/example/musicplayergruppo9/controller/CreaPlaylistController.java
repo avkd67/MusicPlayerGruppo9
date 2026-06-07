@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.example.musicplayergruppo9.model.Playlist;
+import org.example.musicplayergruppo9.pattern.observer.Observer;
 import org.example.musicplayergruppo9.service.PlaylistService;
 
 import javafx.fxml.FXML;
@@ -15,7 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.example.musicplayergruppo9.utilities.FXutilities;
 
-public class CreaPlaylistController {
+public class CreaPlaylistController implements Observer {
 
     @FXML private TextField nomePlaylist;
     @FXML private ImageView imgCopertina;
@@ -26,7 +27,7 @@ public class CreaPlaylistController {
 
     @FXML
     public void initialize() {
-        playlistService = new PlaylistService();
+        playlistService = PlaylistService.getInstance();
     }
 
     // selezione dell'immagine della copertina della playlist
@@ -66,5 +67,10 @@ public class CreaPlaylistController {
         else {
             FXutilities.mostraAlertErrore("Errore", "Nome vuoto", "Il nome della playlist non può essere lasciato in bianco.");
         }
+    }
+
+    @Override
+    public void update() {
+
     }
 }

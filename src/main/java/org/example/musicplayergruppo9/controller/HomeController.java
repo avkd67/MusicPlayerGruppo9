@@ -3,6 +3,7 @@ package org.example.musicplayergruppo9.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.example.musicplayergruppo9.pattern.observer.Observer;
 import org.example.musicplayergruppo9.service.PlaylistService;
 import org.example.musicplayergruppo9.model.Playlist;
 
@@ -26,29 +27,30 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class HomeController {
+public class HomeController implements Observer {
 
     // il flowpane permette la visualizzazione a griglia e va a capo automaticamente
     @FXML
-    private FlowPane playlistsFlowPane; 
+    private FlowPane playlistsFlowPane;
 
     private ObservableList<Playlist> playlistsObservableList;
     private PlaylistService playlistService;
+    private ArrayList<Playlist> playlistRecuperate;
 
     // segnaposto per il tasto aggiungi playlist
     private final Playlist segnaposto_aggiungi = new Playlist();
 
     @FXML
     public void initialize() {
-        playlistService = new PlaylistService();
+        playlistService = PlaylistService.getInstance();
+        playlistService.attach(this);
 
         // prendo le playlists presenti nel db e ci lego l'observable list
-        ArrayList<Playlist> playlistRecuperate = playlistService.getAllPlaylists();
+        playlistRecuperate = playlistService.getAllPlaylists();
         playlistsObservableList = FXCollections.observableArrayList(playlistRecuperate);
 
         segnaposto_aggiungi.setId(-1);
         playlistsObservableList.add(segnaposto_aggiungi);
-
         mostraPlaylists();
     }
 
@@ -181,13 +183,22 @@ public class HomeController {
             popupStage.showAndWait();
 
             // Ricarica le playlist dopo la creazione
-            ArrayList<Playlist> aggiornate = playlistService.getAllPlaylists();
-            playlistsObservableList = FXCollections.observableArrayList(aggiornate);
-            playlistsObservableList.add(segnaposto_aggiungi);
-            mostraPlaylists();
+            //ArrayList<Playlist> aggiornate = playlistService.getAllPlaylists();
+            //playlistsObservableList = FXCollections.observableArrayList(aggiornate);
+            //playlistsObservableList.add(segnaposto_aggiungi);
+            update();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void update() {
+        playlistsObservableList.clear();
+        playlistRecuperate = playlistService.getAllPlaylists();
+        playlistsObservableList.addAll(playlistRecuperate);
+        playlistsObservableList.add(segnaposto_aggiungi);
+        mostraPlaylists();
     }
 }
