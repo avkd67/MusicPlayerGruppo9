@@ -4,6 +4,7 @@ import org.example.musicplayergruppo9.database.DAO.BranoDAO;
 import org.example.musicplayergruppo9.database.DAO.PlaylistBraniDAO;
 import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.Playlist;
+import org.example.musicplayergruppo9.utilities.FXutilities;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -97,6 +98,8 @@ public class RimuoviBranoLibreriaCommand implements Command {
 
             // Riporto i file fisici nelle cartelle originali
             ripristinaDaCestino();
+
+            FXutilities.mostraAlertSuccesso("Ripristino brano","Brano ripristinato correttamente");
         }
     }
 

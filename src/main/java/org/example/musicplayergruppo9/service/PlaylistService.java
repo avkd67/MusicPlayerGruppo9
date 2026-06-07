@@ -41,7 +41,7 @@ public class PlaylistService {
         String percorsoAssoluto = playlist.getPercorsoCopertina();
         String percorsoRelativo;
 
-        if (percorsoAssoluto != null){
+        if (percorsoAssoluto != null && !percorsoAssoluto.startsWith("AltriFile")){
             try {
                 Path cartellaCopertine = java.nio.file.Paths.get("AltriFile", "Copertine");
 
@@ -61,6 +61,23 @@ public class PlaylistService {
         }
 
         return playlistDAO.getInstance().salvaPlaylist(playlist);
+    }
+
+    // salva la playlist nel db e le associa tutti i brani presenti nella lista
+    public boolean salvaPlaylistConBrani(Playlist playlist, ArrayList<Brano> brani) {
+        try {
+            if(!salvaPlaylist(playlist)){
+                return false;
+            }
+
+            for(Brano brano : brani){
+                if(!this.aggiungiBranoAPlaylist(playlist, brano))
+                    return false;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
     }
 
     public boolean aggiornaPlaylist(Playlist playlist, Playlist playlistAggiornata) throws IOException {

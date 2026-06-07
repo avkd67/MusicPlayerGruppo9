@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.Playlist;
+import org.example.musicplayergruppo9.pattern.command.CommandHistory;
+import org.example.musicplayergruppo9.pattern.command.RimuoviPlaylistHomeCommand;
 import org.example.musicplayergruppo9.service.PlaylistService;
 
 import javafx.collections.FXCollections;
@@ -42,9 +44,11 @@ public class BraniPlaylistController {
 
     private ObservableList<Brano> braniObservableList;
     private PlaylistService playlistService;
+    private CommandHistory commandHistory;
 
     @FXML
     public void initialize() {
+        commandHistory = CommandHistory.getInstance();
         playlistService =  new PlaylistService();
         braniObservableList = FXCollections.observableArrayList();
         listaBrani.setItems(braniObservableList);
@@ -106,7 +110,7 @@ public class BraniPlaylistController {
     @FXML
     public void onEliminaPlaylist(){
         if(FXutilities.mostraAlertConferma("Elimina playlist", "Sicuro di voler eliminare la playlist?")) {
-            playlistService.eliminaPlaylist(playlist);
+            commandHistory.execute(new RimuoviPlaylistHomeCommand(playlist));
             FXutilities.chiudiFinestra(imgCopertina);
         }
     }
