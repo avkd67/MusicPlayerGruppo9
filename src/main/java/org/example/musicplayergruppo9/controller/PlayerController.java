@@ -262,6 +262,8 @@ public class PlayerController {
         // Resetta l'iteratore della playlist corrente
         iteratorCorrente = null;
 
+        branoCorrente = null;
+
         // Ferma fisicamente jPlayer tramite il PlayerService
         if (playerService != null) {
             playerService.stopAudio();

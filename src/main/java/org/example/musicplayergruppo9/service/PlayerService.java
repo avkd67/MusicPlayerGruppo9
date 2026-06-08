@@ -154,6 +154,10 @@ public class PlayerService {
         isStopped = true;
         isPlaying = false;
 
+        if (playerThread != null) {
+            playerThread.interrupt();
+        }
+
         if (jPlayer != null) {
             try {
                 jPlayer.close(); // Questo farà terminare pacificamente il ciclo if(!jPlayer.play(1))
