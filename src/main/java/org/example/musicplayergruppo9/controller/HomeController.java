@@ -38,6 +38,9 @@ public class HomeController implements Observer {
     private PlaylistService playlistService;
     private ArrayList<Playlist> playlistRecuperate;
 
+    // Riferimento al MainController, verrà iniettato da MainController
+    private MainController mainController;
+
     // segnaposto per il tasto aggiungi playlist
     private final Playlist segnaposto_aggiungi = new Playlist();
 
@@ -161,6 +164,8 @@ public class HomeController implements Observer {
             Parent root = loader.load();
             BraniPlaylistController controllerDestinazione = loader.getController();
             controllerDestinazione.setPlaylist(playlist);
+            // Passo il riferimento al MainController così la playlist può essere riprodotta
+            controllerDestinazione.setMainController(this.mainController);
 
             Stage stage = new Stage();
             stage.setTitle("Playlist: " + playlist.getNome());
@@ -170,6 +175,10 @@ public class HomeController implements Observer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
     }
 
     // tasto "+", apre il popup per creare una nuova playlist 

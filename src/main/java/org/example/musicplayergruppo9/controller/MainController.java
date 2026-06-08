@@ -32,6 +32,10 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/HomeView.fxml"));
             Node viewHome = loader.load();
 
+            // Inietto il riferimento al MainController nella Home
+            org.example.musicplayergruppo9.controller.HomeController homeController = loader.getController();
+            if (homeController != null) homeController.setMainController(this);
+
             // Si svuota l'area contenuti e inserisci la nuova view
             areaContenuti.getChildren().setAll(viewHome);
 

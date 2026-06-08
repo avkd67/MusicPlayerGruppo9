@@ -30,7 +30,7 @@
 
         <HBox layoutX="62.0" layoutY="167.0" spacing="15.0">
             <children>
-                <Button mnemonicParsing="false" style="-fx-padding: 8 15 8 15; -fx-font-size: 14px;" styleClass="button-icona" text=" ▶ ">
+                <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#playPlaylist" style="-fx-padding: 8 15 8 15; -fx-font-size: 14px;" styleClass="button-icona" text=" ▶ ">
                     <tooltip>
                         <Tooltip text="Play" />
                     </tooltip>
