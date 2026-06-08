@@ -11,7 +11,7 @@ public class BranoIteratorTest {
 
     @Test
     void iteratorBranoRestituisceSeStesso() {
-        Brano brano = new Brano(1, "Blessed", "Night Sinny", "pop", 0, 354, "/path/audio.mp3", "mp3", null, false, false, false);
+        Brano brano = new Brano(1, "Blessed", "Night Sinny", "pop", 0, 354, "/path/audio.mp3", "mp3", null, false, false, false, 0);
 
         Iterator<Brano> it = brano.iterator();
 
@@ -22,7 +22,7 @@ public class BranoIteratorTest {
 
     @Test
     void iteratorBranoNonRestituisceAltriElementi() {
-        Brano brano = new Brano(2, "Malamente", "Rosalia", "pop", 0, 482, "/path/audio.mp3", "mp3", null, false, false, false);
+        Brano brano = new Brano(2, "Malamente", "Rosalia", "pop", 0, 482, "/path/audio.mp3", "mp3", null, false, false, false, 0);
 
         Iterator<Brano> it = brano.iterator();
         it.next(); // consuma l'elemento

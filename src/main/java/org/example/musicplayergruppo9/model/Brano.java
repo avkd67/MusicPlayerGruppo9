@@ -22,6 +22,8 @@ public class Brano implements ElementoCoda{
     private boolean newRelease;
     private boolean explicit;
 
+    private int contatoreAscolti;
+
 
     // costruttore senza id per l'inserimento
     public Brano(String titolo, String artista, String genere, int dataRilascio, int durata, String percorsoFileAudio, String estensione, String percorsoCopertina, boolean newRelease, boolean explicit) {
@@ -38,7 +40,7 @@ public class Brano implements ElementoCoda{
     }
 
     //costruttore con id per il recupero
-    public Brano(int id, String titolo, String artista, String genere, int dataRilascio, int durata, String percorsoFileAudio, String estensione, String percorsoCopertina, boolean preferito, boolean newRelease, boolean explicit) {
+    public Brano(int id, String titolo, String artista, String genere, int dataRilascio, int durata, String percorsoFileAudio, String estensione, String percorsoCopertina, boolean preferito, boolean newRelease, boolean explicit, int contatoreAscolti) {
         this.id = id;
         this.titolo = titolo;
         this.artista = artista;
@@ -51,6 +53,7 @@ public class Brano implements ElementoCoda{
         this.preferito = preferito;
         this.newRelease = newRelease;
         this.explicit = explicit;
+        this.contatoreAscolti = contatoreAscolti;
     }
 
     //per la creazione di oggetti brano che saranno riempiti successivamente con i dati necessari.
@@ -152,6 +155,14 @@ public class Brano implements ElementoCoda{
 
     public void setExplicit(boolean explicit) {
         this.explicit = explicit;
+    }
+
+    public int getContatoreAscolti() {
+        return contatoreAscolti; 
+    }
+
+    public void setContatoreAscolti(int contatoreAscolti) { 
+        this.contatoreAscolti = contatoreAscolti; 
     }
 
     @Override
