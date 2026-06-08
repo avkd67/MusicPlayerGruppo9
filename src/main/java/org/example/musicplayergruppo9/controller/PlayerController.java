@@ -163,6 +163,10 @@ public class PlayerController {
             // Coda vuota: nessun elemento da riprodurre
             branoCorrente = null;
             iteratorCorrente = null;
+            svuotaCoda();
+            if (mainController != null) {
+                mainController.chiudiPlayerVisivamente();
+            }
             System.out.println("[PlayerController] Coda vuota.");
             return;
         }

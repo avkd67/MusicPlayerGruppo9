@@ -186,4 +186,11 @@ public class MainController {
             System.out.println("[MainController] Impossibile svuotare: PlayerController non inizializzato.");
         }
     }
+
+    public void chiudiPlayerVisivamente() {
+        mainContainer.setBottom(null);
+        playerAperto = false;
+        playerController = null;
+        System.out.println("[MainController] Player rimosso dalla schermata principale.");
+    }
 }
