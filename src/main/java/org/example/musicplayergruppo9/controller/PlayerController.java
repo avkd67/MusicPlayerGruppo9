@@ -110,11 +110,11 @@ public class PlayerController {
     public void loopSong() {
         if (strategia instanceof StrategiaLoop) {
             strategia = new StrategiaSequenziale();
-            btnLoop.getStyleClass().remove("button-attivo");
+            if (btnLoop != null) btnLoop.getStyleClass().remove("button-attivo");
             System.out.println("[PlayerController] Loop: OFF");
         } else {
             strategia = new StrategiaLoop();
-            btnLoop.getStyleClass().add("button-attivo");
+            if (btnLoop != null) btnLoop.getStyleClass().add("button-attivo");
             System.out.println("[PlayerController] Loop: ON");
         }
     }
@@ -303,7 +303,9 @@ public class PlayerController {
 
     private void aggiornaVisibilitaSkipPlaylist() {
         boolean isPlaylist = elementoCorrente instanceof Playlist;
-        btnSkipPlaylist.setVisible(isPlaylist);
-        btnSkipPlaylist.setManaged(isPlaylist); 
+        if (btnSkipPlaylist != null) {
+            btnSkipPlaylist.setVisible(isPlaylist);
+            btnSkipPlaylist.setManaged(isPlaylist); 
+        }
     }
 }
