@@ -182,6 +182,18 @@ public class BraniPlaylistController implements Observer {
         }
     }
 
+    // Metodo chiamato dal pulsante 'Aggiungi alla coda' nella vista Playlist
+    @FXML
+    public void aggiungiPlaylistAllaCoda() {
+        if (playlist == null) return;
+        if (mainController != null) {
+            mainController.aggiungiInCoda(playlist);
+            System.out.println("[BraniPlaylistController] Playlist aggiunta in coda: " + playlist.getNome());
+        } else {
+            System.out.println("[BraniPlaylistController] MainController non impostato. Impossibile aggiungere in coda.");
+        }
+    }
+
     @Override
     public void update() {
         // aggiorna i brani
