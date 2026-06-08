@@ -1,6 +1,7 @@
 package org.example.musicplayergruppo9.controller;
 
 import org.example.musicplayergruppo9.model.Brano;
+import org.example.musicplayergruppo9.model.Playlist;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -129,5 +130,113 @@ public class PlayerControllerTest {
         player.loopSong();
         player.loopSong();
         assertFalse(player.isLoopAttivo());
+    }
+
+    //playlist con un solo brano: dopo lo skip il player si ferma
+    @Test
+    void skipUnicoBranoDiPlaylistSvuotaPlayer() {
+        Brano solo = new Brano(3, "Solo", "Artista3", "Pop", 0, 120, "/path/3.mp3", "mp3", null, false, false, false, 0);
+        Playlist pl = creaPlaylist("Singola", solo);
+ 
+        player.aggiungiInCoda(pl);
+        player.skipSong();
+ 
+        assertNull(player.getBranoCorrente());
+    }
+ 
+    //playlist con b1, b2 -> skipSong deve passare a b2 restando nella playlist
+    @Test
+    void skipBranoDentroPlaylistPassaAlSuccessivoDellaPlaylist() {
+        Playlist pl = creaPlaylist("Playlist Due Brani", b1, b2);
+ 
+        player.aggiungiInCoda(pl);
+        player.skipSong();
+ 
+        assertEquals(b2, player.getBranoCorrente());
+    }
+ 
+    // dopo uno skip che esaurisce la playlist, il player si ferma se non c'è altro in coda
+    @Test
+    void skipFinePlaylistSenzaAltroInCodaSvuotaPlayer() {
+        Playlist pl = creaPlaylist("Playlist Due Brani", b1, b2);
+ 
+        player.aggiungiInCoda(pl);
+        player.skipSong();
+        player.skipSong();
+ 
+        assertNull(player.getBranoCorrente());
+    }
+ 
+    //dopo lo skip che esaurisce la playlist, deve partire il brano successivo in coda
+    @Test
+    void skipFinePlaylistPassaAllElementoSuccessivoInCoda() {
+        Brano bEsterno = new Brano(3, "BranoEsterno", "Artista3", "Pop", 0, 150, "/path/3.mp3", "mp3", null, false, false, false, 0);
+        Playlist pl = creaPlaylist("Playlist Corta", b1);
+ 
+        player.aggiungiInCoda(pl);
+        player.aggiungiInCoda(bEsterno);
+ 
+        player.skipSong();
+ 
+        assertEquals(bEsterno, player.getBranoCorrente());
+    }
+ 
+    //con il loop attivo, skipSong dentro la playlist riparte dallo stesso brano
+    @Test
+    void skipBranoDentroPlaylistConLoopAttivoRiparteDaStessoBrano() {
+        Playlist pl = creaPlaylist("Playlist Loop", b1, b2);
+ 
+        player.aggiungiInCoda(pl);
+        player.loopSong();
+        player.skipSong();
+ 
+        assertEquals(b1, player.getBranoCorrente());
+    }
+
+    //skipPlaylist deve saltare tutti i brani rimanenti della playlist e passare al successivo in coda
+    @Test
+    void skipPlaylistSaltaTuttiIBraniEPassaAlSuccessivo() {
+        Brano bEsterno = new Brano(3, "BranoEsterno", "Artista3", "Pop", 0, 150, "/path/3.mp3", "mp3", null, false, false, false, 0);
+        Playlist pl = creaPlaylist("Playlist Lunga", b1, b2);
+ 
+        player.aggiungiInCoda(pl);
+        player.aggiungiInCoda(bEsterno);
+ 
+        player.skipPlaylist();
+ 
+        assertEquals(bEsterno, player.getBranoCorrente());
+    }
+ 
+    //skipPlaylist quando non c'è nient'altro in coda deve svuotare il player
+    @Test
+    void skipPlaylistSenzaAltroInCodaSvuotaPlayer() {
+        Playlist pl = creaPlaylist("Playlist Sola", b1, b2);
+ 
+        player.aggiungiInCoda(pl);
+        player.skipPlaylist();
+ 
+        assertNull(player.getBranoCorrente());
+    }
+ 
+    // skipPlaylist con loop attivo non deve fare nulla (comportamento definito nel controller)
+    @Test
+    void skipPlaylistConLoopAttivoNonCambiaBrano() {
+        Playlist pl = creaPlaylist("Playlist Loop", b1, b2);
+ 
+        player.aggiungiInCoda(pl);
+        player.loopSong();
+        player.skipPlaylist();
+ 
+        assertEquals(b1, player.getBranoCorrente());
+    }
+    
+    private Playlist creaPlaylist(String nome, Brano... brani) {
+        Playlist pl = new Playlist();
+        pl.setId(99);
+        pl.setNome(nome);
+        for (Brano b : brani) {
+            pl.aggiungiBrano(b);
+        }
+        return pl;
     }
 }
