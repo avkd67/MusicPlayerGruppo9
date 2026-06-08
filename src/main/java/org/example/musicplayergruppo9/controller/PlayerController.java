@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.ElementoCoda;
+import org.example.musicplayergruppo9.model.Playlist;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaLoop;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaRiproduzione;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaSequenziale;
@@ -34,19 +35,18 @@ public class PlayerController {
     @FXML private Button btnPlayPause;
     @FXML private Label lblTempo;
     @FXML private Slider sliderProgresso;
-
     @FXML private Button btnLoop;
+    @FXML private Button btnSkipPlaylist;
+
    
     private static PlayerService playerService;
-
     //per svolgere task 6.2
     private final Queue<ElementoCoda> coda = new LinkedList<>();
-
     //iterare sull'elemento in riproduzione
     private Iterator<Brano> iteratorCorrente;
-
     private Brano branoCorrente;
-
+    //per permettere lo skip dell'elemento (brano o playlist) in coda
+    private ElementoCoda elementoCorrente;
     //Design Pattern: Strategy
     //scelto per soddisfare la task 7.2: loop
     private StrategiaRiproduzione strategia = new StrategiaSequenziale();
@@ -63,7 +63,7 @@ public class PlayerController {
                 () -> sliderProgresso.setMax(playerService.getTotalDuration().toSeconds())
         );
 
-        //gestione slier per mandare avanti e indietro la musica drag and drop
+        //gestione slider per mandare avanti e indietro la musica drag and drop
         sliderProgresso.valueProperty().addListener((observable, oldValue, newValue) -> {
             if(sliderProgresso.isValueChanging() && playerService != null) {
                 playerService.seek(sliderProgresso.getValue());
@@ -84,6 +84,7 @@ public class PlayerController {
         playerService.setOnEndOfMediaCallback(() -> {
             strategia.onFineBrano(this); 
         });
+
 
     }
 
@@ -149,11 +150,24 @@ public class PlayerController {
         togglePlayPause();
     }
 
-    //da implementare nell prossime task
+    
     @FXML
     public void skipPlaylist() {
-        System.out.println("[PlayerController] skipPlaylist cliccato!");
+        // Se loop attivo, non fare nulla (o decidi tu il comportamento)
+        if (strategia instanceof StrategiaLoop) return;
+
+        //playlist in riproduzione, skippa l'intera playlist e passa al  prossimo elemento in coda
+        if (elementoCorrente instanceof Playlist) {
+            iteratorCorrente = null;   // esaurisci l'iteratore della playlist corrente
+            avviaProssimoElemento();
+            return;
+        }
+
+        avviaProssimoElemento();
     }
+
+    
+
 
     //logica estrazione elemento in coda
     private void avviaProssimoElemento() {
@@ -163,13 +177,20 @@ public class PlayerController {
             // Coda vuota: nessun elemento da riprodurre
             branoCorrente = null;
             iteratorCorrente = null;
+            elementoCorrente = null;
+
+            aggiornaVisibilitaSkipPlaylist();
+
             svuotaCoda();
             if (mainController != null) {
                 mainController.chiudiPlayerVisivamente();
             }
-            System.out.println("[PlayerController] Coda vuota.");
+            
             return;
         }
+
+        elementoCorrente = prossimo;
+        aggiornaVisibilitaSkipPlaylist();
 
         // Inizializza l'iteratore sul nuovo elemento (Brano o Playlist)
         iteratorCorrente = prossimo.iterator();
@@ -177,6 +198,8 @@ public class PlayerController {
         if (iteratorCorrente.hasNext()) {
             branoCorrente = iteratorCorrente.next();
             riproduciBranoCorrente();
+
+
         } else {
             // Elemento vuoto: salta al successivo
             avviaProssimoElemento();
@@ -201,7 +224,6 @@ public class PlayerController {
             playerService.loadTrack(branoCorrente);
         }
 
-        System.out.println("[PlayerController] ▶ " + branoCorrente.getTitolo());
     }
 
     private void aggiornaUIProgresso(Duration currentTime) {
@@ -255,6 +277,7 @@ public class PlayerController {
             if (lblTempo != null) lblTempo.setText("00:00");
             if (sliderProgresso != null) sliderProgresso.setValue(0);
 
+
             System.out.println("[PlayerController] File rilasciato per eliminazione.");
         }
     }
@@ -268,11 +291,19 @@ public class PlayerController {
 
         branoCorrente = null;
 
+        elementoCorrente = null;
+
         // Ferma fisicamente jPlayer tramite il PlayerService
         if (playerService != null) {
             playerService.stopAudio();
         }
 
         System.out.println("[PlayerController] Coda svuotata e jPlayer fermato.");
+    }
+
+    private void aggiornaVisibilitaSkipPlaylist() {
+        boolean isPlaylist = elementoCorrente instanceof Playlist;
+        btnSkipPlaylist.setVisible(isPlaylist);
+        btnSkipPlaylist.setManaged(isPlaylist); 
     }
 }
