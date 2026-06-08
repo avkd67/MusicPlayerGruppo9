@@ -3,14 +3,20 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.CreaPlaylistController" stylesheets="@../Style.css">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" spacing="20.0" stylesheets="@../Style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.CreaPlaylistController">
    <children>
-      <Button styleClass="button-icona" layoutX="217.0" layoutY="227.0" mnemonicParsing="false" onAction="#onSfogliaCopertina" prefHeight="25.0" prefWidth="179.0" text="aggiungi copertina" />
-      <TextField fx:id="nomePlaylist" layoutX="108.0" layoutY="263.0" prefHeight="25.0" prefWidth="398.0" text="nome playlist" />
-      <Button styleClass="button-icona" layoutX="359.0" layoutY="344.0" mnemonicParsing="false" onAction="#onAnnulla" text="annulla" />
-      <Button styleClass="button-icona" layoutX="190.0" layoutY="344.0" mnemonicParsing="false" onAction="#onOk" prefHeight="25.0" prefWidth="54.0" text="ok" />
-      <ImageView fx:id="imgCopertina" fitHeight="150.0" fitWidth="200.0" layoutX="207.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="imgCopertina" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+      <Button mnemonicParsing="false" onAction="#onSfogliaCopertina" prefHeight="25.0" prefWidth="179.0" styleClass="button-icona" text="aggiungi copertina" />
+      <TextField fx:id="nomePlaylist" maxWidth="398.0" prefHeight="25.0" prefWidth="398.0" text="nome playlist" />
+
+      <HBox alignment="CENTER" spacing="50.0">
+         <children>
+            <Button mnemonicParsing="false" onAction="#onOk" prefHeight="25.0" prefWidth="80.0" styleClass="button-icona" text="ok" />
+            <Button mnemonicParsing="false" onAction="#onAnnulla" prefHeight="25.0" prefWidth="80.0" styleClass="button-icona" text="annulla" />
+         </children>
+      </HBox>
    </children>
-</Pane>
+</VBox>
