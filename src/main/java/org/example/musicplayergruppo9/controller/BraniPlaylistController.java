@@ -3,9 +3,12 @@ package org.example.musicplayergruppo9.controller;
 import java.io.File;
 import java.util.List;
 
+import org.example.musicplayergruppo9.database.DAO.PlaylistBraniDAO;
 import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.Playlist;
+import org.example.musicplayergruppo9.pattern.command.AggiungiBranoPlaylistCommand;
 import org.example.musicplayergruppo9.pattern.command.CommandHistory;
+import org.example.musicplayergruppo9.pattern.command.RimuoviBranoPlaylistCommand;
 import org.example.musicplayergruppo9.pattern.command.RimuoviPlaylistHomeCommand;
 import org.example.musicplayergruppo9.pattern.observer.Observer;
 import org.example.musicplayergruppo9.service.PlaylistService;
@@ -114,11 +117,13 @@ public class BraniPlaylistController implements Observer {
         }
     }
 
-    // TODO: eliminazione brano dalla playlist !
     public void eliminaBranoDaPlaylist(Brano brano){
-        if(FXutilities.mostraAlertConferma("Rimozione brano", "Sei sicuro di voler rimuovere " + brano.getTitolo() + " dalla playlist?"))
-            playlistService.eliminaBranoDaPlaylist(playlist, brano);
-        update();
+        if(FXutilities.mostraAlertConferma("Rimozione brano", "Sei sicuro di voler rimuovere " + brano.getTitolo() + " dalla playlist?"));
+        RimuoviBranoPlaylistCommand comandoRimuovi = new RimuoviBranoPlaylistCommand(brano, this.playlist, new PlaylistBraniDAO());
+        boolean successo = commandHistory.execute(comandoRimuovi);
+        if (successo) {
+            update();
+        }
     }
 
     // eliminazione della playlist selezionata
@@ -164,9 +169,13 @@ public class BraniPlaylistController implements Observer {
     }
 
     public void aggiungiBranoAPlaylist(Brano brano){
-        playlist.aggiungiBrano(brano);
-        playlistService.aggiungiBranoAPlaylist(playlist, brano);
-        update();
+        AggiungiBranoPlaylistCommand comandoAggiungi = new AggiungiBranoPlaylistCommand(brano, playlist, new PlaylistBraniDAO());
+
+        boolean successo = commandHistory.execute(comandoAggiungi);
+        if (successo) {
+            playlist.aggiungiBrano(brano);
+            update();
+        }
     }
 
     // Metodo chiamato dal bottone Play nella vista Playlist
@@ -355,4 +364,16 @@ public class BraniPlaylistController implements Observer {
             }
 
         }
+
+
+    @FXML
+    public void onUndo() {
+        if (commandHistory.canUndo()) {
+            commandHistory.undo();
+            System.out.println("Ultima azione annullata dalla vista Playlist.");
+            update();
+        } else {
+            System.out.println("Nessuna azione da annullare.");
+        }
+    }
 }
