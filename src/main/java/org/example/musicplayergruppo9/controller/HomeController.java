@@ -3,6 +3,7 @@ package org.example.musicplayergruppo9.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javafx.scene.image.Image;
 import org.example.musicplayergruppo9.pattern.observer.Observer;
 import org.example.musicplayergruppo9.service.PlaylistService;
 import org.example.musicplayergruppo9.model.Playlist;
@@ -70,7 +71,7 @@ public class HomeController implements Observer {
     // Card per una playlist esistente
     private VBox createPlaylistCard(Playlist playlist) {
         VBox card = new VBox(6);
-        card.setAlignment(Pos.CENTER);
+        card.setAlignment(Pos.TOP_CENTER);
         card.setPadding(new Insets(6));
 
         // Copertina 
@@ -101,6 +102,7 @@ public class HomeController implements Observer {
         Label nome = new Label(playlist.getNome());
         nome.setFont(Font.font("System", 12));
         nome.setTextAlignment(TextAlignment.CENTER);
+        nome.setAlignment(Pos.TOP_CENTER);
         nome.setWrapText(true);
         nome.setMaxWidth(90);
 
@@ -116,7 +118,7 @@ public class HomeController implements Observer {
     // card con il "+" per aggiungere una playlist
     private VBox createAddCard() {
         VBox card = new VBox(6);
-        card.setAlignment(Pos.CENTER);
+        card.setAlignment(Pos.TOP_CENTER);
         card.setPadding(new Insets(6));
 
         StackPane addBox = new StackPane();
@@ -127,15 +129,18 @@ public class HomeController implements Observer {
         background.setArcWidth(6);
         background.setArcHeight(6);
 
-        Label plus = new Label("+");
-        plus.setFont(Font.font("System", 36));
-        plus.setTextFill(Color.DARKGRAY);
-
-        addBox.getChildren().addAll(background, plus);
+        Image iconaPiu = new Image(getClass().getResourceAsStream("/org/example/musicplayergruppo9/img/plus_symbol.svg.png"));
+        ImageView plusImg = new ImageView(iconaPiu);
+        plusImg.setFitWidth(60);
+        plusImg.setFitHeight(60);
+        plusImg.setPreserveRatio(true);
+        addBox.getChildren().addAll(background, plusImg);
 
         Label etichetta = new Label("Aggiungi\nPlaylist");
         etichetta.setFont(Font.font("System", 12));
         etichetta.setTextAlignment(TextAlignment.CENTER);
+        etichetta.setAlignment(Pos.TOP_CENTER);
+
 
         // onPlus è la funzione associata al pulsante +
         card.getChildren().addAll(addBox, etichetta);
