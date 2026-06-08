@@ -210,7 +210,8 @@ public class BranoDAO implements Subject {
                         rs.getString("percorso_copertina"),
                         rs.getBoolean("preferito"),
                         isNewRelease,
-                        rs.getBoolean("explicit")
+                        rs.getBoolean("explicit"),
+                        rs.getInt("contatore_ascolti")
                 );
 
                 listaBrani.add(brano);
@@ -339,4 +340,23 @@ public class BranoDAO implements Subject {
             o.update();
         }
     }
+
+    public boolean incrementaAscolti(int id) {
+        String sql = "UPDATE brani SET contatore_ascolti = contatore_ascolti + 1 WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    
+            pstmt.setInt(1, id);
+            boolean aggiornato = pstmt.executeUpdate() > 0;
+            if (aggiornato) {
+                notifyObservers();
+            }
+            return aggiornato;
+        } catch (SQLException e) {
+            System.err.println("[BranoDAO] Errore incremento ascolti ID: " + id);
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
 }

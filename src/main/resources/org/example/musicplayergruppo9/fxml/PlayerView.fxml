@@ -63,7 +63,7 @@
                               <Font size="16.0" />
                            </font>
                         </Button>
-                        <Button styleClass="button-icona" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#skipPlaylist" prefHeight="35.0" prefWidth="35.0" text="⏭">
+                        <Button fx:id="btnSkipPlaylist" styleClass="button-icona" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#skipPlaylist" visible="false" managed="false" prefHeight="35.0" prefWidth="35.0" text="⏭">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>

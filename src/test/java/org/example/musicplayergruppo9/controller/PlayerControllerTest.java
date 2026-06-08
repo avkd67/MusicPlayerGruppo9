@@ -14,8 +14,8 @@ public class PlayerControllerTest {
     @BeforeEach
     void setUp() {
         player = new PlayerController();
-        b1 = new Brano(1, "Brano1", "Artista1", "Pop", 0, 180, "/path/1.mp3", "mp3", null, false, false, false);
-        b2 = new Brano(2, "Brano2", "Artista2", "Pop", 0, 200, "/path/2.mp3", "mp3", null, false, false, false);
+        b1 = new Brano(1, "Brano1", "Artista1", "Pop", 0, 180, "/path/1.mp3", "mp3", null, false, false, false, 0);
+        b2 = new Brano(2, "Brano2", "Artista2", "Pop", 0, 200, "/path/2.mp3", "mp3", null, false, false, false, 0);
     }
 
     //per verificare che l'elemento aggiunto in coda verrà prodotto dal player

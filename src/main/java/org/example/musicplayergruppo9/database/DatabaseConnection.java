@@ -54,6 +54,7 @@ public class DatabaseConnection {
                 "percorso_copertina TEXT, " +
                 "preferito INTEGER DEFAULT 0, " +
                 "new_release INTEGER DEFAULT 0, " +
+                "contatore_ascolti INTEGER DEFAULT 0,"+
                 "explicit INTEGER DEFAULT 0" +
                 ");";
 
@@ -89,9 +90,19 @@ public class DatabaseConnection {
             stmt.execute(sqlTabellaPlaylistBrani);
             System.out.println("[Database] Tabella 'playlist_brani' verificata/creata con successo.");
 
+            //aggiunge contatore_ascolti se manca
+            try {
+                stmt.execute("ALTER TABLE brani ADD COLUMN contatore_ascolti INTEGER DEFAULT 0");
+                System.out.println("[Database] Migrazione: colonna 'contatore_ascolti' aggiunta.");
+            } catch (SQLException ignored) {
+                //colonna già presente
+            }
+
         } catch (SQLException e) {
             System.err.println("[Database] Errore durante l'inizializzazione delle tabelle:");
             e.printStackTrace();
         }
     }
+
+
 }
