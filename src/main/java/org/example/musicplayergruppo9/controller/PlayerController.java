@@ -13,6 +13,7 @@ import org.example.musicplayergruppo9.model.Playlist;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaLoop;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaRiproduzione;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaSequenziale;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaRandom;
 import org.example.musicplayergruppo9.service.PlayerService;
 import java.io.IOException;
 import javafx.fxml.FXMLLoader;
@@ -51,6 +52,8 @@ public class PlayerController {
     //scelto per soddisfare la task 7.2: loop
     private StrategiaRiproduzione strategia = new StrategiaSequenziale();
     
+    private boolean randomAttivo = false;
+
     @FXML
     public void initialize() {
         if (playerService == null) {
@@ -124,18 +127,32 @@ public class PlayerController {
     public void skipSong() {
 
         //caso a. loop attivo riparte la stessa canzone
-        if (strategia instanceof StrategiaLoop) {
+        if (strategia instanceof StrategiaLoop && !(elementoCorrente instanceof Playlist)) {
             riproduciBranoCorrente();
             return;
         }
 
-        //caso b. siamo dentro una playlist, skippa al brano presente nella playlist
+         // caso b. siamo dentro una playlist e ha ancora brani
         if (iteratorCorrente != null && iteratorCorrente.hasNext()) {
             branoCorrente = iteratorCorrente.next();
             riproduciBranoCorrente();
             return;
         }
-        //caso c. skippa all'elemento in coda (brano o playlist)
+
+        // caso c. playlist finita — se loop playlist, ricomincia dall'inizio
+        if (elementoCorrente instanceof Playlist) {
+            Playlist p = (Playlist) elementoCorrente;
+            if (strategia instanceof StrategiaLoop) {
+                iteratorCorrente = randomAttivo ? p.getRandomIterator() : p.iterator();
+                if (iteratorCorrente.hasNext()) {
+                    branoCorrente = iteratorCorrente.next();
+                    riproduciBranoCorrente();
+                    return;
+                }
+            }
+        }
+        
+        //caso d. skippa all'elemento in coda (brano o playlist)
         avviaProssimoElemento();
     }
 
@@ -166,8 +183,6 @@ public class PlayerController {
         avviaProssimoElemento();
     }
 
-    
-
 
     //logica estrazione elemento in coda
     private void avviaProssimoElemento() {
@@ -192,8 +207,11 @@ public class PlayerController {
         elementoCorrente = prossimo;
         aggiornaVisibilitaSkipPlaylist();
 
-        // Inizializza l'iteratore sul nuovo elemento (Brano o Playlist)
-        iteratorCorrente = prossimo.iterator();
+        if (randomAttivo && prossimo instanceof Playlist) {
+            iteratorCorrente = ((Playlist) prossimo).getRandomIterator();
+        } else {
+            iteratorCorrente = prossimo.iterator();
+        }
 
         if (iteratorCorrente.hasNext()) {
             branoCorrente = iteratorCorrente.next();
@@ -308,4 +326,29 @@ public class PlayerController {
             btnSkipPlaylist.setManaged(isPlaylist); 
         }
     }
+
+    @FXML
+    public void randomPlaylist() {
+        randomAttivo = !randomAttivo;
+
+        // Se c'è una playlist in riproduzione, ricrea subito l'iteratore
+        if (elementoCorrente instanceof Playlist) {
+            Playlist p = (Playlist) elementoCorrente;
+            if (randomAttivo) {
+                // mescola e ricomincia dal primo brano casuale
+                iteratorCorrente = p.getRandomIterator();
+            } else {
+                // ripristina l'ordine normale — ricomincia dall'inizio della playlist
+                iteratorCorrente = p.iterator();
+            }
+            // riproduci subito il prossimo brano con il nuovo ordine
+            if (iteratorCorrente.hasNext()) {
+                branoCorrente = iteratorCorrente.next();
+                riproduciBranoCorrente();
+            }
+        }
+    }
+
+    public boolean isRandomAttivo() { return randomAttivo; }
+
 }

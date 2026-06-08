@@ -3,6 +3,8 @@ package org.example.musicplayergruppo9.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collections;
+
 
 
 public class Playlist implements Iterable<Brano>, ElementoCoda {
@@ -94,5 +96,11 @@ public class Playlist implements Iterable<Brano>, ElementoCoda {
             System.out.println(brano.toString());
              });
     */ 
+
+    public Iterator<Brano> getRandomIterator() {
+        ArrayList<Brano> braniMescolati = new ArrayList<>(this.brani);
+        Collections.shuffle(braniMescolati);
+        return braniMescolati.iterator();
+    }
 
 }

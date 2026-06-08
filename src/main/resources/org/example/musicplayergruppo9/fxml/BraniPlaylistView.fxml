@@ -35,12 +35,12 @@
                         <Tooltip text="Play" />
                     </tooltip>
                 </Button>
-                <Button mnemonicParsing="false" style="-fx-padding: 8 15 8 15; -fx-font-size: 14px;" styleClass="button-icona" text="🔀">
+                <Button fx:id="btnRandom" mnemonicParsing="false" onAction="#onRandom" style="-fx-padding: 8 15 8 15; -fx-font-size: 14px;" styleClass="button-icona" text="🔀">
                     <tooltip>
                         <Tooltip text="Riproduzione casuale" />
                     </tooltip>
                 </Button>
-                <Button mnemonicParsing="false" style="-fx-padding: 8 15 8 15; -fx-font-size: 14px;" styleClass="button-icona" text="🔁">
+                <Button fx:id="btnLoop" mnemonicParsing="false" onAction="#onLoop" style="-fx-padding: 8 15 8 15; -fx-font-size: 14px;" styleClass="button-icona" text="🔁">
                     <tooltip>
                         <Tooltip text="Ripeti" />
                     </tooltip>

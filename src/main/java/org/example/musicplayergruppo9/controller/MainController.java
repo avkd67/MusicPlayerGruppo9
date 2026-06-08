@@ -24,6 +24,7 @@ public class MainController {
     private boolean playerAperto = false;
     private CommandHistory commandHistory = CommandHistory.getInstance();
 
+
     // Metodo collegato al click del tasto "Home" a sinistra
     @FXML
     public void mostraHome() {

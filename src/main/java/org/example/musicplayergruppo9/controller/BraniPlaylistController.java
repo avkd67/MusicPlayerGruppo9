@@ -46,6 +46,9 @@ public class BraniPlaylistController implements Observer {
     @FXML
     private Playlist playlist;
 
+    @FXML private Button btnRandom;
+    @FXML private Button btnLoop;
+
     private ObservableList<Brano> braniObservableList;
     private PlaylistService playlistService;
     private CommandHistory commandHistory;
@@ -376,4 +379,38 @@ public class BraniPlaylistController implements Observer {
             System.out.println("Nessuna azione da annullare.");
         }
     }
+
+
+//playlist in ordine casuale shuffle
+    @FXML
+    public void onRandom() {
+        if (mainController == null) return;
+        PlayerController pc = mainController.getPlayerController();
+        if (pc == null) return;
+
+        pc.randomPlaylist();
+
+        if (pc.isRandomAttivo()) {
+            btnRandom.getStyleClass().add("button-attivo");
+        } else {
+            btnRandom.getStyleClass().remove("button-attivo");
+        }
+    }
+
+    //playlist in loop
+    @FXML
+    public void onLoop() {
+        if (mainController == null) return;
+        PlayerController pc = mainController.getPlayerController();
+        if (pc == null) return;
+
+        pc.loopSong();
+
+        if (pc.isLoopAttivo()) {
+            btnLoop.getStyleClass().add("button-attivo");
+        } else {
+            btnLoop.getStyleClass().remove("button-attivo");
+        }
+    }
+
 }
