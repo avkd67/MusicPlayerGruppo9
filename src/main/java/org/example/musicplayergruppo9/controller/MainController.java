@@ -108,6 +108,7 @@ public class MainController {
 
                 // PASSA I DATI: Prendi il controller del player e passagli il brano
                 playerController = (PlayerController) loader.getController();
+                if (playerController != null) playerController.setMainController(this);
 
                 // Inserisce dinamicamente il player nella parte in basso del BorderPane
                 mainContainer.setBottom(playerView);
@@ -123,6 +124,25 @@ public class MainController {
             } else {
                 playerController.aggiungiInCoda(elemento);
             }
+        }
+    }
+
+    // Apre la vista della coda di riproduzione
+    public void apriCodaRiproduzione() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/CodaRiproduzioneView.fxml"));
+            javafx.scene.Parent root = loader.load();
+            CodaRiproduzioneController controller = loader.getController();
+            controller.setPlayerController(this.playerController);
+
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle("Coda di riproduzione");
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.initOwner(mainContainer.getScene().getWindow());
+            stage.initModality(javafx.stage.Modality.NONE);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -146,6 +166,7 @@ public class MainController {
                     .getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
                 Node playerView = loader.load();
                 playerController = (PlayerController) loader.getController();
+                if (playerController != null) playerController.setMainController(this);
                 mainContainer.setBottom(playerView);
                 playerAperto = true;
             } catch (IOException e) {
