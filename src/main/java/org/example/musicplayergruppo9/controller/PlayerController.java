@@ -254,4 +254,19 @@ public class PlayerController {
             System.out.println("[PlayerController] File rilasciato per eliminazione.");
         }
     }
+
+    public void svuotaCoda() {
+        // Svuota la coda degli elementi futuri
+        coda.clear();
+
+        // Resetta l'iteratore della playlist corrente
+        iteratorCorrente = null;
+
+        // Ferma fisicamente jPlayer tramite il PlayerService
+        if (playerService != null) {
+            playerService.stopAudio();
+        }
+
+        System.out.println("[PlayerController] Coda svuotata e jPlayer fermato.");
+    }
 }

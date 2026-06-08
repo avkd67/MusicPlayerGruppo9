@@ -174,6 +174,7 @@ public class BraniPlaylistController implements Observer {
     public void playPlaylist() {
         if (playlist == null) return;
         if (mainController != null) {
+            mainController.svuotaCoda();
             // Apre il player (se necessario) e aggiunge la playlist in coda
             mainController.apriPlayer(playlist);
             System.out.println("[BraniPlaylistController] Riproduzione playlist richiesta: " + playlist.getNome());

@@ -179,4 +179,11 @@ public class MainController {
         }
     }
 
+    public void svuotaCoda() {
+        if (playerController != null) {
+            playerController.svuotaCoda();
+        } else {
+            System.out.println("[MainController] Impossibile svuotare: PlayerController non inizializzato.");
+        }
+    }
 }
