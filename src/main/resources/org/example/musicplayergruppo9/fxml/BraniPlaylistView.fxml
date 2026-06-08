@@ -30,7 +30,7 @@
 
         <HBox layoutX="62.0" layoutY="167.0" spacing="15.0">
             <children>
-                <Button mnemonicParsing="false" style="-fx-padding: 8 15 8 15; -fx-font-size: 14px;" styleClass="button-icona" text=" ▶ ">
+                <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#playPlaylist" style="-fx-padding: 8 15 8 15; -fx-font-size: 14px;" styleClass="button-icona" text=" ▶ ">
                     <tooltip>
                         <Tooltip text="Play" />
                     </tooltip>
@@ -52,7 +52,7 @@
 
         <HBox alignment="CENTER" layoutX="397.0" layoutY="85.0" spacing="20.0">
             <children>
-                <Button mnemonicParsing="false" style="-fx-padding: 10 20 10 20; -fx-font-size: 18px;" styleClass="button-icona" text="➕">
+                <Button mnemonicParsing="false" onAction="#aggiungiPlaylistAllaCoda" style="-fx-padding: 10 20 10 20; -fx-font-size: 18px;" styleClass="button-icona" text="➕">
                     <tooltip>
                         <Tooltip text="Aggiungi alla coda" />
                     </tooltip>

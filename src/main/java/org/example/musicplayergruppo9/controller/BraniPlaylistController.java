@@ -46,6 +46,12 @@ public class BraniPlaylistController implements Observer {
     private ObservableList<Brano> braniObservableList;
     private PlaylistService playlistService;
     private CommandHistory commandHistory;
+    // Riferimento al MainController per poter aprire/controllare il player
+    private MainController mainController;
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
 
     @FXML
     public void initialize() {
@@ -75,6 +81,11 @@ public class BraniPlaylistController implements Observer {
         // carico i brani associati a quella playlist dal database
         List<Brano> braniRecuperati = playlistService.getBraniByPlaylist(this.playlist);
         braniObservableList.addAll(braniRecuperati);
+
+        // Assicuro che la Playlist contenga internamente i brani recuperati
+        // in modo che il suo iterator() non sia vuoto quando viene messa in coda
+        this.playlist.getBrani().clear();
+        this.playlist.getBrani().addAll(braniRecuperati);
 
          // Aggiungo il placeholder finale 
         segnaposto_aggiungi.setId(-1);
@@ -156,6 +167,31 @@ public class BraniPlaylistController implements Observer {
         playlist.aggiungiBrano(brano);
         playlistService.aggiungiBranoAPlaylist(playlist, brano);
         update();
+    }
+
+    // Metodo chiamato dal bottone Play nella vista Playlist
+    @FXML
+    public void playPlaylist() {
+        if (playlist == null) return;
+        if (mainController != null) {
+            // Apre il player (se necessario) e aggiunge la playlist in coda
+            mainController.apriPlayer(playlist);
+            System.out.println("[BraniPlaylistController] Riproduzione playlist richiesta: " + playlist.getNome());
+        } else {
+            System.out.println("[BraniPlaylistController] MainController non impostato. Impossibile riprodurre playlist.");
+        }
+    }
+
+    // Metodo chiamato dal pulsante 'Aggiungi alla coda' nella vista Playlist
+    @FXML
+    public void aggiungiPlaylistAllaCoda() {
+        if (playlist == null) return;
+        if (mainController != null) {
+            mainController.aggiungiInCoda(playlist);
+            System.out.println("[BraniPlaylistController] Playlist aggiunta in coda: " + playlist.getNome());
+        } else {
+            System.out.println("[BraniPlaylistController] MainController non impostato. Impossibile aggiungere in coda.");
+        }
     }
 
     @Override

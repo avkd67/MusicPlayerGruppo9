@@ -13,6 +13,13 @@ import org.example.musicplayergruppo9.pattern.strategy.StrategiaLoop;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaRiproduzione;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaSequenziale;
 import org.example.musicplayergruppo9.service.PlayerService;
+import java.io.IOException;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import org.example.musicplayergruppo9.controller.MainController;
 
 import java.io.File;
 import java.util.Iterator;
@@ -86,6 +93,16 @@ public class PlayerController {
         if (branoCorrente == null) {
             avviaProssimoElemento();
         }
+    }
+
+    // Restituisce una snapshot della coda per visualizzazione (non altera lo stato)
+    public java.util.List<ElementoCoda> getCodaSnapshot() {
+        return new java.util.ArrayList<>(coda);
+    }
+
+    // Rimuove il primo elemento uguale passato dalla coda (ritorna true se rimosso)
+    public boolean rimuoviDaCoda(ElementoCoda elemento) {
+        return coda.remove(elemento);
     }
 
     @FXML
@@ -197,6 +214,20 @@ public class PlayerController {
     public void setBrano(Brano brano) {
         branoCorrente = brano;
         riproduciBranoCorrente();
+    }
+
+    // Riferimento al MainController per aprire finestre figlie
+    private MainController mainController;
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+    }
+
+    @FXML
+    public void apriCoda() {
+        if (mainController != null) {
+            mainController.apriCodaRiproduzione();
+        }
     }
 
     public Brano getBranoCorrente() { return branoCorrente; }
