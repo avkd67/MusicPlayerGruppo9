@@ -267,6 +267,15 @@ public class BraniPlaylistController implements Observer {
                 eliminaBranoDaPlaylist(brano);
             });
 
+            //bottone per mettere in coda presente vicino ai brani di una playlist
+            btnCoda.setOnAction(e -> {
+                Brano brano = getItem();
+                if (brano != null && brano.getId() != -1 && mainController != null) {
+                    mainController.aggiungiInCoda(brano);
+                    System.out.println("[BraniPlaylistController] Brano aggiunto in coda: " + brano.getTitolo());
+                }
+            });
+
             // Bottone Info apre l'infografica del brano
             btnInfo.setOnAction(e -> {
                 Brano b = getItem();
@@ -274,6 +283,7 @@ public class BraniPlaylistController implements Observer {
                     apriVistaInfoBrano(b);
                 }
             });
+
 
             // Configurazione "Elemento" Aggiungi
             hboxAggiungi.setAlignment(Pos.CENTER_LEFT);
