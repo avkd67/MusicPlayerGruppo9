@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.ElementoCoda;
+import org.example.musicplayergruppo9.model.ElementoCodaConOpzioni;
 import org.example.musicplayergruppo9.model.Playlist;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaLoop;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaRiproduzione;
@@ -22,13 +23,15 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.example.musicplayergruppo9.controller.MainController;
+import org.example.musicplayergruppo9.pattern.observer.PlaylistObserver;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
-public class PlayerController {
+public class PlayerController implements PlaylistObserver {
 
     @FXML private ImageView imgCopertina;
     @FXML private Label lblTitolo;
@@ -53,6 +56,8 @@ public class PlayerController {
     private StrategiaRiproduzione strategia = new StrategiaSequenziale();
     
     private boolean randomAttivo = false;
+
+    private Playlist playlistOsservata = null;
 
     @FXML
     public void initialize() {
@@ -125,6 +130,8 @@ public class PlayerController {
     //task 6.2 gestione skip nelle varie situazioni
     @FXML
     public void skipSong() {
+        ElementoCoda elementoReale = estraiElementoReale(elementoCorrente);
+        boolean thisRandom = estraiRandom(elementoCorrente);
 
         //caso a. loop attivo riparte la stessa canzone
         if (strategia instanceof StrategiaLoop && !(elementoCorrente instanceof Playlist)) {
@@ -140,15 +147,13 @@ public class PlayerController {
         }
 
         // caso c. playlist finita — se loop playlist, ricomincia dall'inizio
-        if (elementoCorrente instanceof Playlist) {
-            Playlist p = (Playlist) elementoCorrente;
-            if (strategia instanceof StrategiaLoop) {
-                iteratorCorrente = randomAttivo ? p.getRandomIterator() : p.iterator();
-                if (iteratorCorrente.hasNext()) {
-                    branoCorrente = iteratorCorrente.next();
-                    riproduciBranoCorrente();
-                    return;
-                }
+        if (elementoCorrente instanceof Playlist && strategia instanceof StrategiaLoop) {
+            Playlist p = (Playlist) elementoReale;
+            iteratorCorrente = thisRandom ? p.getRandomIterator() : p.iterator();
+            if (iteratorCorrente.hasNext()) {
+                branoCorrente = iteratorCorrente.next();
+                riproduciBranoCorrente();
+                return;
             }
         }
         
@@ -173,12 +178,8 @@ public class PlayerController {
         // Se loop attivo, non fare nulla (o decidi tu il comportamento)
         if (strategia instanceof StrategiaLoop) return;
 
-        //playlist in riproduzione, skippa l'intera playlist e passa al  prossimo elemento in coda
-        if (elementoCorrente instanceof Playlist) {
-            iteratorCorrente = null;   // esaurisci l'iteratore della playlist corrente
-            avviaProssimoElemento();
-            return;
-        }
+        // Salta l'intera playlist corrente
+        iteratorCorrente = null;
 
         avviaProssimoElemento();
     }
@@ -186,6 +187,8 @@ public class PlayerController {
 
     //logica estrazione elemento in coda
     private void avviaProssimoElemento() {
+        smetteDiOsservare();
+
         ElementoCoda prossimo = coda.poll();
 
         if (prossimo == null) {
@@ -208,10 +211,20 @@ public class PlayerController {
         elementoCorrente = prossimo;
         aggiornaVisibilitaSkipPlaylist();
 
-        if (randomAttivo && prossimo instanceof Playlist) {
-            iteratorCorrente = ((Playlist) prossimo).getRandomIterator();
+        //Legge il flag random dall'elemento stesso (se wrappato), non dal globale
+        boolean thisRandom = estraiRandom(prossimo);
+        ElementoCoda elementoReale = estraiElementoReale(prossimo);
+
+         //Registra observer se è una playlist
+         if (elementoReale instanceof Playlist) {
+            osservaPlaylist((Playlist) elementoReale);
+        }
+
+        //Crea l'iteratore con il random corretto per questo specifico elemento
+        if (thisRandom && elementoReale instanceof Playlist) {
+            iteratorCorrente = ((Playlist) elementoReale).getRandomIterator();
         } else {
-            iteratorCorrente = prossimo.iterator();
+            iteratorCorrente = elementoReale.iterator();
         }
 
         if (iteratorCorrente.hasNext()) {
@@ -261,7 +274,6 @@ public class PlayerController {
         riproduciBranoCorrente();
     }
 
-    // Riferimento al MainController per aprire finestre figlie
     private MainController mainController;
 
     public void setMainController(MainController mainController) {
@@ -281,14 +293,13 @@ public class PlayerController {
     
     public int getDimensioneCoda() { return coda.size(); }
 
-    // per gestire l'eliminazione di un file in riproduzione
+    //per gestire l'eliminazione di un file in riproduzione
     public void fermaErilasciaFileSeCorrente(Brano branoDaEliminare) {
         if (branoCorrente != null && branoCorrente.getId() == branoDaEliminare.getId()) {
             if (playerService != null) {
-                playerService.stopAudio(); // Chiude il FileInputStream
+                playerService.stopAudio();
             }
 
-            // Ripulisce l'interfaccia utente del player
             branoCorrente = null;
             if (lblTitolo != null) lblTitolo.setText("Nessun brano");
             if (lblArtista != null) lblArtista.setText("");
@@ -296,13 +307,13 @@ public class PlayerController {
             if (lblTempo != null) lblTempo.setText("00:00");
             if (sliderProgresso != null) sliderProgresso.setValue(0);
 
-
-            System.out.println("[PlayerController] File rilasciato per eliminazione.");
         }
     }
 
     public void svuotaCoda() {
-        // Svuota la coda degli elementi futuri
+        smetteDiOsservare();
+
+        //Svuota la coda degli elementi futuri
         coda.clear();
 
         // Resetta l'iteratore della playlist corrente
@@ -312,15 +323,14 @@ public class PlayerController {
 
         elementoCorrente = null;
 
-        // Ferma fisicamente jPlayer tramite il PlayerService
         if (playerService != null) {
             playerService.stopAudio();
         }
 
-        System.out.println("[PlayerController] Coda svuotata e jPlayer fermato.");
     }
 
     private void aggiornaVisibilitaSkipPlaylist() {
+        ElementoCoda reale = estraiElementoReale(elementoCorrente);
         boolean isPlaylist = elementoCorrente instanceof Playlist;
         if (btnSkipPlaylist != null) {
             btnSkipPlaylist.setVisible(isPlaylist);
@@ -345,11 +355,83 @@ public class PlayerController {
     public void setRandomAttivo(boolean valore) {
         randomAttivo = valore;
 
-        // Se c'è già una playlist in riproduzione, ricrea subito l'iteratore
-        if (elementoCorrente instanceof Playlist) {
-            Playlist p = (Playlist) elementoCorrente;
-            iteratorCorrente = randomAttivo ? p.getRandomIterator() : p.iterator();
+        // Se la playlist corrente NON è wrappata (aggiunta senza opzioni),
+        // aggiorna l'iteratore in tempo reale
+        if (!(elementoCorrente instanceof ElementoCodaConOpzioni)) {
+            ElementoCoda reale = estraiElementoReale(elementoCorrente);
+            if (reale instanceof Playlist) {
+                Playlist p = (Playlist) reale;
+                iteratorCorrente = randomAttivo ? p.getRandomIterator() : p.iterator();
+            }
         }
+    }
+
+    // Inizia ad osservare una nuova playlist
+    private void osservaPlaylist(Playlist p) {
+        if (playlistOsservata != null) {
+            playlistOsservata.removePlaylistObserver(this);
+        }
+        playlistOsservata = p;
+        if (p != null) {
+            p.addPlaylistObserver(this);
+        }
+    }
+
+    //Smette di osservare la playlist corrente
+    private void smetteDiOsservare() {
+        if (playlistOsservata != null) {
+            playlistOsservata.removePlaylistObserver(this);
+            playlistOsservata = null;
+        }
+    }
+
+    //PlaylistObserver — notifiche aggiunta/rimozione brani
+ 
+    @Override
+    public void onBranoAggiunto(Brano brano) {
+        if (playlistOsservata == null) return;
+ 
+        // Ricrea l'iteratore dal brano successivo a quello corrente,
+        // così il nuovo brano viene raggiunto naturalmente in sequenza
+        List<Brano> brani = playlistOsservata.getBrani();
+        int posCorrente = brani.indexOf(branoCorrente);
+        int riparti = posCorrente >= 0 ? posCorrente + 1 : brani.size();
+        iteratorCorrente = brani.listIterator(riparti);
+     }
+
+    @Override
+    public void onBranoRimosso(Brano brano) {
+        if (playlistOsservata == null) return;
+ 
+        //Caso critico: il brano rimosso è quello in riproduzione ora
+        if (branoCorrente != null && branoCorrente.getId() == brano.getId()) {
+            skipSong();
+            return;
+        }
+ 
+        //Brano futuro: ricrea l'iteratore dal punto corretto
+        List<Brano> brani = playlistOsservata.getBrani();
+        int posCorrente = brani.indexOf(branoCorrente);
+        int riparti = posCorrente >= 0 ? posCorrente + 1 : brani.size();
+        iteratorCorrente = brani.listIterator(riparti);
+     }
+
+    //Estrae il flag random dall'elemento: se è un wrapper legge il suo valore,
+    //altrimenti usa il flag globale (per brani singoli aggiunti senza wrapper)
+    private boolean estraiRandom(ElementoCoda elemento) {
+        if (elemento instanceof ElementoCodaConOpzioni) {
+            return ((ElementoCodaConOpzioni) elemento).isRandom();
+        }
+        return randomAttivo;
+    }
+ 
+    
+    //Scarta il wrapper per ottenere l'elemento reale (Brano o Playlist)
+    private ElementoCoda estraiElementoReale(ElementoCoda elemento) {
+        if (elemento instanceof ElementoCodaConOpzioni) {
+            return ((ElementoCodaConOpzioni) elemento).getElemento();
+        }
+        return elemento;
     }
     
 }

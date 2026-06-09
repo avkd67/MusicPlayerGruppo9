@@ -3,6 +3,11 @@ package org.example.musicplayergruppo9.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.example.musicplayergruppo9.pattern.observer.PlaylistObserver;
+
+import org.example.musicplayergruppo9.pattern.observer.PlaylistObserver;
+
 import java.util.Collections;
 
 
@@ -14,6 +19,17 @@ public class Playlist implements Iterable<Brano>, ElementoCoda {
     private ArrayList<Brano> brani;
     private int id;
     private String percorsoCopertina;
+
+    //patter Observer per gestire inserimento e cancellazione brano in playlist durante l'esecuzione
+    private final ArrayList<PlaylistObserver> playlistObservers = new ArrayList<>();
+
+    public void addPlaylistObserver(PlaylistObserver o) {
+        if (!playlistObservers.contains(o)) playlistObservers.add(o);
+    }
+
+    public void removePlaylistObserver(PlaylistObserver o) {
+        playlistObservers.remove(o);
+    }
 
     // Costruttore, percorsoCopertina può essere null se l'utente non ne seleziona una
     public Playlist(String nome, String percorsoCopertina){
@@ -37,11 +53,15 @@ public class Playlist implements Iterable<Brano>, ElementoCoda {
     // metodo per aggiungere un brano alla playlist
     public void aggiungiBrano(Brano brano){
         brani.add(brano);
+        //notifica dopo l'aggiunta
+        playlistObservers.forEach(o -> o.onBranoAggiunto(brano));
     }
 
     // metodo per rimuovere un brano dalla playlist
     public void rimuoviBrano(Brano brano){
         brani.remove(brano);
+        //notifica dopo la rimozione
+        playlistObservers.forEach(o -> o.onBranoRimosso(brano));
     }
 
     // metodo per ottenere il nome della playlist

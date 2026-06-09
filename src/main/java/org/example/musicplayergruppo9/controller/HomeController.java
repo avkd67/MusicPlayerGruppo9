@@ -163,10 +163,12 @@ public class HomeController implements Observer {
             );
             Parent root = loader.load();
             BraniPlaylistController controllerDestinazione = loader.getController();
-            controllerDestinazione.setPlaylist(playlist);
+            
             // Passo il riferimento al MainController così la playlist può essere riprodotta
             controllerDestinazione.setMainController(this.mainController);
             this.mainController.setBraniPlaylistController(controllerDestinazione);
+            controllerDestinazione.setPlaylist(playlist);
+
             
             Stage stage = new Stage();
             stage.setTitle("Playlist: " + playlist.getNome());

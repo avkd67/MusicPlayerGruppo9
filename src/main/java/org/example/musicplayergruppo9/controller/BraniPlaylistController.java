@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.example.musicplayergruppo9.database.DAO.PlaylistBraniDAO;
 import org.example.musicplayergruppo9.model.Brano;
+import org.example.musicplayergruppo9.model.ElementoCodaConOpzioni;
 import org.example.musicplayergruppo9.model.Playlist;
 import org.example.musicplayergruppo9.pattern.command.AggiungiBranoPlaylistCommand;
 import org.example.musicplayergruppo9.pattern.command.CommandHistory;
@@ -57,7 +58,6 @@ public class BraniPlaylistController implements Observer {
     private ObservableList<Brano> braniObservableList;
     private PlaylistService playlistService;
     private CommandHistory commandHistory;
-    // Riferimento al MainController per poter aprire/controllare il player
     private MainController mainController;
 
     public void setMainController(MainController mainController) {
@@ -85,7 +85,6 @@ public class BraniPlaylistController implements Observer {
 
         LblNomePlaylist.setText(this.playlist.getNome());
 
-         // Mette la copertina della playlist, se esiste
         if(this.playlist.getPercorsoCopertina() != null)
             imgCopertina.setImage(new Image(new File(this.playlist.getPercorsoCopertina()).toURI().toString()));
 
@@ -101,9 +100,24 @@ public class BraniPlaylistController implements Observer {
          // Aggiungo il placeholder finale 
         segnaposto_aggiungi.setId(-1);
         braniObservableList.add(segnaposto_aggiungi);
+
+        sincronizzaStatoPulsanti();
     }
 
-    // TODO: aggiunta brano dalla lista di tutti i brani / creazione sul momento ?
+    //legge lo stato reale da PlayerController
+    private void sincronizzaStatoPulsanti() {
+        if (mainController == null) return;
+        PlayerController pc = mainController.getPlayerController();
+        if (pc == null) return;
+
+        //Allinea il campo locale allo stato reale
+        randomAttivo = pc.isRandomAttivo();
+        setBottoneAttivo(btnRandom, randomAttivo);
+
+        //Stessa cosa per il loop
+        setBottoneAttivo(btnLoop, pc.isLoopAttivo());
+    }
+
     public void aggiungiBrano(){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/AggiungiBranoPlaylistView.fxml"));
@@ -125,14 +139,22 @@ public class BraniPlaylistController implements Observer {
         }
     }
 
-    public void eliminaBranoDaPlaylist(Brano brano){
-        if(FXutilities.mostraAlertConferma("Rimozione brano", "Sei sicuro di voler rimuovere " + brano.getTitolo() + " dalla playlist?"));
-        RimuoviBranoPlaylistCommand comandoRimuovi = new RimuoviBranoPlaylistCommand(brano, this.playlist, new PlaylistBraniDAO());
-        boolean successo = commandHistory.execute(comandoRimuovi);
+    public void eliminaBranoDaPlaylist(Brano brano) {
+        if (!FXutilities.mostraAlertConferma("Rimozione brano",
+                "Sei sicuro di voler rimuovere " + brano.getTitolo() + " dalla playlist?")) {
+            return;
+        }
+    
+        RimuoviBranoPlaylistCommand cmd =
+                new RimuoviBranoPlaylistCommand(brano, playlist, new PlaylistBraniDAO());
+    
+        boolean successo = commandHistory.execute(cmd);
         if (successo) {
-            update();
+            playlist.rimuoviBrano(brano);//notifica PlaylistObserver (PlayerController)
+            update();//aggiorna UI (BraniPlaylistController)
         }
     }
+    
 
     // eliminazione della playlist selezionata
     @FXML
@@ -147,20 +169,16 @@ public class BraniPlaylistController implements Observer {
     public void onModifica(){
         System.out.println("Apertura della vista Modifica Playlist...");
         try {
-            // Carica il file FXML della vista Modifica Playlist
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/ModificaPlaylistView.fxml"));
             javafx.scene.Parent root = loader.load();
 
-            // crea una nuova finestra popup
             javafx.stage.Stage stageModifica = new javafx.stage.Stage();
             stageModifica.setTitle("Modifica Playlist");
             stageModifica.setScene(new javafx.scene.Scene(root));
 
-            // mando le info sulla playlist alla schermata di modifica della stessa
             ModificaPlaylistController controllerModifica = loader.getController();
             controllerModifica.setPlaylist(playlist);
 
-            // per fare in modo che non si possa cliccare dietro
             stageModifica.initModality(javafx.stage.Modality.APPLICATION_MODAL);
 
             stageModifica.showAndWait();
@@ -176,10 +194,11 @@ public class BraniPlaylistController implements Observer {
         }
     }
 
-    public void aggiungiBranoAPlaylist(Brano brano){
-        AggiungiBranoPlaylistCommand comandoAggiungi = new AggiungiBranoPlaylistCommand(brano, playlist, new PlaylistBraniDAO());
-
-        boolean successo = commandHistory.execute(comandoAggiungi);
+    public void aggiungiBranoAPlaylist(Brano brano) {
+        AggiungiBranoPlaylistCommand cmd =
+                new AggiungiBranoPlaylistCommand(brano, playlist, new PlaylistBraniDAO());
+    
+        boolean successo = commandHistory.execute(cmd);
         if (successo) {
             playlist.aggiungiBrano(brano);
             update();
@@ -193,17 +212,11 @@ public class BraniPlaylistController implements Observer {
 
         if (!inRiproduzione) {
             mainController.svuotaCoda();
-
             mainController.inizializzaPlayerSeNecessario();
 
-            //PlayerController esiste: imposta random
-            PlayerController pc = mainController.getPlayerController();
-            if (pc != null) {
-                pc.setRandomAttivo(randomAttivo);
-            }
-
-            //aggiungi in coda: l'iteratore verrà creato con randomAttivo già corretto
-            mainController.aggiungiInCoda(playlist);
+            ElementoCodaConOpzioni playlistConOpzioni =
+                    new ElementoCodaConOpzioni(playlist, randomAttivo);
+            mainController.aggiungiInCoda(playlistConOpzioni);
 
             inRiproduzione = true;
             btnPlay.setText(" ⏸ ");
@@ -215,16 +228,15 @@ public class BraniPlaylistController implements Observer {
         }
     }
 
-    // Metodo chiamato dal pulsante 'Aggiungi alla coda' nella vista Playlist
     @FXML
     public void aggiungiPlaylistAllaCoda() {
-        if (playlist == null) return;
-        if (mainController != null) {
-            mainController.aggiungiInCoda(playlist);
-            System.out.println("[BraniPlaylistController] Playlist aggiunta in coda: " + playlist.getNome());
-        } else {
-            System.out.println("[BraniPlaylistController] MainController non impostato. Impossibile aggiungere in coda.");
-        }
+
+        if (playlist == null || mainController == null) return;
+
+        ElementoCodaConOpzioni playlistConOpzioni =
+            new ElementoCodaConOpzioni(playlist, randomAttivo);
+        mainController.aggiungiInCoda(playlistConOpzioni);
+
     }
 
     @Override
@@ -407,11 +419,7 @@ public class BraniPlaylistController implements Observer {
         
         randomAttivo = !randomAttivo;
 
-        if (randomAttivo) {
-            btnRandom.getStyleClass().add("button-attivo");
-        } else {
-            btnRandom.getStyleClass().remove("button-attivo");
-        }
+        setBottoneAttivo(btnRandom, randomAttivo);
 
         //player è già aperto, aggiorna subito il PlayerController
         if (mainController != null) {
@@ -432,17 +440,20 @@ public class BraniPlaylistController implements Observer {
 
         pc.loopSong();
 
-        if (pc.isLoopAttivo()) {
-            btnLoop.getStyleClass().add("button-attivo");
-        } else {
-            btnLoop.getStyleClass().remove("button-attivo");
-        }
+        setBottoneAttivo(btnLoop, pc.isLoopAttivo());
     }
 
     //chiamato da MainController quando la playlist finisce
     public void onFinePlaylist() {
         inRiproduzione = false;
         btnPlay.setText(" ▶ ");
+    }
+
+    private void setBottoneAttivo(Button btn, boolean attivo) {
+        btn.getStyleClass().remove("button-attivo");
+        if (attivo) {
+            btn.getStyleClass().add("button-attivo");
+        }
     }
 
 }

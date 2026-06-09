@@ -74,6 +74,13 @@
 .button-attivo:hover {
     -fx-background-color: #9d4ced;
     -fx-border-color: #9d4ced;
+    -fx-effect: dropshadow(gaussian, #9d4ced, 16, 0.8, 0, 0);
+}
+
+.button-attivo:pressed {
+    -fx-background-color: #6a25a0;
+    -fx-border-color: #6a25a0;
+    -fx-effect: dropshadow(gaussian, #6a25a0, 8, 0.4, 0, 0);
 }
 
 /* --- CHECKBOX --- */
