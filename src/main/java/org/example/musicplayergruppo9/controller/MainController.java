@@ -99,11 +99,11 @@ public class MainController {
         }
         //aggiunge in coda
         if (playerController != null) {
-            if (elemento instanceof Brano) {
-                playerController.setBrano((Brano) elemento);
-            } else {
+            //if (elemento instanceof Brano) {
+              //  playerController.setBrano((Brano) elemento);
+           // } else {
                 playerController.aggiungiInCoda(elemento);
-            }
+            //}
         }
     }
 

@@ -270,7 +270,10 @@ public class PlayerController implements PlaylistObserver {
     }
 
     public void setBrano(Brano brano) {
+        elementoCorrente = brano;
+        iteratorCorrente = null;
         branoCorrente = brano;
+        aggiornaVisibilitaSkipPlaylist();
         riproduciBranoCorrente();
     }
 
@@ -331,7 +334,7 @@ public class PlayerController implements PlaylistObserver {
 
     private void aggiornaVisibilitaSkipPlaylist() {
         ElementoCoda reale = estraiElementoReale(elementoCorrente);
-        boolean isPlaylist = elementoCorrente instanceof Playlist;
+        boolean isPlaylist = reale instanceof Playlist;
         if (btnSkipPlaylist != null) {
             btnSkipPlaylist.setVisible(isPlaylist);
             btnSkipPlaylist.setManaged(isPlaylist); 
