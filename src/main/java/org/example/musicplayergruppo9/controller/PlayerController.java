@@ -330,23 +330,13 @@ public class PlayerController {
     @FXML
     public void randomPlaylist() {
         randomAttivo = !randomAttivo;
-
-        // Se c'è una playlist in riproduzione, ricrea subito l'iteratore
+        
+        // Aggiorna solo l'iteratore per i brani futuri, senza avviare nulla
         if (elementoCorrente instanceof Playlist) {
             Playlist p = (Playlist) elementoCorrente;
-            if (randomAttivo) {
-                // mescola e ricomincia dal primo brano casuale
-                iteratorCorrente = p.getRandomIterator();
-            } else {
-                // ripristina l'ordine normale — ricomincia dall'inizio della playlist
-                iteratorCorrente = p.iterator();
-            }
-            // riproduci subito il prossimo brano con il nuovo ordine
-            if (iteratorCorrente.hasNext()) {
-                branoCorrente = iteratorCorrente.next();
-                riproduciBranoCorrente();
-            }
+            iteratorCorrente = randomAttivo ? p.getRandomIterator() : p.iterator();
         }
+
     }
 
     public boolean isRandomAttivo() { return randomAttivo; }

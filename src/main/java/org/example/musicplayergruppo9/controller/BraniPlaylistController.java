@@ -48,6 +48,9 @@ public class BraniPlaylistController implements Observer {
 
     @FXML private Button btnRandom;
     @FXML private Button btnLoop;
+    @FXML private Button btnPlay;
+
+    private boolean inRiproduzione = false;
 
     private ObservableList<Brano> braniObservableList;
     private PlaylistService playlistService;
@@ -181,18 +184,28 @@ public class BraniPlaylistController implements Observer {
         }
     }
 
-    // Metodo chiamato dal bottone Play nella vista Playlist
+    //bottone Play nella schermata della playlist
     @FXML
     public void playPlaylist() {
+
         if (playlist == null) return;
-        if (mainController != null) {
+        if (mainController == null) return;
+    
+        if (!inRiproduzione) {
+            //avvia la riproduzione
             mainController.svuotaCoda();
-            // Apre il player (se necessario) e aggiunge la playlist in coda
             mainController.apriPlayer(playlist);
-            System.out.println("[BraniPlaylistController] Riproduzione playlist richiesta: " + playlist.getNome());
+            inRiproduzione = true;
+            btnPlay.setText("⏸");
         } else {
-            System.out.println("[BraniPlaylistController] MainController non impostato. Impossibile riprodurre playlist.");
+            //metti in pausa
+            PlayerController pc = mainController.getPlayerController();
+            if (pc != null) pc.togglePlayPause();
+    
+            inRiproduzione = false;
+            btnPlay.setText(" ▶ ");
         }
+
     }
 
     // Metodo chiamato dal pulsante 'Aggiungi alla coda' nella vista Playlist
