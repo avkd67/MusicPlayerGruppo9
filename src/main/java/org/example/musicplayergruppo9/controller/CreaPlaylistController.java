@@ -3,7 +3,10 @@ package org.example.musicplayergruppo9.controller;
 import java.io.File;
 import java.io.IOException;
 
+import org.example.musicplayergruppo9.database.DAO.PlaylistDAO;
 import org.example.musicplayergruppo9.model.Playlist;
+import org.example.musicplayergruppo9.pattern.command.AggiungiPlaylistCommand;
+import org.example.musicplayergruppo9.pattern.command.CommandHistory;
 import org.example.musicplayergruppo9.pattern.observer.Observer;
 import org.example.musicplayergruppo9.service.PlaylistService;
 
@@ -53,14 +56,17 @@ public class CreaPlaylistController implements Observer {
             }
 
             try {
-                if(playlistService.salvaPlaylist(playlist)){
-                    FXutilities.chiudiFinestra(nomePlaylist);
-                }
-                else {
-                    System.err.println("Errore: la playlist non è stata salvata. Controllare il nome della playlist");
+                PlaylistDAO playlistDAO = PlaylistDAO.getInstance();
+                AggiungiPlaylistCommand comandoCrea = new AggiungiPlaylistCommand(playlist, playlistDAO.getInstance());
 
+                boolean successo = CommandHistory.getInstance().execute(comandoCrea);
+
+                if(successo){
+                    FXutilities.chiudiFinestra(nomePlaylist);
+
+                    playlistService.notifyObservers();
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

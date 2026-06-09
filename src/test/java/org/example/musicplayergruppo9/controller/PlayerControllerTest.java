@@ -2,6 +2,7 @@ package org.example.musicplayergruppo9.controller;
 
 import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.Playlist;
+import org.example.musicplayergruppo9.service.PlayerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -238,5 +239,102 @@ public class PlayerControllerTest {
             pl.aggiungiBrano(b);
         }
         return pl;
+    }
+    // --- TEST PER LO SLIDER (DRAG) ---
+
+    @Test
+    void sliderDragAggiornaTempoDiRiproduzione() throws Exception {
+        player.aggiungiInCoda(b1);
+        PlayerService service = getPlayerServiceTramiteReflection(player);
+
+        // Inseriamo un file fittizio per superare il blocco "if (currentFile == null)"
+        java.lang.reflect.Field fileField = service.getClass().getDeclaredField("currentFile");
+        fileField.setAccessible(true);
+        fileField.set(service, new java.io.File("dummy.mp3"));
+
+        // Simuliamo l'utente che trascina lo slider al secondo 60
+        service.seek(60.0);
+
+        double tempoAttuale = ottieniTempoTramiteReflection(service);
+        assertEquals(60.0, tempoAttuale, "Il tempo di riproduzione interno deve corrispondere alla posizione dello slider");
+    }
+
+    // Se lo slider viene trascinato a un valore negativo (errore UI)
+    @Test
+    void sliderDragValoreNegativoRipristinaAInizio() throws Exception {
+        player.aggiungiInCoda(b1);
+        PlayerService service = getPlayerServiceTramiteReflection(player);
+
+        // Inseriamo un file fittizio
+        java.lang.reflect.Field fileField = service.getClass().getDeclaredField("currentFile");
+        fileField.setAccessible(true);
+        fileField.set(service, new java.io.File("dummy.mp3"));
+
+        // Simuliamo un drag accidentale a valori negativi
+        service.seek(-10.0);
+
+        double tempoAttuale = ottieniTempoTramiteReflection(service);
+        assertEquals(0.0, tempoAttuale, "I valori negativi dovrebbero essere sanificati all'inizio del brano (0.0)");
+    }
+
+    // Se lo slider viene trascinato a un valore superiore alla durata del brano
+    @Test
+    void sliderDragOltreDurataPassaAlBranoSuccessivo() {
+        player.aggiungiInCoda(b1); // dura 180 secondi
+        player.aggiungiInCoda(b2);
+
+        PlayerService service = getPlayerServiceTramiteReflection(player);
+
+        // Simuliamo un drag oltre il limite (es. 185 secondi)
+        service.seek(185.0);
+        assertEquals(b2, player.getBranoCorrente(), "Trascinare lo slider oltre la fine dovrebbe far scattare il brano successivo");
+    }
+
+
+
+    // --- METODI DI UTILITY PER TEST DI SLIDER ---
+
+    // Recupera il PlayerService nascosto dentro il PlayerController
+    private PlayerService getPlayerServiceTramiteReflection(PlayerController controller) {
+        try {
+            java.lang.reflect.Field serviceField = null;
+            for (java.lang.reflect.Field f : controller.getClass().getDeclaredFields()) {
+                if (f.getType().equals(org.example.musicplayergruppo9.service.PlayerService.class)) {
+                    serviceField = f;
+                    break;
+                }
+            }
+            if (serviceField == null) {
+                fail("Istanza di PlayerService non trovata dentro PlayerController");
+            }
+            serviceField.setAccessible(true);
+
+            // Leggiamo il valore attuale
+            PlayerService service = (PlayerService) serviceField.get(controller);
+
+            // Se il service è null (perché il costruttore o l'initialize di JavaFX non l'hanno creato),
+            // lo creiamo noi e lo iniettiamo direttamente nel controller!
+            if (service == null) {
+                service = new PlayerService();
+                serviceField.set(controller, service);
+            }
+
+            return service;
+        } catch (Exception e) {
+            fail("Impossibile accedere al PlayerService: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Legge i secondi correnti dal PlayerService
+    private double ottieniTempoTramiteReflection(PlayerService service) {
+        try {
+            java.lang.reflect.Field secondsField = service.getClass().getDeclaredField("currentSeconds");
+            secondsField.setAccessible(true);
+            return (double) secondsField.get(service);
+        } catch (Exception e) {
+            fail("Impossibile accedere a currentSeconds: " + e.getMessage());
+            return -1;
+        }
     }
 }

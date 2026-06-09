@@ -11,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import org.example.musicplayergruppo9.model.ElementoCoda;
 import org.example.musicplayergruppo9.pattern.command.CommandHistory;
+import org.example.musicplayergruppo9.service.PlaylistService;
 
 public class MainController {
 
@@ -70,32 +71,9 @@ public class MainController {
     }
 
     @FXML
-    public void play() {
-        System.out.println("Pulsante Play cliccato!");
-    }
-
-    //task 6.2 lo skip viene delegato a PlayerController
-    @FXML
-    public void skipSong() {
-        //delega al PlayerController
-        if (playerController != null) playerController.skipSong();
-    }
-
-    @FXML
-    public void skipPlaylist() {
-        System.out.println("Pulsante skipPlaylist cliccato!");
-    }
-
-    //task 7.2 Delega il loop al PlayerController
-    @FXML
-    public void loopSong() {
-        //delega al PlayerController
-        if (playerController != null) playerController.loopSong();
-    }
-
-    @FXML
     public void unDo() {
         commandHistory.undo();
+        PlaylistService.getInstance().notifyObservers();
     }
 
     //Chiamato quando l'utentne clicca su brano/playlist, 
