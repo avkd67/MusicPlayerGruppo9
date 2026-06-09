@@ -14,7 +14,7 @@ module org.example.musicplayergruppo9 {
     exports org.example.musicplayergruppo9;
 
     exports org.example.musicplayergruppo9.pattern.state;
-
+    exports org.example.musicplayergruppo9.pattern.observer;
     exports org.example.musicplayergruppo9.pattern.strategy;
     
     exports org.example.musicplayergruppo9.controller;

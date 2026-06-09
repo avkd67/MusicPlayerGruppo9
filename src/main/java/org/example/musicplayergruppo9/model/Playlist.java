@@ -3,13 +3,9 @@ package org.example.musicplayergruppo9.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.example.musicplayergruppo9.pattern.observer.PlaylistObserver;
-
-import org.example.musicplayergruppo9.pattern.observer.PlaylistObserver;
-
 import java.util.Collections;
 
+import org.example.musicplayergruppo9.pattern.observer.PlaylistObserver;
 
 
 public class Playlist implements Iterable<Brano>, ElementoCoda {
