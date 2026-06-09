@@ -25,6 +25,7 @@ public class MainController {
     private boolean playerAperto = false;
     private CommandHistory commandHistory = CommandHistory.getInstance();
 
+    private BraniPlaylistController braniPlaylistController;
 
     // Metodo collegato al click del tasto "Home" a sinistra
     @FXML
@@ -167,9 +168,39 @@ public class MainController {
     }
 
     public void chiudiPlayerVisivamente() {
+        notificaFinePlaylist();
         mainContainer.setBottom(null);
         playerAperto = false;
         playerController = null;
         System.out.println("[MainController] Player rimosso dalla schermata principale.");
     }
+
+    //per implementare le riproduzioni alternative della playlist
+    
+    public void setBraniPlaylistController(BraniPlaylistController controller) {
+        this.braniPlaylistController = controller;
+    }
+    
+    public void notificaFinePlaylist() {
+        if (braniPlaylistController != null) {
+            braniPlaylistController.onFinePlaylist();
+        }
+    }
+
+    public void inizializzaPlayerSeNecessario() {
+        if (!playerAperto) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass()
+                        .getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
+                Node playerView = loader.load();
+                playerController = (PlayerController) loader.getController();
+                if (playerController != null) playerController.setMainController(this);
+                mainContainer.setBottom(playerView);
+                playerAperto = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

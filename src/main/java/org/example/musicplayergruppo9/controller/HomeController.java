@@ -166,7 +166,8 @@ public class HomeController implements Observer {
             controllerDestinazione.setPlaylist(playlist);
             // Passo il riferimento al MainController così la playlist può essere riprodotta
             controllerDestinazione.setMainController(this.mainController);
-
+            this.mainController.setBraniPlaylistController(controllerDestinazione);
+            
             Stage stage = new Stage();
             stage.setTitle("Playlist: " + playlist.getNome());
             stage.setScene(new Scene(root));

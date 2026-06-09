@@ -199,6 +199,7 @@ public class PlayerController {
             svuotaCoda();
             if (mainController != null) {
                 mainController.chiudiPlayerVisivamente();
+                mainController.notificaFinePlaylist();
             }
             
             return;
@@ -330,7 +331,7 @@ public class PlayerController {
     @FXML
     public void randomPlaylist() {
         randomAttivo = !randomAttivo;
-        
+
         // Aggiorna solo l'iteratore per i brani futuri, senza avviare nulla
         if (elementoCorrente instanceof Playlist) {
             Playlist p = (Playlist) elementoCorrente;
@@ -341,4 +342,14 @@ public class PlayerController {
 
     public boolean isRandomAttivo() { return randomAttivo; }
 
+    public void setRandomAttivo(boolean valore) {
+        randomAttivo = valore;
+
+        // Se c'è già una playlist in riproduzione, ricrea subito l'iteratore
+        if (elementoCorrente instanceof Playlist) {
+            Playlist p = (Playlist) elementoCorrente;
+            iteratorCorrente = randomAttivo ? p.getRandomIterator() : p.iterator();
+        }
+    }
+    
 }

@@ -50,6 +50,8 @@ public class BraniPlaylistController implements Observer {
     @FXML private Button btnLoop;
     @FXML private Button btnPlay;
 
+    private boolean randomAttivo = false; 
+
     private boolean inRiproduzione = false;
 
     private ObservableList<Brano> braniObservableList;
@@ -184,28 +186,33 @@ public class BraniPlaylistController implements Observer {
         }
     }
 
-    //bottone Play nella schermata della playlist
+    //metodo per gestire il play nella finestra della playlist, con annesso shuffle
     @FXML
     public void playPlaylist() {
+        if (playlist == null || mainController == null) return;
 
-        if (playlist == null) return;
-        if (mainController == null) return;
-    
         if (!inRiproduzione) {
-            //avvia la riproduzione
             mainController.svuotaCoda();
-            mainController.apriPlayer(playlist);
+
+            mainController.inizializzaPlayerSeNecessario();
+
+            //PlayerController esiste: imposta random
+            PlayerController pc = mainController.getPlayerController();
+            if (pc != null) {
+                pc.setRandomAttivo(randomAttivo);
+            }
+
+            //aggiungi in coda: l'iteratore verrà creato con randomAttivo già corretto
+            mainController.aggiungiInCoda(playlist);
+
             inRiproduzione = true;
-            btnPlay.setText("⏸");
+            btnPlay.setText(" ⏸ ");
         } else {
-            //metti in pausa
             PlayerController pc = mainController.getPlayerController();
             if (pc != null) pc.togglePlayPause();
-    
             inRiproduzione = false;
             btnPlay.setText(" ▶ ");
         }
-
     }
 
     // Metodo chiamato dal pulsante 'Aggiungi alla coda' nella vista Playlist
@@ -394,20 +401,26 @@ public class BraniPlaylistController implements Observer {
     }
 
 
-//playlist in ordine casuale shuffle
+    //playlist in ordine casuale shuffle
     @FXML
     public void onRandom() {
-        if (mainController == null) return;
-        PlayerController pc = mainController.getPlayerController();
-        if (pc == null) return;
+        
+        randomAttivo = !randomAttivo;
 
-        pc.randomPlaylist();
-
-        if (pc.isRandomAttivo()) {
+        if (randomAttivo) {
             btnRandom.getStyleClass().add("button-attivo");
         } else {
             btnRandom.getStyleClass().remove("button-attivo");
         }
+
+        //player è già aperto, aggiorna subito il PlayerController
+        if (mainController != null) {
+            PlayerController pc = mainController.getPlayerController();
+            if (pc != null) {
+                pc.setRandomAttivo(randomAttivo);
+            }
+        }
+
     }
 
     //playlist in loop
@@ -424,6 +437,12 @@ public class BraniPlaylistController implements Observer {
         } else {
             btnLoop.getStyleClass().remove("button-attivo");
         }
+    }
+
+    //chiamato da MainController quando la playlist finisce
+    public void onFinePlaylist() {
+        inRiproduzione = false;
+        btnPlay.setText(" ▶ ");
     }
 
 }
