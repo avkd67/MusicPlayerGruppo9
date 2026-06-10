@@ -191,6 +191,7 @@ public class LibreriaController implements Observer {
             
             // Definisce l'azione di eliminazione (per la Task 1.4.3)
             btnElimina.setOnAction(e -> {
+                e.consume();
                 Brano b = getItem();
                 // Assicuriamoci di non provare a eliminare il bottone finto "Aggiungi brano" (id -1)
                 if (b != null && b.getId() != -1) {
@@ -228,6 +229,7 @@ public class LibreriaController implements Observer {
 
             // Gestione bottone Info: apre l'infografica del brano
             btnInfo.setOnAction(e -> {
+                e.consume();
                 Brano b = getItem();
                 if (b != null && b.getId() != -1) {
                     apriVistaInfoBrano(b);
@@ -236,6 +238,7 @@ public class LibreriaController implements Observer {
 
             // Gestione bottone Preferito
             btnPreferito.setOnAction(e -> {
+                e.consume();
                 Brano b = getItem();
                 if (b != null && b.getId() != -1) { // Evitiamo crash sulla riga finta "Aggiungi brano"
                     boolean nuovoStato = !b.isPreferito();
@@ -247,6 +250,7 @@ public class LibreriaController implements Observer {
 
             // Gestione bottone Coda
             btnCoda.setOnAction(e -> {
+                e.consume();
                 Brano b = getItem();
                 aggiungiInCoda(b);
             });

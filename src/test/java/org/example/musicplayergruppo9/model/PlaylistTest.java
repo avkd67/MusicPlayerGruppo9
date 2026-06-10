@@ -1,6 +1,8 @@
 package org.example.musicplayergruppo9.model;
 
 import org.junit.jupiter.api.*;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaOrdineSequenziale;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaOrdineShuffle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -132,7 +134,8 @@ public class PlaylistTest {
         playlist.aggiungiBrano(brano2);
         playlist.aggiungiBrano(brano3);
  
-        ElementoCodaConOpzioni elemento = new ElementoCodaConOpzioni(playlist, false);
+        ElementoCodaConOpzioni elemento =
+                new ElementoCodaConOpzioni(playlist, new StrategiaOrdineSequenziale(), false);
  
         Iterator<Brano> it = elemento.iterator();
         List<Brano> riprodotti = new ArrayList<>();
@@ -149,7 +152,8 @@ public class PlaylistTest {
         playlist.aggiungiBrano(brano2);
         playlist.aggiungiBrano(brano3);
  
-        ElementoCodaConOpzioni elemento = new ElementoCodaConOpzioni(playlist, true);
+        ElementoCodaConOpzioni elemento =
+                new ElementoCodaConOpzioni(playlist, new StrategiaOrdineShuffle(), false);
  
         Iterator<Brano> it = elemento.iterator();
         List<Brano> riprodotti = new ArrayList<>();
@@ -169,7 +173,7 @@ public class PlaylistTest {
         playlist.aggiungiBrano(brano2);
         playlist.aggiungiBrano(brano3);
  
-        Iterator<Brano> it = playlist.getRandomIterator();
+        Iterator<Brano> it = new StrategiaOrdineShuffle().creaIterator(playlist.getBrani());
         List<Brano> riprodotti = new ArrayList<>();
         it.forEachRemaining(riprodotti::add);
  
@@ -193,8 +197,8 @@ public class PlaylistTest {
         List<Brano> esecuzione1 = new ArrayList<>();
         List<Brano> esecuzione2 = new ArrayList<>();
  
-        playlist.getRandomIterator().forEachRemaining(esecuzione1::add);
-        playlist.getRandomIterator().forEachRemaining(esecuzione2::add);
+        new StrategiaOrdineShuffle().creaIterator(playlist.getBrani()).forEachRemaining(esecuzione1::add);
+        new StrategiaOrdineShuffle().creaIterator(playlist.getBrani()).forEachRemaining(esecuzione2::add);
  
         assertEquals(10, esecuzione1.size());
         assertEquals(10, esecuzione2.size());
@@ -212,10 +216,10 @@ public class PlaylistTest {
  
         List<Brano> originale = new ArrayList<>(playlist.getBrani());
  
-        playlist.getRandomIterator();
+        new StrategiaOrdineShuffle().creaIterator(playlist.getBrani());
  
         assertEquals(originale, playlist.getBrani(),
-                "getRandomIterator() non deve modificare la lista interna della playlist");
+                "StrategiaOrdineShuffle non deve modificare la lista interna della playlist");
     }
 
     //loop
@@ -245,12 +249,12 @@ public class PlaylistTest {
         playlist.aggiungiBrano(brano3);
  
         //priima lo shuffle
-        Iterator<Brano> it1 = playlist.getRandomIterator();
+        Iterator<Brano> it1 = new StrategiaOrdineShuffle().creaIterator(playlist.getBrani());
         it1.forEachRemaining(b -> {}); 
         assertFalse(it1.hasNext());
  
        //shuffle e loop
-        Iterator<Brano> it2 = playlist.getRandomIterator();
+        Iterator<Brano> it2 = new StrategiaOrdineShuffle().creaIterator(playlist.getBrani());
         List<Brano> secondaPassata = new ArrayList<>();
         it2.forEachRemaining(secondaPassata::add);
  

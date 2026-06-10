@@ -107,16 +107,5 @@ public class Playlist implements Iterable<Brano>, ElementoCoda {
     public String getTitolo() {
         return nome;
     }
-       
-    /* brani.forEach(brano -> {
-            System.out.println(brano.toString());
-             });
-    */ 
-
-    public Iterator<Brano> getRandomIterator() {
-        ArrayList<Brano> braniMescolati = new ArrayList<>(this.brani);
-        Collections.shuffle(braniMescolati);
-        return braniMescolati.iterator();
-    }
 
 }

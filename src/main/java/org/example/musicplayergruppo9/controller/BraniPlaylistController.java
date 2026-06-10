@@ -13,6 +13,9 @@ import org.example.musicplayergruppo9.pattern.command.RimuoviBranoPlaylistComman
 import org.example.musicplayergruppo9.pattern.command.RimuoviPlaylistHomeCommand;
 import org.example.musicplayergruppo9.pattern.observer.Observer;
 import org.example.musicplayergruppo9.service.PlaylistService;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaOrdineBrani;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaOrdineSequenziale;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaOrdineShuffle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,6 +55,7 @@ public class BraniPlaylistController implements Observer {
     @FXML private Button btnPlay;
 
     private boolean randomAttivo = false; 
+    private boolean loopAttivo = false;
 
     private boolean inRiproduzione = false;
 
@@ -106,16 +110,17 @@ public class BraniPlaylistController implements Observer {
 
     //legge lo stato reale da PlayerController
     private void sincronizzaStatoPulsanti() {
-        if (mainController == null) return;
-        PlayerController pc = mainController.getPlayerController();
-        if (pc == null) return;
-
-        //Allinea il campo locale allo stato reale
-        randomAttivo = pc.isRandomAttivo();
+        
         setBottoneAttivo(btnRandom, randomAttivo);
+        setBottoneAttivo(btnLoop, loopAttivo);
 
-        //Stessa cosa per il loop
-        setBottoneAttivo(btnLoop, pc.isLoopAttivo());
+    }
+
+    private StrategiaOrdineBrani getStrategiaOrdineCorrente() {
+        if (randomAttivo) {
+            return new StrategiaOrdineShuffle();
+        }
+        return new StrategiaOrdineSequenziale();
     }
 
     public void aggiungiBrano(){
@@ -215,7 +220,8 @@ public class BraniPlaylistController implements Observer {
             mainController.inizializzaPlayerSeNecessario();
 
             ElementoCodaConOpzioni playlistConOpzioni =
-                    new ElementoCodaConOpzioni(playlist, randomAttivo);
+                    new ElementoCodaConOpzioni(playlist, getStrategiaOrdineCorrente(),
+                    loopAttivo);
             mainController.aggiungiInCoda(playlistConOpzioni);
 
             inRiproduzione = true;
@@ -234,7 +240,8 @@ public class BraniPlaylistController implements Observer {
         if (playlist == null || mainController == null) return;
 
         ElementoCodaConOpzioni playlistConOpzioni =
-            new ElementoCodaConOpzioni(playlist, randomAttivo);
+            new ElementoCodaConOpzioni(playlist, getStrategiaOrdineCorrente(),
+            loopAttivo);
         mainController.aggiungiInCoda(playlistConOpzioni);
 
     }
@@ -422,10 +429,13 @@ public class BraniPlaylistController implements Observer {
         setBottoneAttivo(btnRandom, randomAttivo);
 
         //player è già aperto, aggiorna subito il PlayerController
-        if (mainController != null) {
+        if (inRiproduzione && mainController != null) {
             PlayerController pc = mainController.getPlayerController();
             if (pc != null) {
-                pc.setRandomAttivo(randomAttivo);
+                pc.aggiornaOpzioniPlaylistCorrente(
+                    getStrategiaOrdineCorrente(),
+                    loopAttivo
+            );
             }
         }
 
@@ -434,13 +444,19 @@ public class BraniPlaylistController implements Observer {
     //playlist in loop
     @FXML
     public void onLoop() {
-        if (mainController == null) return;
-        PlayerController pc = mainController.getPlayerController();
-        if (pc == null) return;
+        loopAttivo = !loopAttivo;
+        setBottoneAttivo(btnLoop, loopAttivo);
 
-        pc.loopSong();
-
-        setBottoneAttivo(btnLoop, pc.isLoopAttivo());
+        if (inRiproduzione && mainController != null) {
+            PlayerController pc = mainController.getPlayerController();
+            if (pc != null) {
+                pc.aggiornaOpzioniPlaylistCorrente(
+                        getStrategiaOrdineCorrente(),
+                        loopAttivo
+                );
+            }
+        }
+        
     }
 
     //chiamato da MainController quando la playlist finisce

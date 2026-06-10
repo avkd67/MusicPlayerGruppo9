@@ -4,6 +4,8 @@ import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.ElementoCoda;
 import org.example.musicplayergruppo9.model.ElementoCodaConOpzioni;
 import org.example.musicplayergruppo9.model.Playlist;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaOrdineSequenziale;
+import org.example.musicplayergruppo9.pattern.strategy.StrategiaOrdineShuffle;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -86,8 +88,10 @@ public class PlayerQueueTest {
                 new Brano("a","a","g",2021,80,"/tmp/a.mp3","mp3",null,false,false),
                 new Brano("b","b","g",2021,90,"/tmp/b.mp3","mp3",null,false,false)
         );
-        ElementoCodaConOpzioni sequenziale = new ElementoCodaConOpzioni(playlist, false);
-        ElementoCodaConOpzioni casuale = new ElementoCodaConOpzioni(playlist, true);
+        ElementoCodaConOpzioni sequenziale =
+                new ElementoCodaConOpzioni(playlist, new StrategiaOrdineSequenziale(), false);
+        ElementoCodaConOpzioni casuale =
+                new ElementoCodaConOpzioni(playlist, new StrategiaOrdineShuffle(), true);
 
         pc.aggiungiInCoda(sequenziale);
         pc.aggiungiInCoda(casuale);
@@ -98,8 +102,12 @@ public class PlayerQueueTest {
         assertSame(casuale, snapshot.get(1));
         assertSame(playlist, ((ElementoCodaConOpzioni) snapshot.get(0)).getElemento());
         assertSame(playlist, ((ElementoCodaConOpzioni) snapshot.get(1)).getElemento());
-        assertFalse(((ElementoCodaConOpzioni) snapshot.get(0)).isRandom());
-        assertTrue(((ElementoCodaConOpzioni) snapshot.get(1)).isRandom());
+        assertInstanceOf(StrategiaOrdineSequenziale.class,
+                ((ElementoCodaConOpzioni) snapshot.get(0)).getStrategiaOrdine());
+        assertFalse(((ElementoCodaConOpzioni) snapshot.get(0)).isLoop());
+        assertInstanceOf(StrategiaOrdineShuffle.class,
+                ((ElementoCodaConOpzioni) snapshot.get(1)).getStrategiaOrdine());
+        assertTrue(((ElementoCodaConOpzioni) snapshot.get(1)).isLoop());
     }
 
     //stesso scenario ma con skip
@@ -110,9 +118,10 @@ public class PlayerQueueTest {
         Brano secondo = new Brano(2, "Secondo", "a", "g", 2021, 90, "/tmp/2.mp3", "mp3", null, false, false, false, 0);
         Playlist playlist = creaPlaylist("Stessa playlist", primo, secondo);
 
-        pc.setRandomAttivo(true);
-        pc.aggiungiInCoda(new ElementoCodaConOpzioni(playlist, false));
-        pc.aggiungiInCoda(new ElementoCodaConOpzioni(playlist, true));
+        pc.aggiungiInCoda(new ElementoCodaConOpzioni(
+                playlist, new StrategiaOrdineSequenziale(), false));
+        pc.aggiungiInCoda(new ElementoCodaConOpzioni(
+                playlist, new StrategiaOrdineShuffle(), false));
 
         assertSame(primo, pc.getBranoCorrente(), "La prima occorrenza deve rispettare l'opzione sequenziale");
         assertEquals(1, pc.getDimensioneCoda(), "La seconda occorrenza della stessa playlist deve restare in coda");
@@ -240,16 +249,16 @@ public class PlayerQueueTest {
 
     //playlist messa in coda con ordine di riproduzione casuale
     @Test
-    void randomAttivo_aggiungiPlaylist_iteratoreVieneCambiato() {
+    void strategiaShuffle_aggiornaPlaylistCorrente_riproduceTuttiIRimanenti() {
         PlayerController pc = new PlayerController();
         Brano b1 = new Brano(1,"R1","A","g",2021,60,"/tmp/r1.mp3","mp3",null,false,false,false,0);
         Brano b2 = new Brano(2,"R2","A","g",2021,60,"/tmp/r2.mp3","mp3",null,false,false,false,0);
         Brano b3 = new Brano(3,"R3","A","g",2021,60,"/tmp/r3.mp3","mp3",null,false,false,false,0);
         Playlist pl = creaPlaylist("PL", b1, b2, b3);
     
-        pc.aggiungiInCoda(pl); //parte b1, sequenziale
-        pc.setRandomAttivo(true);
-        assertTrue(pc.isRandomAttivo());
+        pc.aggiungiInCoda(new ElementoCodaConOpzioni(
+                pl, new StrategiaOrdineSequenziale(), false)); //parte b1, sequenziale
+        pc.aggiornaOpzioniPlaylistCorrente(new StrategiaOrdineShuffle(), false);
     
         java.util.Set<Brano> riprodotti = new java.util.HashSet<>();
         riprodotti.add(pc.getBranoCorrente());
@@ -257,12 +266,12 @@ public class PlayerQueueTest {
         pc.skipSong(); riprodotti.add(pc.getBranoCorrente());
     
         assertTrue(riprodotti.containsAll(List.of(b1, b2, b3)),
-                "Con random attivo tutti i brani della playlist devono essere riprodotti");
+                "Con strategia shuffle tutti i brani della playlist devono essere riprodotti");
     }
  
     //playlist messa in coda con riproduzione sequenziale dei suoi brani
     @Test
-    void elementoCodaConOpzioni_random_false_rispettaOrdineSequenziale() {
+    void elementoCodaConOpzioni_strategiaSequenziale_rispettaOrdineSequenziale() {
         PlayerController pc = new PlayerController();
         Brano corrente = new Brano("C","A","g",2020,60,"/tmp/c.mp3","mp3",null,false,false);
         pc.setBrano(corrente);
@@ -271,15 +280,15 @@ public class PlayerQueueTest {
         Brano b2 = new Brano(2,"S2","A","g",2021,60,"/tmp/s2.mp3","mp3",null,false,false,false,0);
         Playlist pl = creaPlaylist("PL", b1, b2);
     
-        pc.setRandomAttivo(true);
-        pc.aggiungiInCoda(new ElementoCodaConOpzioni(pl, false));
+        pc.aggiungiInCoda(new ElementoCodaConOpzioni(
+                pl, new StrategiaOrdineSequenziale(), false));
     
         pc.skipSong();
         assertSame(b1, pc.getBranoCorrente(),
-                "Con ElementoCodaConOpzioni random=false il primo brano deve essere b1");
+                "Con ElementoCodaConOpzioni sequenziale il primo brano deve essere b1");
         pc.skipSong();
         assertSame(b2, pc.getBranoCorrente(),
-                "Con ElementoCodaConOpzioni random=false il secondo brano deve essere b2");
+                "Con ElementoCodaConOpzioni sequenziale il secondo brano deve essere b2");
     }
 
     //brano aggiunto in coda quando il player è in riproduzione
