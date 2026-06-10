@@ -406,13 +406,23 @@ public class PlayerController implements PlaylistObserver {
     public void setRandomAttivo(boolean valore) {
         randomAttivo = valore;
 
-        // Se la playlist corrente NON è wrappata (aggiunta senza opzioni),
-        // aggiorna l'iteratore in tempo reale
+        //aggiorna l'iteratore in tempo reale partendo dal brano successivo a quello corrente
         if (!(elementoCorrente instanceof ElementoCodaConOpzioni)) {
             ElementoCoda reale = estraiElementoReale(elementoCorrente);
             if (reale instanceof Playlist) {
                 Playlist p = (Playlist) reale;
-                iteratorCorrente = randomAttivo ? p.getRandomIterator() : p.iterator();
+                List<Brano> brani = p.getBrani();
+                int posCorrente = brani.indexOf(branoCorrente);
+                int riparti = posCorrente >= 0 ? posCorrente + 1 : brani.size();
+    
+                if (randomAttivo) {
+                    //Shuffle solo i brani non ancora riprodotti
+                    List<Brano> rimanenti = new java.util.ArrayList<>(brani.subList(riparti, brani.size()));
+                    java.util.Collections.shuffle(rimanenti);
+                    iteratorCorrente = rimanenti.iterator();
+                } else {
+                    iteratorCorrente = brani.listIterator(riparti);
+                }
             }
         }
     }
