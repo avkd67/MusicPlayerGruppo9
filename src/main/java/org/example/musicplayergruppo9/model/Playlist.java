@@ -3,6 +3,7 @@ package org.example.musicplayergruppo9.model;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 
 public class Playlist implements Iterable<Brano>, ElementoCoda {
@@ -89,10 +90,19 @@ public class Playlist implements Iterable<Brano>, ElementoCoda {
     public String getTitolo() {
         return nome;
     }
-       
-    /* brani.forEach(brano -> {
-            System.out.println(brano.toString());
-             });
-    */ 
+
+    // override dell'equals
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Playlist playlist = (Playlist) o;
+        return Objects.equals(nome, playlist.nome);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nome);
+    }
 
 }

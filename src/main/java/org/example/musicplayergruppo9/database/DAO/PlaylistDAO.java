@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import org.example.musicplayergruppo9.database.DatabaseConnection;
 import org.example.musicplayergruppo9.model.Playlist;
 
-// TODO: rendere observable ed aggiornare le cose come branoDAO
-
 public class PlaylistDAO {
 
     // singleton per evitare che più istanze di DAO che si connettano al database
@@ -55,7 +53,7 @@ public class PlaylistDAO {
         return false;
     }
 
-    // metodo per aggiornare i dati di una playlist esistente
+    // metodo per aggiornare i dati di una playlist esistente (SOLO nome e copertina)
     public boolean aggiornaPlaylist(Playlist playlist, Playlist playlistModificata){
         String sql = "UPDATE playlist SET nome = ?, copertina = ? WHERE id = ?";
 
