@@ -94,6 +94,7 @@ public class BraniPlaylistController implements Observer {
 
         // carico i brani associati a quella playlist dal database
         List<Brano> braniRecuperati = playlistService.getBraniByPlaylist(this.playlist);
+        braniRecuperati.addAll(playlist.getBrani());
         braniObservableList.addAll(braniRecuperati);
 
         // Assicuro che la Playlist contenga internamente i brani recuperati

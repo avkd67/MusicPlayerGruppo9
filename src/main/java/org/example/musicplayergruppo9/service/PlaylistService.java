@@ -52,7 +52,7 @@ public class PlaylistService implements Subject {
     // restituisce le playlist generate in base al genere dei brani
     // prendo tutti i brani e li divido per genere,
     // creo una playlist per ogni genere trovato e le restituisco
-    private ArrayList<Playlist> getPlaylistsByGenere(){
+    public ArrayList<Playlist> getPlaylistsByGenere(){
 
         List<Brano> brani = branoDAO.getTuttiIBrani();
         HashMap<String, Playlist> mappaPlaylists = new HashMap<>();
@@ -80,7 +80,7 @@ public class PlaylistService implements Subject {
     // restituisce le playlist generate in base all'anno di pubblicazione dei brani
     // prendo tutti i brani e li divido in tanti gruppi quanti sono le date di pubblicazione,
     // assegnandoli poi a playlist diverse e restituendone l'array
-    private ArrayList<Playlist> getPlaylistsByAnno(){
+    public ArrayList<Playlist> getPlaylistsByAnno(){
 
         // come ho fatto per i generi, solo che ora stiamo trattando interi e l'assenza di dato è 0 e non più NULL
         HashMap<Integer, Playlist> mappaAnnoPlaylist = new HashMap<>();
@@ -104,7 +104,7 @@ public class PlaylistService implements Subject {
 
     // restituisce una playlist con tutti i brani preferiti
     // faccio prima un retrieve di tutti i brani e poi li aggiungo ad una playlist chiamata Preferiti
-    private Playlist getPlaylistPreferiti(){
+    public Playlist getPlaylistPreferiti(){
 
         List<Brano> brani = branoDAO.getTuttiIBrani();
         ArrayList<Playlist> playlists = getAllPlaylists();

@@ -34,6 +34,9 @@ public class HomeController implements Observer {
     @FXML
     private FlowPane playlistsFlowPane;
 
+    @FXML
+    private FlowPane suggeriteFlowPane;
+
     private ObservableList<Playlist> playlistsObservableList;
     private PlaylistService playlistService;
     private ArrayList<Playlist> playlistRecuperate;
@@ -55,7 +58,16 @@ public class HomeController implements Observer {
 
         segnaposto_aggiungi.setId(-1);
         playlistsObservableList.add(segnaposto_aggiungi);
+
+        ArrayList<Playlist> playlistAutomatiche = new ArrayList<>();
+        playlistAutomatiche.add(playlistService.getPlaylistPreferiti());
+
+        playlistAutomatiche.addAll(playlistService.getPlaylistsByAnno());
+
+        playlistAutomatiche.addAll(playlistService.getPlaylistsByGenere());
+
         mostraPlaylists();
+        mostraPlaylistSuggerite(playlistAutomatiche);
     }
 
     private void mostraPlaylists() {
@@ -68,6 +80,14 @@ public class HomeController implements Observer {
             } else {
                 playlistsFlowPane.getChildren().add(createPlaylistCard(p));
             }
+        }
+    }
+
+    private void mostraPlaylistSuggerite(ArrayList<Playlist> playlistAutomatiche){
+        suggeriteFlowPane.getChildren().clear();
+
+        for(Playlist p : playlistAutomatiche) {
+            suggeriteFlowPane.getChildren().add(createPlaylistCard(p));
         }
     }
 
@@ -217,5 +237,16 @@ public class HomeController implements Observer {
         playlistsObservableList.addAll(playlistRecuperate);
         playlistsObservableList.add(segnaposto_aggiungi);
         mostraPlaylists();
+
+        // ricalcolo per aggiornare le automatiche
+        ArrayList<Playlist> playlistAutomatiche = new ArrayList<>();
+        playlistAutomatiche.add(playlistService.getPlaylistPreferiti());
+
+        playlistAutomatiche.addAll(playlistService.getPlaylistsByAnno());
+
+        playlistAutomatiche.addAll(playlistService.getPlaylistsByGenere());
+
+        mostraPlaylistSuggerite(playlistAutomatiche);
+
     }
 }
