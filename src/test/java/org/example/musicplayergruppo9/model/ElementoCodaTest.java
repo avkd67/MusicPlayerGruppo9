@@ -10,7 +10,7 @@ public class ElementoCodaTest {
     //test strutturale
     @Test
     void branoImplementaElementoCoda() {
-        Brano brano = new Brano(1, "Titolo", "Artista", "Pop", 0, 180, "/path/audio.mp3", "mp3", null, false, false, false);
+        Brano brano = new Brano(1, "Titolo", "Artista", "Pop", 0, 180, "/path/audio.mp3", "mp3", null, false, false, false, 0);
         assertInstanceOf(ElementoCoda.class, brano);
     }
 

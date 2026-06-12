@@ -11,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import org.example.musicplayergruppo9.model.ElementoCoda;
 import org.example.musicplayergruppo9.pattern.command.CommandHistory;
+import org.example.musicplayergruppo9.service.PlaylistService;
 
 public class MainController {
 
@@ -24,6 +25,8 @@ public class MainController {
     private boolean playerAperto = false;
     private CommandHistory commandHistory = CommandHistory.getInstance();
 
+    private BraniPlaylistController braniPlaylistController;
+
     // Metodo collegato al click del tasto "Home" a sinistra
     @FXML
     public void mostraHome() {
@@ -31,6 +34,10 @@ public class MainController {
             // Si carica il file fxml della Home (che sarà un AnchorPane o VBox a sé stante)
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/HomeView.fxml"));
             Node viewHome = loader.load();
+
+            // Inietto il riferimento al MainController nella Home
+            org.example.musicplayergruppo9.controller.HomeController homeController = loader.getController();
+            if (homeController != null) homeController.setMainController(this);
 
             // Si svuota l'area contenuti e inserisci la nuova view
             areaContenuti.getChildren().setAll(viewHome);
@@ -65,32 +72,9 @@ public class MainController {
     }
 
     @FXML
-    public void play() {
-        System.out.println("Pulsante Play cliccato!");
-    }
-
-    //task 6.2 lo skip viene delegato a PlayerController
-    @FXML
-    public void skipSong() {
-        //delega al PlayerController
-        if (playerController != null) playerController.skipSong();
-    }
-
-    @FXML
-    public void skipPlaylist() {
-        System.out.println("Pulsante skipPlaylist cliccato!");
-    }
-
-    //task 7.2 Delega il loop al PlayerController
-    @FXML
-    public void loopSong() {
-        //delega al PlayerController
-        if (playerController != null) playerController.loopSong();
-    }
-
-    @FXML
     public void unDo() {
         commandHistory.undo();
+        PlaylistService.getInstance().notifyObservers();
     }
 
     //Chiamato quando l'utentne clicca su brano/playlist, 
@@ -104,6 +88,7 @@ public class MainController {
 
                 // PASSA I DATI: Prendi il controller del player e passagli il brano
                 playerController = (PlayerController) loader.getController();
+                if (playerController != null) playerController.setMainController(this);
 
                 // Inserisce dinamicamente il player nella parte in basso del BorderPane
                 mainContainer.setBottom(playerView);
@@ -119,6 +104,25 @@ public class MainController {
             } else {
                 playerController.aggiungiInCoda(elemento);
             }
+        }
+    }
+
+    // Apre la vista della coda di riproduzione
+    public void apriCodaRiproduzione() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/musicplayergruppo9/fxml/CodaRiproduzioneView.fxml"));
+            javafx.scene.Parent root = loader.load();
+            CodaRiproduzioneController controller = loader.getController();
+            controller.setPlayerController(this.playerController);
+
+            javafx.stage.Stage stage = new javafx.stage.Stage();
+            stage.setTitle("Coda di riproduzione");
+            stage.setScene(new javafx.scene.Scene(root));
+            stage.initOwner(mainContainer.getScene().getWindow());
+            stage.initModality(javafx.stage.Modality.NONE);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -142,6 +146,7 @@ public class MainController {
                     .getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
                 Node playerView = loader.load();
                 playerController = (PlayerController) loader.getController();
+                if (playerController != null) playerController.setMainController(this);
                 mainContainer.setBottom(playerView);
                 playerAperto = true;
             } catch (IOException e) {
@@ -151,6 +156,50 @@ public class MainController {
 
         if (playerController != null) {
             playerController.aggiungiInCoda(elemento);
+        }
+    }
+
+    public void svuotaCoda() {
+        if (playerController != null) {
+            playerController.svuotaCoda();
+        } else {
+            System.out.println("[MainController] Impossibile svuotare: PlayerController non inizializzato.");
+        }
+    }
+
+    public void chiudiPlayerVisivamente() {
+        notificaFinePlaylist();
+        mainContainer.setBottom(null);
+        playerAperto = false;
+        playerController = null;
+        System.out.println("[MainController] Player rimosso dalla schermata principale.");
+    }
+
+    //per implementare le riproduzioni alternative della playlist
+    
+    public void setBraniPlaylistController(BraniPlaylistController controller) {
+        this.braniPlaylistController = controller;
+    }
+    
+    public void notificaFinePlaylist() {
+        if (braniPlaylistController != null) {
+            braniPlaylistController.onFinePlaylist();
+        }
+    }
+
+    public void inizializzaPlayerSeNecessario() {
+        if (!playerAperto) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass()
+                        .getResource("/org/example/musicplayergruppo9/fxml/PlayerView.fxml"));
+                Node playerView = loader.load();
+                playerController = (PlayerController) loader.getController();
+                if (playerController != null) playerController.setMainController(this);
+                mainContainer.setBottom(playerView);
+                playerAperto = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

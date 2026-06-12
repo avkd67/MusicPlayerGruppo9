@@ -63,7 +63,7 @@
                               <Font size="16.0" />
                            </font>
                         </Button>
-                        <Button styleClass="button-icona" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#skipPlaylist" prefHeight="35.0" prefWidth="35.0" text="⏭">
+                        <Button fx:id="btnSkipPlaylist" styleClass="button-icona" maxHeight="35.0" maxWidth="35.0" minHeight="35.0" minWidth="35.0" mnemonicParsing="false" onAction="#skipPlaylist" visible="false" managed="false" prefHeight="35.0" prefWidth="35.0" text="⏭">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -98,6 +98,14 @@
                </HBox.margin>
                <font>
                   <Font size="25.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnCoda" styleClass="button-icona" maxHeight="60.0" maxWidth="60.0" minHeight="60.0" minWidth="60.0" mnemonicParsing="false" onAction="#apriCoda" prefHeight="60.0" prefWidth="60.0" text="☰">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="20.0" />
                </font>
             </Button>
          </children>

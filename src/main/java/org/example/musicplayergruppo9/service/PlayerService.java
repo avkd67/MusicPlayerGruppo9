@@ -3,6 +3,8 @@ package org.example.musicplayergruppo9.service;
 import javafx.application.Platform;
 import javafx.util.Duration;
 import javazoom.jl.player.Player;
+
+import org.example.musicplayergruppo9.database.DAO.BranoDAO;
 import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.pattern.state.PausedState;
 import org.example.musicplayergruppo9.pattern.state.PlayerState;
@@ -15,6 +17,8 @@ public class PlayerService {
 
     private Player jPlayer;
     private PlayerState currentState;
+
+    private Brano branoCorrente;
 
     private Runnable onEndOfMediaCallback;
 
@@ -53,6 +57,8 @@ public class PlayerService {
 
     public void loadTrack(Brano brano) {
         stopAudio();
+
+        this.branoCorrente = brano;
 
         File fileAudio = brano.getFileAudio();
         if (fileAudio != null && fileAudio.exists()) {
@@ -154,6 +160,10 @@ public class PlayerService {
         isStopped = true;
         isPlaying = false;
 
+        if (playerThread != null) {
+            playerThread.interrupt();
+        }
+
         if (jPlayer != null) {
             try {
                 jPlayer.close(); // Questo farà terminare pacificamente il ciclo if(!jPlayer.play(1))
@@ -183,6 +193,10 @@ public class PlayerService {
         // Notifica il PlayerController che il brano è finito
         if (onEndOfMediaCallback != null) {
             Platform.runLater(onEndOfMediaCallback);
+        }
+
+        if (branoCorrente != null) {
+            BranoDAO.getInstance().incrementaAscolti(branoCorrente.getId());
         }
     }
 
