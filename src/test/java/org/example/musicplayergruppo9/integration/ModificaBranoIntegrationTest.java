@@ -62,4 +62,44 @@ public class ModificaBranoIntegrationTest {
         Assertions.assertEquals(nuovoTitolo, trovato.getTitolo(), "Titolo non aggiornato nel DB");
         Assertions.assertEquals("ModifiedGenre", trovato.getGenere(), "Genere non aggiornato nel DB");
     }
+
+    //Test per verificare che il flag esplicito venga memorizzato in db insieme al brano
+    @Test
+    public void testExplicitFlagVieneSalvatoNelDatabase() {
+        branoInserito.setExplicit(true);
+
+        boolean aggiornato = branoDAO.aggiornaBrano(branoInserito);
+        Assertions.assertTrue(aggiornato, "La modifica del flag explicit dovrebbe andare a buon fine");
+
+        List<Brano> tutti = branoDAO.getTuttiIBrani();
+        Brano trovato = tutti.stream()
+                .filter(x -> x.getId() == branoInserito.getId())
+                .findFirst()
+                .orElse(null);
+
+        Assertions.assertNotNull(trovato, "Brano non trovato nel DB");
+        Assertions.assertTrue(trovato.isExplicit(), "Il flag explicit deve essere salvato e recuperato dal DB");
+    }
+
+    //Test per verificare che il flag nuova uscita venga memorizzato in db insieme al brano
+    @Test
+    public void testNewReleaseVieneRiconosciutoConAnnoCorrente() {
+        int annoCorrente = java.time.LocalDate.now().getYear();
+
+        branoInserito.setDataRilascio(annoCorrente);
+        branoInserito.setNewRelease(true);
+
+        boolean aggiornato = branoDAO.aggiornaBrano(branoInserito);
+        Assertions.assertTrue(aggiornato, "La modifica del flag new release dovrebbe andare a buon fine");
+
+        List<Brano> tutti = branoDAO.getTuttiIBrani();
+        Brano trovato = tutti.stream()
+                .filter(x -> x.getId() == branoInserito.getId())
+                .findFirst()
+                .orElse(null);
+
+        Assertions.assertNotNull(trovato, "Brano non trovato nel DB");
+        Assertions.assertTrue(trovato.isNewRelease(), "Il brano deve risultare nuova uscita se l'anno è quello corrente");
+    }
+    
 }
