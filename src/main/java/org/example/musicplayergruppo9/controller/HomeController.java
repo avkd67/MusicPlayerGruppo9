@@ -105,7 +105,8 @@ public class HomeController implements Observer {
         suggeriteFlowPane.getChildren().clear();
 
         for(Playlist p : playlistAutomatiche) {
-            suggeriteFlowPane.getChildren().add(createPlaylistCard(p));
+            if(!p.getBrani().isEmpty())
+                suggeriteFlowPane.getChildren().add(createPlaylistCard(p));
         }
     }
 
