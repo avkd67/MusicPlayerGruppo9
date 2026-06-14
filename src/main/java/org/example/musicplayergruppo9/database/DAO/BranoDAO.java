@@ -358,5 +358,48 @@ public class BranoDAO implements Subject {
             return false;
         }
     }
+
+    public List<Brano> getBraniPiuRiprodotti(int limite) {
+        List<Brano> listaBrani = new ArrayList<>();
+        String sql = "SELECT * FROM brani WHERE contatore_ascolti > 5 ORDER BY contatore_ascolti DESC LIMIT ?";
+        int annoCorrente = java.time.LocalDate.now().getYear();
+    
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    
+            pstmt.setInt(1, limite);
+    
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    int anno = rs.getInt("data_rilascio");
+                    boolean isNewRelease = (anno > 0 && anno == annoCorrente);
+    
+                    Brano brano = new Brano(
+                            rs.getInt("id"),
+                            rs.getString("titolo"),
+                            rs.getString("artista"),
+                            rs.getString("genere"),
+                            anno,
+                            rs.getInt("durata"),
+                            rs.getString("percorso_file_audio"),
+                            rs.getString("estensione"),
+                            rs.getString("percorso_copertina"),
+                            rs.getBoolean("preferito"),
+                            isNewRelease,
+                            rs.getBoolean("explicit"),
+                            rs.getInt("contatore_ascolti")
+                    );
+    
+                    listaBrani.add(brano);
+                }
+            }
+    
+        } catch (SQLException e) {
+            System.err.println("[BranoDAO] Errore recupero brani piu riprodotti.");
+            e.printStackTrace();
+        }
+    
+        return listaBrani;
+    }
     
 }

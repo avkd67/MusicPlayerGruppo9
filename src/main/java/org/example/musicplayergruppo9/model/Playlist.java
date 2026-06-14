@@ -19,6 +19,8 @@ public class Playlist implements Iterable<Brano>, ElementoCoda {
 
     //patter Observer per gestire inserimento e cancellazione brano in playlist durante l'esecuzione
     private final ArrayList<PlaylistObserver> playlistObservers = new ArrayList<>();
+    
+    private int contatoreAscolti;
 
     public void addPlaylistObserver(PlaylistObserver o) {
         if (!playlistObservers.contains(o)) playlistObservers.add(o);
@@ -121,6 +123,14 @@ public class Playlist implements Iterable<Brano>, ElementoCoda {
     @Override
     public int hashCode() {
         return Objects.hash(nome);
+    }
+
+    public int getContatoreAscolti() {
+        return contatoreAscolti;
+    }
+    
+    public void setContatoreAscolti(int contatoreAscolti) {
+        this.contatoreAscolti = contatoreAscolti;
     }
 
 }

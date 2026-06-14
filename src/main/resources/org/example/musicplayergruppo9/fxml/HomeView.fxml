@@ -36,6 +36,10 @@
                     hgap="16" vgap="16"
                     style="-fx-padding: 4;"/>
 
+          <Label text="Playlist più riprodotte" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+          <FlowPane fx:id="topPlaylistFlowPane" hgap="16" vgap="16" style="-fx-padding: 4;"/>
+
         </VBox>
       </children>
     </AnchorPane>

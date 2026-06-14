@@ -108,6 +108,7 @@ public class PlaylistDAO {
             while (rs.next()) {
                 Playlist playlist = new Playlist(rs.getString("nome"), rs.getString("copertina"));
                 playlist.setId(rs.getInt("id"));
+                playlist.setContatoreAscolti(rs.getInt("contatore_ascolti"));
                 playlists.add(playlist);
             }
 
@@ -140,4 +141,47 @@ public class PlaylistDAO {
         }
         return false;
     }
+
+    public boolean incrementaAscolti(int playlistId) {
+        String sql = "UPDATE playlist SET contatore_ascolti = contatore_ascolti + 1 WHERE id = ?";
+    
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    
+            pstmt.setInt(1, playlistId);
+            return pstmt.executeUpdate() > 0;
+    
+        } catch (SQLException e) {
+            System.err.println("[PlaylistDAO] Errore incremento ascolti playlist ID: " + playlistId);
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public ArrayList<Playlist> getPlaylistsPiuRiprodotte(int limite) {
+        ArrayList<Playlist> playlists = new ArrayList<>();
+        String sql = "SELECT * FROM playlist WHERE contatore_ascolti > 5 ORDER BY contatore_ascolti DESC LIMIT ?";
+    
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+    
+            pstmt.setInt(1, limite);
+    
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Playlist playlist = new Playlist(rs.getString("nome"), rs.getString("copertina"));
+                    playlist.setId(rs.getInt("id"));
+                    playlist.setContatoreAscolti(rs.getInt("contatore_ascolti"));
+                    playlists.add(playlist);
+                }
+            }
+    
+        } catch (SQLException e) {
+            System.err.println("[PlaylistDAO] Errore recupero playlist piu riprodotte.");
+            e.printStackTrace();
+        }
+    
+        return playlists;
+    }
+
 }

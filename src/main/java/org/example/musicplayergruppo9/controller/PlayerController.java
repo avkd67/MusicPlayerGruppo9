@@ -24,6 +24,8 @@ import org.example.musicplayergruppo9.pattern.strategy.StrategiaSequenziale;
 import org.example.musicplayergruppo9.pattern.strategy.StrategiaOrdineBrani;
 import org.example.musicplayergruppo9.service.PlayerService;
 import org.example.musicplayergruppo9.pattern.observer.PlaylistObserver;
+import org.example.musicplayergruppo9.service.StatisticheService;
+
 //import java.io.IOException;
 //import javafx.fxml.FXMLLoader;
 //import javafx.scene.Parent;
@@ -248,7 +250,9 @@ public class PlayerController implements PlaylistObserver {
         ElementoCoda elementoReale = estraiElementoReale(prossimo);
 
         if (elementoReale instanceof Playlist) {
-            osservaPlaylist((Playlist) elementoReale);
+            Playlist playlist = (Playlist) elementoReale;
+            osservaPlaylist(playlist);
+            StatisticheService.getInstance().registraRiproduzionePlaylist(playlist);
         }
 
         iteratorCorrente = prossimo.iterator();

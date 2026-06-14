@@ -92,7 +92,13 @@ public class BraniPlaylistController implements Observer {
         if(this.playlist.getPercorsoCopertina() != null)
             imgCopertina.setImage(new Image(new File(this.playlist.getPercorsoCopertina()).toURI().toString()));
 
-            List<Brano> braniRecuperati = playlistService.getBraniByPlaylist(this.playlist);
+            List<Brano> braniRecuperati;
+
+            if (this.playlist.getId() > 0) {
+                braniRecuperati = playlistService.getBraniByPlaylist(this.playlist);
+            } else {
+                braniRecuperati = new java.util.ArrayList<>(this.playlist.getBrani());
+            }
 
             braniObservableList.clear();
             braniObservableList.addAll(braniRecuperati);
@@ -252,8 +258,17 @@ public class BraniPlaylistController implements Observer {
     public void update() {
         // aggiorna i brani
         System.out.println("Si si... sto aggiornando i brani -_-/ ");
+        
         braniObservableList.clear();
-        List<Brano> braniAggiornati = playlistService.getBraniByPlaylist(playlist);
+
+        List<Brano> braniAggiornati;
+
+        if (playlist.getId() > 0) {
+            braniAggiornati = playlistService.getBraniByPlaylist(playlist);
+        } else {
+            braniAggiornati = new java.util.ArrayList<>(playlist.getBrani());
+        }
+
         braniObservableList.addAll(braniAggiornati);
         braniObservableList.add(segnaposto_aggiungi);
 

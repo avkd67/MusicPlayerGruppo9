@@ -29,6 +29,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.application.Platform;
+import org.example.musicplayergruppo9.service.StatisticheService;
 
 public class HomeController implements Observer {
 
@@ -38,6 +40,9 @@ public class HomeController implements Observer {
 
     @FXML
     private FlowPane suggeriteFlowPane;
+
+    @FXML
+    private FlowPane topPlaylistFlowPane;
 
     private ObservableList<Playlist> playlistsObservableList;
     private PlaylistService playlistService;
@@ -51,10 +56,15 @@ public class HomeController implements Observer {
 
     private final Map<Integer, Stage> finestrePlaylistAperte = new HashMap<>();
 
+    private StatisticheService statisticheService;
+
     @FXML
     public void initialize() {
         playlistService = PlaylistService.getInstance();
         playlistService.attach(this);
+
+        statisticheService = StatisticheService.getInstance();
+        statisticheService.attach(this);
 
         // prendo le playlists presenti nel db e ci lego l'observable list
         playlistRecuperate = playlistService.getAllPlaylists();
@@ -66,12 +76,16 @@ public class HomeController implements Observer {
         ArrayList<Playlist> playlistAutomatiche = new ArrayList<>();
         playlistAutomatiche.add(playlistService.getPlaylistPreferiti());
 
+        playlistAutomatiche.add(statisticheService.getPlaylistBraniPiuRiprodotti());
+
         playlistAutomatiche.addAll(playlistService.getPlaylistsByAnno());
 
         playlistAutomatiche.addAll(playlistService.getPlaylistsByGenere());
 
         mostraPlaylists();
         mostraPlaylistSuggerite(playlistAutomatiche);
+        mostraPlaylistPiuRiprodotte();
+
     }
 
     private void mostraPlaylists() {
@@ -251,6 +265,11 @@ public class HomeController implements Observer {
 
     @Override
     public void update() {
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(this::update);
+            return;
+        }
+
         playlistsObservableList.clear();
         playlistRecuperate = playlistService.getAllPlaylists();
         playlistsObservableList.addAll(playlistRecuperate);
@@ -261,11 +280,23 @@ public class HomeController implements Observer {
         ArrayList<Playlist> playlistAutomatiche = new ArrayList<>();
         playlistAutomatiche.add(playlistService.getPlaylistPreferiti());
 
+        playlistAutomatiche.add(statisticheService.getPlaylistBraniPiuRiprodotti());
+
         playlistAutomatiche.addAll(playlistService.getPlaylistsByAnno());
 
         playlistAutomatiche.addAll(playlistService.getPlaylistsByGenere());
 
         mostraPlaylistSuggerite(playlistAutomatiche);
-
+        mostraPlaylistPiuRiprodotte();
+        
     }
+
+    private void mostraPlaylistPiuRiprodotte() {
+        topPlaylistFlowPane.getChildren().clear();
+    
+        for (Playlist p : statisticheService.getPlaylistPiuRiprodotte()) {
+            topPlaylistFlowPane.getChildren().add(createPlaylistCard(p));
+        }
+    }
+
 }

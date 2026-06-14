@@ -65,8 +65,9 @@ public class PlaylistService implements Subject {
 
                 // controllo sia già stato considerato come genere nella hashmap, altrimenti ce lo inserisco
                 if(!mappaPlaylists.containsKey(genere)){
-                    mappaPlaylists.put(genere, new Playlist("Playlist " + genere, null));
-                }
+                    Playlist playlistGenere = new Playlist("Playlist " + genere, null);
+                    playlistGenere.setId(-300 - mappaPlaylists.size());
+                    mappaPlaylists.put(genere, playlistGenere);                }
 
                 // aggiungo il brano alla playlist dedicata a quel genere
                 mappaPlaylists.get(genere).aggiungiBrano(brano);
@@ -92,7 +93,9 @@ public class PlaylistService implements Subject {
             if(dataRilascio != 0){
 
                 if(!mappaAnnoPlaylist.containsKey(dataRilascio)){
-                    mappaAnnoPlaylist.put(dataRilascio, new Playlist("Playlist " + dataRilascio, null));
+                    Playlist playlistAnno = new Playlist("Playlist " + dataRilascio, null);
+                    playlistAnno.setId(-400 - mappaAnnoPlaylist.size());
+                    mappaAnnoPlaylist.put(dataRilascio, playlistAnno);
                 }
 
                 mappaAnnoPlaylist.get(dataRilascio).aggiungiBrano(brano);
@@ -110,6 +113,7 @@ public class PlaylistService implements Subject {
         ArrayList<Playlist> playlists = getAllPlaylists();
 
         Playlist preferiti = new Playlist("Playlist preferiti", null);
+        preferiti.setId(-100);
 
         for(Brano brano: brani){
             if(brano.isPreferito()){

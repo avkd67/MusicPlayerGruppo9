@@ -61,7 +61,8 @@ public class DatabaseConnection {
         String sqlTabellaPlaylist = "CREATE TABLE IF NOT EXISTS playlist (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "nome TEXT NOT NULL, " +
-                "copertina TEXT" +
+                "copertina TEXT, " +
+                "contatore_ascolti INTEGER DEFAULT 0" +
                 ");";
 
         String sqlTabellaPlaylistBrani = "CREATE TABLE IF NOT EXISTS playlist_brani (" +
@@ -96,6 +97,13 @@ public class DatabaseConnection {
                 System.out.println("[Database] Migrazione: colonna 'contatore_ascolti' aggiunta.");
             } catch (SQLException ignored) {
                 //colonna già presente
+            }
+
+            try {
+                stmt.execute("ALTER TABLE playlist ADD COLUMN contatore_ascolti INTEGER DEFAULT 0");
+                System.out.println("[Database] Migrazione: colonna 'contatore_ascolti' aggiunta a playlist.");
+            } catch (SQLException ignored) {
+                // colonna gia presente
             }
 
         } catch (SQLException e) {
