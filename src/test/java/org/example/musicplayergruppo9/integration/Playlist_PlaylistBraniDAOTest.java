@@ -374,4 +374,161 @@ public class Playlist_PlaylistBraniDAOTest {
             }
         }
     }
+
+    // test sul corretto smistamento dei brani tra le playlist di diverso genere
+    @Test
+    @DisplayName("getPlaylistsByGenere: brani con genere diverso finiscono in playlist separate")
+    void getPlaylistsByGenere_braniDivisiPerGenere() throws Exception {
+
+        // inserisco un secondo brano con genere diverso
+        try (var stmt = conn.createStatement()) {
+            stmt.execute("UPDATE brani SET genere = 'Pop' WHERE titolo = 'Bad Romance'");
+            stmt.execute("INSERT INTO brani (titolo, artista, percorso_file_audio, genere) VALUES ('Toxic', 'Britney Spears', 'path2', 'Rock')");
+        }
+
+        // simulo esattamente la logica del service: prendo tutti i brani e smisto in memoria
+        var mappaGeneri = new java.util.HashMap<String, java.util.ArrayList<String>>();
+        try (var rs = conn.createStatement().executeQuery("SELECT titolo, genere FROM brani")) {
+            while (rs.next()) {
+                String genere = rs.getString("genere");
+                if (genere != null) {
+                    mappaGeneri.computeIfAbsent(genere, k -> new java.util.ArrayList<>())
+                            .add(rs.getString("titolo"));
+                }
+            }
+        }
+
+        assertEquals(2, mappaGeneri.size(), "devono essere create esattamente 2 playlist, una per genere");
+        assertEquals(1, mappaGeneri.get("Pop").size(), "la playlist Pop deve contenere 1 brano");
+        assertEquals(1, mappaGeneri.get("Rock").size(), "la playlist Rock deve contenere 1 brano");
+    }
+
+    // check sul fatto che i brani null vengano ignorati
+    @Test
+    @DisplayName("getPlaylistsByGenere: brani senza genere (NULL) vengono ignorati")
+    void getPlaylistsByGenere_braniSenzaGenereIgnorati() throws Exception {
+
+        // Bad Romance non ha genere (NULL di default), aggiungo un brano con genere
+        try (var stmt = conn.createStatement()) {
+            stmt.execute("INSERT INTO brani (titolo, artista, percorso_file_audio, genere) VALUES ('Shallow', 'Lady Gaga', 'path2', 'Pop')");
+        }
+
+        // prendo tutti i brani e smisto in memoria come fa il service
+        var mappaGeneri = new java.util.HashMap<String, java.util.ArrayList<String>>();
+        try (var rs = conn.createStatement().executeQuery("SELECT titolo, genere FROM brani")) {
+            while (rs.next()) {
+                String genere = rs.getString("genere");
+                if (genere != null) {
+                    mappaGeneri.computeIfAbsent(genere, k -> new java.util.ArrayList<>())
+                            .add(rs.getString("titolo"));
+                }
+            }
+        }
+
+        // Bad Romance (senza genere) deve essere ignorato, solo Shallow deve risultare
+        assertEquals(1, mappaGeneri.size(), "Solo 1 genere deve essere considerato, il brano senza genere va ignorato");
+        assertTrue(mappaGeneri.containsKey("Pop"), "Deve esistere solo la playlist Pop");
+    }
+
+    // controllo che lo smistamento sia corretto anche sulla stessa playlist
+    @Test
+    @DisplayName("getPlaylistsByGenere: più brani dello stesso genere finiscono nella stessa playlist")
+    void getPlaylistsByGenere_stessoGenereSteaPlaylist() throws Exception {
+
+        try (var stmt = conn.createStatement()) {
+            stmt.execute("UPDATE brani SET genere = 'Pop' WHERE titolo = 'Bad Romance'");
+            stmt.execute("INSERT INTO brani (titolo, artista, percorso_file_audio, genere) VALUES ('Toxic', 'Britney Spears', 'path2', 'Pop')");
+        }
+
+        var mappaGeneri = new java.util.HashMap<String, java.util.ArrayList<String>>();
+        try (var rs = conn.createStatement().executeQuery("SELECT titolo, genere FROM brani")) {
+            while (rs.next()) {
+                String genere = rs.getString("genere");
+                if (genere != null) {
+                    mappaGeneri.computeIfAbsent(genere, k -> new java.util.ArrayList<>())
+                            .add(rs.getString("titolo"));
+                }
+            }
+        }
+
+        assertEquals(1, mappaGeneri.size(), "Deve essere creata esattamente 1 playlist per il genere Pop");
+        assertEquals(2, mappaGeneri.get("Pop").size(), "La playlist Pop deve contenere esattamente 2 brani");
+    }
+
+    // smistamento dei brani, uguale ma per anno questa volta
+    @Test
+    @DisplayName("getPlaylistsByAnno: brani con anno diverso finiscono in playlist separate")
+    void getPlaylistsByAnno_braniDivisiPerAnno() throws Exception {
+
+        try (var stmt = conn.createStatement()) {
+            stmt.execute("UPDATE brani SET data_rilascio = 2008 WHERE titolo = 'Bad Romance'");
+            stmt.execute("INSERT INTO brani (titolo, artista, percorso_file_audio, data_rilascio) VALUES ('Bohemian Rhapsody', 'Queen', 'path2', 1975)");
+        }
+
+        // simulo esattamente la logica del service: prendo tutti i brani e smisto in memoria
+        var mappaAnni = new java.util.HashMap<Integer, java.util.ArrayList<String>>();
+        try (var rs = conn.createStatement().executeQuery("SELECT titolo, data_rilascio FROM brani")) {
+            while (rs.next()) {
+                int anno = rs.getInt("data_rilascio");
+                if (anno != 0) {
+                    mappaAnni.computeIfAbsent(anno, k -> new java.util.ArrayList<>())
+                            .add(rs.getString("titolo"));
+                }
+            }
+        }
+
+        assertEquals(2, mappaAnni.size(), "Devono essere create esattamente 2 playlist, una per anno");
+        assertEquals(1, mappaAnni.get(2008).size(), "La playlist 2008 deve contenere 1 brano");
+        assertEquals(1, mappaAnni.get(1975).size(), "La playlist 1975 deve contenere 1 brano");
+    }
+
+    // i brani senza anno (anno = 0) non vanno considerati proprio
+    @Test
+    @DisplayName("getPlaylistsByAnno: brani senza anno (0) vengono ignorati")
+    void getPlaylistsByAnno_braniSenzaAnnoIgnorati() throws Exception {
+
+        // Bad Romance ha data_rilascio = 0 (default), aggiungo un brano con anno
+        try (var stmt = conn.createStatement()) {
+            stmt.execute("INSERT INTO brani (titolo, artista, percorso_file_audio, data_rilascio) VALUES ('Toxic', 'Britney Spears', 'path2', 2003)");
+        }
+
+        var mappaAnni = new java.util.HashMap<Integer, java.util.ArrayList<String>>();
+        try (var rs = conn.createStatement().executeQuery("SELECT titolo, data_rilascio FROM brani")) {
+            while (rs.next()) {
+                int anno = rs.getInt("data_rilascio");
+                if (anno != 0) {
+                    mappaAnni.computeIfAbsent(anno, k -> new java.util.ArrayList<>())
+                            .add(rs.getString("titolo"));
+                }
+            }
+        }
+
+        assertEquals(1, mappaAnni.size(), "Solo 1 anno deve essere considerato, il brano senza anno va ignorato");
+        assertTrue(mappaAnni.containsKey(2003), "Deve esistere solo la playlist 2003");
+    }
+
+    // se l'anno è uguale e già presente, allora il brano va inserito in quella playlist
+    @Test
+    @DisplayName("getPlaylistsByAnno: più brani dello stesso anno finiscono nella stessa playlist")
+    void getPlaylistsByAnno_stessoAnnoStessaPlaylist() throws Exception {
+
+        try (var stmt = conn.createStatement()) {
+            stmt.execute("UPDATE brani SET data_rilascio = 2008 WHERE titolo = 'Bad Romance'");
+            stmt.execute("INSERT INTO brani (titolo, artista, percorso_file_audio, data_rilascio) VALUES ('Just Dance', 'Lady Gaga', 'path2', 2008)");
+        }
+
+        var mappaAnni = new java.util.HashMap<Integer, java.util.ArrayList<String>>();
+        try (var rs = conn.createStatement().executeQuery("SELECT titolo, data_rilascio FROM brani")) {
+            while (rs.next()) {
+                int anno = rs.getInt("data_rilascio");
+                if (anno != 0) {
+                    mappaAnni.computeIfAbsent(anno, k -> new java.util.ArrayList<>())
+                            .add(rs.getString("titolo"));
+                }
+            }
+        }
+
+        assertEquals(1, mappaAnni.size(), "Deve essere creata esattamente 1 playlist per l'anno 2008");
+        assertEquals(2, mappaAnni.get(2008).size(), "La playlist 2008 deve contenere esattamente 2 brani");
+    }
 }
