@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 // Test di integrazione per PlaylistBraniDAO e PlaylistDAO.
 // non applicato su musicplayer.db
 
-public class PlaylistBraniDAOTest {
+public class Playlist_PlaylistBraniDAOTest {
 
     private Connection conn;
 
@@ -289,7 +289,88 @@ public class PlaylistBraniDAOTest {
             pstmt.setInt(1, branoId);
             try (var rs = pstmt.executeQuery()) {
                 assertEquals(1, rs.getInt(1),
-                        "Il brano non deve essere eliminato quando si elimina la playlist");
+                        "il brano non deve essere eliminato quando si elimina la playlist");
+            }
+        }
+    }
+
+    // aggiunta di un brano alla playlist preferiti (controlla che i brani settati come preferiti siano correttamente considerati)
+    @Test
+    @DisplayName("Aggiungi Preferito: il brano viene settato come preferito (flag a 1)")
+    void aggiungiBranoPreferiti() throws Exception {
+        int branoId = getBranoId();
+
+        // simula l'azione del DAO di aggiungere ai preferiti aggiornando la colonna
+        try (var pstmt = conn.prepareStatement("UPDATE brani SET preferito = 1 WHERE id = ?")) {
+            pstmt.setInt(1, branoId);
+            int righe = pstmt.executeUpdate();
+            assertEquals(1, righe, "Deve aggiornare esattamente 1 brano");
+        }
+
+        // verifica che il db abbia registrato il cambiamento
+        try (var pstmt = conn.prepareStatement("SELECT preferito FROM brani WHERE id = ?")) {
+            pstmt.setInt(1, branoId);
+            try (var rs = pstmt.executeQuery()) {
+                assertEquals(1, rs.getInt("preferito"), "il flag preferito del brano deve essere 1");
+            }
+        }
+    }
+
+    // aggiunta di un secondo brano ai preferiti
+    @Test
+    @DisplayName("Aggiungi Secondo Preferito: a playlist esistente devo poter popolare la playlist")
+    void aggiuntaSecondoBranoPreferiit() throws Exception {
+        int branoId1 = getBranoId();
+
+        // inserisco un secondo brano nel DB
+        try (var stmt = conn.createStatement()) {
+            stmt.execute("INSERT INTO brani (titolo, artista, percorso_file_audio) VALUES ('Toxic', 'Britney Spears', 'path2')");
+        }
+
+        // recupero l'id del brano appena inserito
+        int branoId2;
+        try (var rs = conn.createStatement().executeQuery("SELECT id FROM brani WHERE titolo = 'Toxic'")) {
+            branoId2 = rs.getInt("id");
+        }
+
+        // aggiunta di entrambi i brani ai preferiti
+        try (var pstmt = conn.prepareStatement("UPDATE brani SET preferito = 1 WHERE id IN (?, ?)")) {
+            pstmt.setInt(1, branoId1);
+            pstmt.setInt(2, branoId2);
+            pstmt.executeUpdate();
+        }
+
+        // la playlist preferiti conterà esattamente 2 brani se la query restituisce 2
+        try (var stmt = conn.createStatement();
+             var rs = stmt.executeQuery("SELECT COUNT(*) FROM brani WHERE preferito = 1")) {
+            assertEquals(2, rs.getInt(1), "ci devono essere esattamente 2 brani con flag preferito = 1 nel db");
+        }
+    }
+
+    // eliminazione di un brano dalla playlist preferiti
+    @Test
+    @DisplayName("Elimina Brano Preferito: a playlist esistente devo poter rimuovere il brano dai preferiti (flag a 0)")
+    void eliminaBranoPreferito() throws Exception {
+        int branoId = getBranoId();
+
+        // mettiamo nel db un brano nei preferiti
+        try (var pstmt = conn.prepareStatement("UPDATE brani SET preferito = 1 WHERE id = ?")) {
+            pstmt.setInt(1, branoId);
+            pstmt.executeUpdate();
+        }
+
+        // rimuovo il brano dai preferiti (riportando il flag a 0)
+        try (var pstmt = conn.prepareStatement("UPDATE brani SET preferito = 0 WHERE id = ?")) {
+            pstmt.setInt(1, branoId);
+            int righe = pstmt.executeUpdate();
+            assertEquals(1, righe, "deve aggiornare esattamente 1 brano");
+        }
+
+        // il db deve tornare allo stato originale
+        try (var pstmt = conn.prepareStatement("SELECT preferito FROM brani WHERE id = ?")) {
+            pstmt.setInt(1, branoId);
+            try (var rs = pstmt.executeQuery()) {
+                assertEquals(0, rs.getInt("preferito"), "il flag preferito deve essere tornato a 0");
             }
         }
     }
