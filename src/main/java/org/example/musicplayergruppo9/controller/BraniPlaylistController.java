@@ -92,19 +92,20 @@ public class BraniPlaylistController implements Observer {
         if(this.playlist.getPercorsoCopertina() != null)
             imgCopertina.setImage(new Image(new File(this.playlist.getPercorsoCopertina()).toURI().toString()));
 
-        // carico i brani associati a quella playlist dal database
-        List<Brano> braniRecuperati = playlistService.getBraniByPlaylist(this.playlist);
-        braniRecuperati.addAll(playlist.getBrani());
-        braniObservableList.addAll(braniRecuperati);
+            List<Brano> braniRecuperati = playlistService.getBraniByPlaylist(this.playlist);
 
-        // Assicuro che la Playlist contenga internamente i brani recuperati
-        // in modo che il suo iterator() non sia vuoto quando viene messa in coda
-        this.playlist.getBrani().clear();
-        this.playlist.getBrani().addAll(braniRecuperati);
+            braniObservableList.clear();
+            braniObservableList.addAll(braniRecuperati);
 
+            this.playlist.getBrani().clear();
+            this.playlist.getBrani().addAll(braniRecuperati);
          // Aggiungo il placeholder finale 
         segnaposto_aggiungi.setId(-1);
         braniObservableList.add(segnaposto_aggiungi);
+
+        if (mainController != null) {
+            loopAttivo = mainController.isLoopPlaylistAttivo(this.playlist);
+        }
 
         sincronizzaStatoPulsanti();
     }
@@ -448,7 +449,9 @@ public class BraniPlaylistController implements Observer {
         loopAttivo = !loopAttivo;
         setBottoneAttivo(btnLoop, loopAttivo);
 
-        if (inRiproduzione && mainController != null) {
+        if (mainController != null) {
+            mainController.setLoopPlaylistAttivo(playlist, loopAttivo);
+
             PlayerController pc = mainController.getPlayerController();
             if (pc != null) {
                 pc.aggiornaOpzioniPlaylistCorrente(
@@ -457,7 +460,6 @@ public class BraniPlaylistController implements Observer {
                 );
             }
         }
-        
     }
 
     //chiamato da MainController quando la playlist finisce

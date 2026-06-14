@@ -9,6 +9,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import java.util.HashMap;
+import java.util.Map;
+import org.example.musicplayergruppo9.model.Playlist;
 import org.example.musicplayergruppo9.model.ElementoCoda;
 import org.example.musicplayergruppo9.pattern.command.CommandHistory;
 import org.example.musicplayergruppo9.service.PlaylistService;
@@ -26,6 +29,8 @@ public class MainController {
     private CommandHistory commandHistory = CommandHistory.getInstance();
 
     private BraniPlaylistController braniPlaylistController;
+
+    private final Map<Integer, Boolean> statoLoopPlaylist = new HashMap<>();
 
     // Metodo collegato al click del tasto "Home" a sinistra
     @FXML
@@ -201,6 +206,16 @@ public class MainController {
                 e.printStackTrace();
             }
         }
+    }
+
+    public boolean isLoopPlaylistAttivo(Playlist playlist) {
+        if (playlist == null) return false;
+        return statoLoopPlaylist.getOrDefault(playlist.getId(), false);
+    }
+    
+    public void setLoopPlaylistAttivo(Playlist playlist, boolean attivo) {
+        if (playlist == null) return;
+        statoLoopPlaylist.put(playlist.getId(), attivo);
     }
 
 }

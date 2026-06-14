@@ -2,6 +2,8 @@ package org.example.musicplayergruppo9.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javafx.scene.image.Image;
 import org.example.musicplayergruppo9.pattern.observer.Observer;
@@ -46,6 +48,8 @@ public class HomeController implements Observer {
 
     // segnaposto per il tasto aggiungi playlist
     private final Playlist segnaposto_aggiungi = new Playlist();
+
+    private final Map<Integer, Stage> finestrePlaylistAperte = new HashMap<>();
 
     @FXML
     public void initialize() {
@@ -173,26 +177,41 @@ public class HomeController implements Observer {
         return card;
     }
 
-    // funzione che, al press di una playlist, ne apre la vista coi suoi brani
     private void apriPlaylist(Playlist playlist) {
         try {
+            int playlistId = playlist.getId();
 
-            // passo al nuovo controller la playlist selezionata dall'utente
+            if (finestrePlaylistAperte.containsKey(playlistId)) {
+                Stage stageGiaAperto = finestrePlaylistAperte.get(playlistId);
+
+                if (stageGiaAperto != null && stageGiaAperto.isShowing()) {
+                    stageGiaAperto.toFront();
+                    stageGiaAperto.requestFocus();
+                    return;
+                } else {
+                    finestrePlaylistAperte.remove(playlistId);
+                }
+            }
+
             FXMLLoader loader = new FXMLLoader(
-            getClass().getResource("/org/example/musicplayergruppo9/fxml/BraniPlaylistView.fxml")
+                    getClass().getResource("/org/example/musicplayergruppo9/fxml/BraniPlaylistView.fxml")
             );
+
             Parent root = loader.load();
             BraniPlaylistController controllerDestinazione = loader.getController();
-            
-            // Passo il riferimento al MainController così la playlist può essere riprodotta
+
             controllerDestinazione.setMainController(this.mainController);
             this.mainController.setBraniPlaylistController(controllerDestinazione);
             controllerDestinazione.setPlaylist(playlist);
 
-            
             Stage stage = new Stage();
             stage.setTitle("Playlist: " + playlist.getNome());
             stage.setScene(new Scene(root));
+
+            finestrePlaylistAperte.put(playlistId, stage);
+
+            stage.setOnCloseRequest(e -> finestrePlaylistAperte.remove(playlistId));
+
             stage.show();
 
         } catch (Exception e) {
