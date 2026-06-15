@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import org.example.musicplayergruppo9.database.DatabaseConnection;
 import org.example.musicplayergruppo9.model.Playlist;
+import org.example.musicplayergruppo9.model.Brano;
 
 public class PlaylistDAO {
 
@@ -182,6 +183,60 @@ public class PlaylistDAO {
         }
     
         return playlists;
+    }
+
+    // Aggiorna l'ordine dei brani nella playlist (colonna 'posizione' in playlist_brani)
+    public boolean aggiornaOrdinePlaylist(Playlist playlist) {
+        String alter = "ALTER TABLE playlist_brani ADD COLUMN posizione INTEGER DEFAULT 0";
+        String updateSql = "UPDATE playlist_brani SET posizione = ? WHERE playlist_id = ? AND brano_id = ?";
+        String insertSql = "INSERT OR REPLACE INTO playlist_brani (playlist_id, brano_id, posizione) VALUES (?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            // assicuriamoci che la colonna esista (SQLite ignora ALTER se fallisce)
+            try {
+                stmt.execute(alter);
+            } catch (SQLException ignored) {
+                // potrebbe già esistere
+            }
+
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement pstmtUpdate = conn.prepareStatement(updateSql);
+                 PreparedStatement pstmtInsert = conn.prepareStatement(insertSql)) {
+
+                int pos = 0;
+                for (Brano b : playlist.getBrani()) {
+                    pos++;
+                    // proviamo a fare update
+                    pstmtUpdate.setInt(1, pos);
+                    pstmtUpdate.setInt(2, playlist.getId());
+                    pstmtUpdate.setInt(3, b.getId());
+                    int affected = pstmtUpdate.executeUpdate();
+                    if (affected == 0) {
+                        pstmtInsert.setInt(1, playlist.getId());
+                        pstmtInsert.setInt(2, b.getId());
+                        pstmtInsert.setInt(3, pos);
+                        pstmtInsert.executeUpdate();
+                    }
+                }
+                conn.commit();
+                conn.setAutoCommit(true);
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                conn.setAutoCommit(true);
+                System.err.println("[PlaylistDAO] Errore aggiornamento ordine playlist");
+                e.printStackTrace();
+                return false;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[PlaylistDAO] Errore connessione aggiornamento ordine");
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

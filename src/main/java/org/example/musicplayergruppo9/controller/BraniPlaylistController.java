@@ -21,6 +21,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -33,12 +39,14 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import org.example.musicplayergruppo9.utilities.FXutilities;
+import org.example.musicplayergruppo9.database.DAO.PlaylistDAO;
 
 public class BraniPlaylistController implements Observer {
 
     // lista dei brani della playlist
     @FXML
     private ListView<Brano> listaBrani;
+
 
     @FXML
     private Label LblNomePlaylist;
@@ -78,6 +86,13 @@ public class BraniPlaylistController implements Observer {
         braniObservableList = FXCollections.observableArrayList();
         listaBrani.setItems(braniObservableList);
         listaBrani.setCellFactory(param -> new BranoListCell());
+
+        // Drag & drop handling is implemented per-cell in BranoListCell
+    }
+
+    private void persistOrder() {
+        if (playlist == null || playlist.getId() <= 0) return;
+        PlaylistDAO.getInstance().aggiornaOrdinePlaylist(playlist);
     }
 
     // segnaposto per l'aggiunta del nuovo brano
@@ -217,6 +232,8 @@ public class BraniPlaylistController implements Observer {
             update();
         }
     }
+
+    
 
     //metodo per gestire il play nella finestra della playlist, con annesso shuffle
     @FXML
@@ -367,6 +384,50 @@ public class BraniPlaylistController implements Observer {
 
             // Cambia il cursore con il ditp per far capire che è cliccabile
             hboxAggiungi.setStyle("-fx-cursor: hand;");
+
+            // Drag-and-drop handlers for reordering rows
+            setOnDragDetected(event -> {
+                Brano item = getItem();
+                if (item == null || item.getId() == -1) return;
+                Dragboard db = startDragAndDrop(TransferMode.MOVE);
+                ClipboardContent cc = new ClipboardContent();
+                cc.putString(String.valueOf(getIndex()));
+                db.setContent(cc);
+                event.consume();
+            });
+
+            setOnDragOver(event -> {
+                Dragboard db = event.getDragboard();
+                if (db.hasString() && event.getGestureSource() != this) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            });
+
+            setOnDragDropped(event -> {
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                if (db.hasString()) {
+                    try {
+                        int srcIndex = Integer.parseInt(db.getString());
+                        int targetIndex = getIndex();
+                        if (srcIndex >= 0 && targetIndex >= 0 && srcIndex != targetIndex) {
+                            Brano item = getListView().getItems().remove(srcIndex);
+                            // if removing earlier shifts target left
+                            if (srcIndex < targetIndex) targetIndex--;
+                            getListView().getItems().add(targetIndex, item);
+
+                            // update model playlist and persist
+                            playlist.getBrani().clear();
+                            for (Brano b : listaBrani.getItems()) if (b.getId() != -1) playlist.getBrani().add(b);
+                            persistOrder();
+                        }
+                        success = true;
+                    } catch (NumberFormatException ignored) {}
+                }
+                event.setDropCompleted(success);
+                event.consume();
+            });
         }
 
         // Funzione per aprire la schermata dedicata alle info del brano selezionato dall'utente
