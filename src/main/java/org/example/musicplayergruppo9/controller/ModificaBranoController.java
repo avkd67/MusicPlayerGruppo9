@@ -76,7 +76,11 @@ public class ModificaBranoController {
 
     @FXML
     private void onSfogliaCopertina() {
-        FXutilities.cercaCopertina(imgCopertina);
+        String percorso = FXutilities.cercaCopertina(imgCopertina);
+
+        if (percorso != null && !percorso.isBlank()) {
+            percorsoCopertinaSelezionata = percorso;
+        }
     }
 
     @FXML
