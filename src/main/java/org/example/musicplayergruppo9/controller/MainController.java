@@ -119,7 +119,8 @@ public class MainController {
             javafx.scene.Parent root = loader.load();
             CodaRiproduzioneController controller = loader.getController();
             controller.setPlayerController(this.playerController);
-
+            this.playerController.setOnCodaAggiornata(controller::refresh);
+            
             javafx.stage.Stage stage = new javafx.stage.Stage();
             stage.setTitle("Coda di riproduzione");
             stage.setScene(new javafx.scene.Scene(root));

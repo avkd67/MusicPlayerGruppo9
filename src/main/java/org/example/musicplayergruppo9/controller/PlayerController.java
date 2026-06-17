@@ -70,6 +70,9 @@ public class PlayerController implements PlaylistObserver {
 
     private MainController mainController;
 
+    //per aggiornare la vista della coda di riproduzione
+    private Runnable onCodaAggiornata;
+
     @FXML
     public void initialize() {
         if (playerService == null) {
@@ -185,6 +188,8 @@ public class PlayerController implements PlaylistObserver {
     //gestione coda
     public void aggiungiInCoda(ElementoCoda elemento) {
         coda.add(elemento);
+        notificaCodaAggiornata();
+
         if (branoCorrente == null) {
             avviaProssimoElemento();
         }
@@ -197,7 +202,13 @@ public class PlayerController implements PlaylistObserver {
 
     // Rimuove il primo elemento uguale passato dalla coda (ritorna true se rimosso)
     public boolean rimuoviDaCoda(ElementoCoda elemento) {
-        return coda.remove(elemento);
+        boolean rimosso = coda.remove(elemento);
+
+        if (rimosso) {
+            notificaCodaAggiornata();
+        }
+
+        return rimosso;
     }
 
     public void svuotaCoda() {
@@ -226,6 +237,8 @@ public class PlayerController implements PlaylistObserver {
         smetteDiOsservare();
 
         ElementoCoda prossimo = coda.poll();
+
+        notificaCodaAggiornata();
 
         if (prossimo == null) {
             // Coda vuota: nessun elemento da riprodurre
@@ -430,4 +443,15 @@ public class PlayerController implements PlaylistObserver {
         iteratorCorrente = nuovaStrategiaOrdine.creaIterator(rimanenti);
     }
    
+    //per aggiornare la vista della coda
+    public void setOnCodaAggiornata(Runnable onCodaAggiornata) {
+        this.onCodaAggiornata = onCodaAggiornata;
+    }
+    
+    private void notificaCodaAggiornata() {
+        if (onCodaAggiornata != null) {
+            javafx.application.Platform.runLater(onCodaAggiornata);
+        }
+    }
+
 }
