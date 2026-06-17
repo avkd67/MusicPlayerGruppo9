@@ -60,7 +60,7 @@ public class PlaylistService implements Subject {
         // controllo tutti i brani
         for(Brano brano : brani){
             // solo se il brano ha un genere
-            if(brano.getGenere() != null){
+            if(!brano.getGenere().isBlank()){
                 String genere = brano.getGenere();
 
                 // controllo sia già stato considerato come genere nella hashmap, altrimenti ce lo inserisco
