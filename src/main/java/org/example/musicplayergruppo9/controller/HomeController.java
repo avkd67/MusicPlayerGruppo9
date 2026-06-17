@@ -118,16 +118,31 @@ public class HomeController implements Observer {
 
         // Copertina 
         javafx.scene.Node cover; // inizializzazione generale, per far riconoscere al codice "cover" anche fuori dall'if
-        if(playlist.getPercorsoCopertina() == null){
 
-            // quando la copertina non è stata caricata
-            Rectangle coverRect = new Rectangle(90, 90);
-            coverRect.setFill(Color.LIGHTGRAY);
-            coverRect.setStroke(Color.GRAY);
-            coverRect.setStrokeWidth(1);
-            coverRect.setArcWidth(6);
-            coverRect.setArcHeight(6);
-            cover = coverRect;
+        if(playlist.getPercorsoCopertina() == null){
+            // quando la playlist non ha alcuna icona selezionata dall'utente, mettiamo quella di default
+            StackPane defaultBox = new StackPane();
+
+            Rectangle background = new Rectangle(90, 90);
+            background.setFill(Color.LIGHTGRAY);
+            background.setStroke(Color.GRAY);
+            background.setStrokeWidth(1);
+            background.setArcWidth(6);
+            background.setArcHeight(6);
+
+            // iconcina della nota musicale
+            Image defaultIcon = new Image(getClass().getResourceAsStream("/org/example/musicplayergruppo9/img/music-note-icon-1.png"));
+            ImageView iconView = new ImageView(defaultIcon);
+
+            // grandezza dell'icona, 60x60 in un riquadro 90x90
+            iconView.setFitWidth(60);
+            iconView.setFitHeight(60);
+            iconView.setPreserveRatio(true);
+            // mettiamo tutti insieme nello StackPane
+            defaultBox.getChildren().addAll(background, iconView);
+
+            cover = defaultBox;
+
             } 
             else
                 {
