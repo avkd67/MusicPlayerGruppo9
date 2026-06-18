@@ -3,6 +3,9 @@ package org.example.musicplayergruppo9.controller;
 import java.io.File;
 import java.util.List;
 
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import org.example.musicplayergruppo9.database.DAO.PlaylistBraniDAO;
 import org.example.musicplayergruppo9.model.Brano;
 import org.example.musicplayergruppo9.model.ElementoCodaConOpzioni;
@@ -34,10 +37,6 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import org.example.musicplayergruppo9.utilities.FXutilities;
 import org.example.musicplayergruppo9.database.DAO.PlaylistDAO;
 
@@ -52,7 +51,9 @@ public class BraniPlaylistController implements Observer {
     private Label LblNomePlaylist;
 
     @FXML 
-    private ImageView imgCopertina; 
+    private StackPane copertinaContainer;
+
+    private ImageView imgCopertina = new ImageView();
 
     // playlist selezionata dall'utente
     @FXML
@@ -104,8 +105,35 @@ public class BraniPlaylistController implements Observer {
 
         LblNomePlaylist.setText(this.playlist.getNome());
 
-        if(this.playlist.getPercorsoCopertina() != null)
-            imgCopertina.setImage(new Image(new File(this.playlist.getPercorsoCopertina()).toURI().toString()));
+        if(this.playlist.getPercorsoCopertina() != null){
+            String uri = new File(this.playlist.getPercorsoCopertina()).toURI().toString();
+
+            imgCopertina.setImage(new Image(uri));
+            imgCopertina.setFitWidth(90);
+            imgCopertina.setFitHeight(90);
+            imgCopertina.setPreserveRatio(true);
+
+            copertinaContainer.getChildren().add(imgCopertina);
+        }
+        else{
+            Rectangle background = new Rectangle(90, 90);
+            background.setFill(Color.LIGHTGRAY);
+            background.setStroke(Color.GRAY);
+            background.setStrokeWidth(1);
+            background.setArcWidth(6);
+            background.setArcHeight(6);
+
+            // iconcina della nota musicale
+            Image defaultIcon = new Image(getClass().getResourceAsStream("/org/example/musicplayergruppo9/img/music-note-icon-1.png"));
+            ImageView iconView = new ImageView(defaultIcon);
+
+            // grandezza dell'icona, 60x60 in un riquadro 90x90
+            iconView.setFitWidth(60);
+            iconView.setFitHeight(60);
+            iconView.setPreserveRatio(true);
+            // mettiamo tutti insieme nello StackPane
+            copertinaContainer.getChildren().addAll(background, iconView);
+        }
 
             List<Brano> braniRecuperati;
 
@@ -190,7 +218,7 @@ public class BraniPlaylistController implements Observer {
     public void onEliminaPlaylist(){
         if(FXutilities.mostraAlertConferma("Elimina playlist", "Sicuro di voler eliminare la playlist?")) {
             commandHistory.execute(new RimuoviPlaylistHomeCommand(playlist));
-            FXutilities.chiudiFinestra(imgCopertina);
+            FXutilities.chiudiFinestra(copertinaContainer);
         }
     }
 
@@ -214,8 +242,7 @@ public class BraniPlaylistController implements Observer {
 
             LblNomePlaylist.setText(this.playlist.getNome());
 
-            if(this.playlist.getPercorsoCopertina() != null)
-                imgCopertina.setImage(new Image(new File(this.playlist.getPercorsoCopertina()).toURI().toString()));
+            aggiornaVisualizzazioneCopertina();
 
         } catch (java.io.IOException e) {
             System.err.println("Errore nel caricamento della vista ModificaPlaylist.fxml");
@@ -292,9 +319,38 @@ public class BraniPlaylistController implements Observer {
 
         // aggiorna nome e immagine di copertina
         LblNomePlaylist.setText(this.playlist.getNome());
-        if(this.playlist.getPercorsoCopertina() != null)
-            imgCopertina.setImage(new Image(new File(this.playlist.getPercorsoCopertina()).toURI().toString()));
+        aggiornaVisualizzazioneCopertina();
 
+    }
+
+    public void aggiornaVisualizzazioneCopertina() {
+        copertinaContainer.getChildren().clear();
+
+        if (this.playlist.getPercorsoCopertina() != null) {
+            String uri = new File(this.playlist.getPercorsoCopertina()).toURI().toString();
+
+            imgCopertina.setImage(new Image(uri));
+            imgCopertina.setFitWidth(90);
+            imgCopertina.setFitHeight(90);
+            imgCopertina.setPreserveRatio(true);
+
+            copertinaContainer.getChildren().add(imgCopertina);
+        } else {
+            Rectangle background = new Rectangle(90, 90);
+            background.setFill(Color.LIGHTGRAY);
+            background.setStroke(Color.GRAY);
+            background.setStrokeWidth(1);
+            background.setArcWidth(6);
+            background.setArcHeight(6);
+
+            Image defaultIcon = new Image(getClass().getResourceAsStream("/org/example/musicplayergruppo9/img/music-note-icon-1.png"));
+            ImageView iconView = new ImageView(defaultIcon);
+            iconView.setFitWidth(60);
+            iconView.setFitHeight(60);
+            iconView.setPreserveRatio(true);
+
+            copertinaContainer.getChildren().addAll(background, iconView);
+        }
     }
 
 
