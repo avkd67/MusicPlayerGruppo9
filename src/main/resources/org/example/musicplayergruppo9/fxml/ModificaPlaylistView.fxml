@@ -2,13 +2,13 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" spacing="20.0" stylesheets="@../Style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.musicplayergruppo9.controller.ModificaPlaylistController">
    <children>
-      <ImageView fx:id="imgCopertina" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+      <StackPane fx:id="copertinaContainer" prefHeight="150.0" prefWidth="366.0" />
       <Button mnemonicParsing="false" onAction="#onSfogliaCopertina" prefHeight="25.0" prefWidth="179.0" styleClass="button-icona" text="aggiungi copertina" />
       <TextField fx:id="TxtFieldNomePlaylist" maxWidth="398.0" prefHeight="25.0" prefWidth="398.0" text="nome playlist" />
 

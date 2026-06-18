@@ -3,6 +3,9 @@ package org.example.musicplayergruppo9.controller;
 import java.io.File;
 import java.io.IOException;
 
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import org.example.musicplayergruppo9.utilities.FXutilities;
 import org.example.musicplayergruppo9.model.Playlist;
 import org.example.musicplayergruppo9.service.PlaylistService;
@@ -21,6 +24,8 @@ public class ModificaPlaylistController {
     private TextField TxtFieldNomePlaylist;
 
     @FXML
+    private StackPane copertinaContainer;
+
     private ImageView imgCopertina;
 
     private Playlist playlist;
@@ -45,14 +50,15 @@ public class ModificaPlaylistController {
 
 
 
-         // Mette la copertina della playlist, se esiste
-        if(this.playlist.getPercorsoCopertina() != null)
-            imgCopertina.setImage(new Image(new File(this.playlist.getPercorsoCopertina()).toURI().toString()));
+        copertinaContainer.getChildren().clear();
+        aggiornaCopertina();
+
     }
 
     @FXML
     private void onSfogliaCopertina(){
         percorsoCopertinaSelezionata = FXutilities.cercaCopertina(imgCopertina);
+        aggiornaCopertina();
     }
 
     @FXML
@@ -81,6 +87,7 @@ public class ModificaPlaylistController {
         // se è stato selezionato un percorso, lo aggiungiamo alla playlistModificata
         if(percorsoCopertinaSelezionata != null){
             playlistModificata.setPercorsoCopertina(percorsoCopertinaSelezionata);
+            aggiornaCopertina();
         }
 
         boolean successo = playlistService.aggiornaPlaylist(playlist, playlistModificata);
@@ -92,6 +99,51 @@ public class ModificaPlaylistController {
             FXutilities.mostraAlertErrore("Errore","Problema nell'aggiornamento della playlist","Impossibile aggiornare la playlist");
 
         FXutilities.chiudiFinestra(TxtFieldNomePlaylist);
+    }
+
+    private void aggiornaCopertina(){
+        copertinaContainer.getChildren().clear();
+
+        if (imgCopertina == null) {
+            imgCopertina = new ImageView();
+        }
+
+        String percorsoDaMostrare = null;
+
+        if(percorsoCopertinaSelezionata != null){
+            percorsoDaMostrare = percorsoCopertinaSelezionata;
+        }
+        else {
+            percorsoDaMostrare = this.playlist.getPercorsoCopertina();
+        }
+
+        if (percorsoDaMostrare != null) {
+            String uri = new File(percorsoDaMostrare).toURI().toString();
+
+            imgCopertina.setImage(new Image(uri));
+            imgCopertina.setFitWidth(90);
+            imgCopertina.setFitHeight(90);
+            imgCopertina.setPreserveRatio(true);
+
+            copertinaContainer.getChildren().add(imgCopertina);
+        } else {
+            Rectangle background = new Rectangle(90, 90);
+            background.setFill(Color.LIGHTGRAY);
+            background.setStroke(Color.GRAY);
+            background.setStrokeWidth(1);
+            background.setArcWidth(6);
+            background.setArcHeight(6);
+
+            Image defaultIcon = (new Image(getClass().getResourceAsStream("/org/example/musicplayergruppo9/img/music-note-icon-1.png")));
+            ImageView iconView = new ImageView(defaultIcon);
+            iconView.setFitWidth(60);
+            iconView.setFitHeight(60);
+            iconView.setPreserveRatio(true);
+
+            imgCopertina.setImage(null);
+            copertinaContainer.getChildren().add(imgCopertina);
+            copertinaContainer.getChildren().addAll(background, iconView);
+        }
     }
 
 
