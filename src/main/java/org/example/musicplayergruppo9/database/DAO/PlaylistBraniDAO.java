@@ -28,7 +28,8 @@ public class PlaylistBraniDAO {
         List<Brano> brani = new ArrayList<>();
         String statement = "SELECT b.* FROM brani b " +
                 "JOIN playlist_brani pb ON b.id = pb.brano_id " +
-                "WHERE pb.playlist_id = ?";
+                "WHERE pb.playlist_id = ?"+
+                "ORDER BY pb.posizione ASC, pb.brano_id ASC";
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(statement)) {
@@ -65,13 +66,14 @@ public class PlaylistBraniDAO {
 
     // metodo per l'aggiunta di un brano ad una playlist
     public boolean aggiungiBranoAPlaylist(Playlist playlist, Brano brano) {
-        String sql = "INSERT OR IGNORE INTO playlist_brani (playlist_id, brano_id) VALUES (?, ?)";
-
+        String sql = "INSERT OR IGNORE INTO playlist_brani (playlist_id, brano_id, posizione) " +
+        "VALUES (?, ?, COALESCE((SELECT MAX(posizione) + 1 FROM playlist_brani WHERE playlist_id = ?), 1))";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, playlist.getId());
             pstmt.setInt(2, brano.getId());
+            pstmt.setInt(3, playlist.getId());
             int righeInteressate = pstmt.executeUpdate();
 
             return righeInteressate > 0;

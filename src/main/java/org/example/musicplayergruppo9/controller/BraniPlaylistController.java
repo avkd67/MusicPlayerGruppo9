@@ -179,6 +179,7 @@ public class BraniPlaylistController implements Observer {
         boolean successo = commandHistory.execute(cmd);
         if (successo) {
             playlist.rimuoviBrano(brano);//notifica PlaylistObserver (PlayerController)
+            persistOrder();
             update();//aggiorna UI (BraniPlaylistController)
         }
     }

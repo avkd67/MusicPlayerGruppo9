@@ -68,6 +68,7 @@ public class DatabaseConnection {
         String sqlTabellaPlaylistBrani = "CREATE TABLE IF NOT EXISTS playlist_brani (" +
             "playlist_id INTEGER NOT NULL, " +
             "brano_id INTEGER NOT NULL, " +
+            "posizione INTEGER DEFAULT 0, " +
             "PRIMARY KEY (playlist_id, brano_id), " +
             "FOREIGN KEY (playlist_id) REFERENCES playlist(id) ON DELETE CASCADE, " +
             "FOREIGN KEY (brano_id) REFERENCES brani(id) ON DELETE CASCADE" +
@@ -102,6 +103,13 @@ public class DatabaseConnection {
             try {
                 stmt.execute("ALTER TABLE playlist ADD COLUMN contatore_ascolti INTEGER DEFAULT 0");
                 System.out.println("[Database] Migrazione: colonna 'contatore_ascolti' aggiunta a playlist.");
+            } catch (SQLException ignored) {
+                // colonna gia presente
+            }
+
+            try {
+                stmt.execute("ALTER TABLE playlist_brani ADD COLUMN posizione INTEGER DEFAULT 0");
+                System.out.println("[Database] Migrazione: colonna 'posizione' aggiunta a playlist_brani.");
             } catch (SQLException ignored) {
                 // colonna gia presente
             }
